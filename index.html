@@ -399,8 +399,8 @@
 <body onclick="closeAllDropdowns(event)">
 
     <!-- Hidden File Inputs ສຳລັບtrigger ເປີດປ່ອງຢ້ຽມເລືອກໄຟລ໌ທັນທີ -->
-    <input type="file" id="hidden-file-general" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleHiddenFileChange(event, 'import_general', 'ວຽກທົ່ວໄປ')">
-    <input type="file" id="hidden-file-strategy" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleHiddenFileChange(event, 'import_strategy', 'ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ')">
+    <input type="file" id="hidden-file-general" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleHiddenFileChange(event, 'import_general', 'ນຳເຂົ້າວຽກທົ່ວໄປ')">
+    <input type="file" id="hidden-file-strategy" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleHiddenFileChange(event, 'import_strategy', 'ນຳເຂົ້າວຽກຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ')">
 
     <!-- Modal ສຳລັບສະແດງຮູບພາບຂະໜາດໃຫຍ່ -->
     <div id="image-modal" class="image-modal-overlay" onclick="closeImageModal()">
@@ -454,11 +454,11 @@
                     <span>ນຳເຂົ້າແຜນ ▾</span>
                 </div>
                 <div id="import-dropdown-menu" class="dropdown-menu">
-                    <div onclick="triggerImport('general')">📁 ວຽກທົ່ວໄປ</div>
-                    <div onclick="triggerImport('strategy')">📊 ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</div>
+                    <div onclick="triggerImport('general')">📁 ນຳເຂົ້າວຽກທົ່ວໄປ</div>
+                    <div onclick="triggerImport('strategy')">📊 ນຳເຂົ້າວຽກຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</div>
                     <div class="dropdown-divider"></div>
-                    <div onclick="showImportManagerPage('import_general', 'ວຽກທົ່ວໄປ', localStorage.getItem('plan_file_import_general') || 'ຍັງບໍ່ມີໄຟລ໌', localStorage.getItem('plan_fileObj_import_general') || '', localStorage.getItem('plan_fileObj_import_general') ? localStorage.getItem('plan_fileObj_import_general').startsWith('data:image/') : false)">📂 ຂໍ້ມູນແຜນທົ່ວໄປ</div>
-                    <div onclick="showImportManagerPage('import_strategy', 'ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ', localStorage.getItem('plan_file_import_strategy') || 'ຍັງບໍ່ມີໄຟລ໌', localStorage.getItem('plan_fileObj_import_strategy') || '', localStorage.getItem('plan_fileObj_import_strategy') ? localStorage.getItem('plan_fileObj_import_strategy').startsWith('data:image/') : false)">📊 ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</div>
+                    <div onclick="showImportManagerPage('import_general', 'ນຳເຂົ້າວຽກທົ່ວໄປ', localStorage.getItem('plan_file_import_general') || 'ຍັງບໍ່ມີໄຟລ໌', localStorage.getItem('plan_fileObj_import_general') || '', localStorage.getItem('plan_fileObj_import_general') ? localStorage.getItem('plan_fileObj_import_general').startsWith('data:image/') : false)">📂 ຂໍ້ມູນແຜນທົ່ວໄປ</div>
+                    <div onclick="showImportManagerPage('import_strategy', 'ນຳເຂົ້າວຽກຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ', localStorage.getItem('plan_file_import_strategy') || 'ຍັງບໍ່ມີໄຟລ໌', localStorage.getItem('plan_fileObj_import_strategy') || '', localStorage.getItem('plan_fileObj_import_strategy') ? localStorage.getItem('plan_fileObj_import_strategy').startsWith('data:image/') : false)">📊 ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</div>
                 </div>
             </div>
 
