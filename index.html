@@ -114,7 +114,13 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 80%;
+            max-width: 70%;
+            cursor: pointer;
+            color: #2563eb;
+            text-decoration: underline;
+        }
+        .file-info-display span:hover {
+            color: #1d4ed8;
         }
         .remove-file-btn {
             background: #ef4444;
@@ -129,6 +135,46 @@
             background: #dc2626;
         }
         
+        /* Modal ສຳລັບສະແດງຮູບພາບຂະໜາດໃຫຍ່ */
+        .image-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+        }
+        .image-modal-content {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 90%;
+            max-height: 90%;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        .image-modal-content img {
+            max-width: 100%;
+            max-height: 75vh;
+            border-radius: 4px;
+        }
+        .image-modal-close {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
         /* ປຸ່ມບັນທຶກຂໍ້ມູນ */
         .action-bar {
             margin-bottom: 15px;
@@ -307,6 +353,16 @@
     </style>
 </head>
 <body>
+
+    <!-- Modal ສຳລັບສະແດງຮູບພາບຕົວຈິງ -->
+    <div id="image-modal" class="image-modal-overlay" onclick="closeImageModal()">
+        <div class="image-modal-content" onclick="event.stopPropagation()">
+            <img id="modal-img-tag" src="" alt="Preview">
+            <div>
+                <button type="button" class="image-modal-close" onclick="closeImageModal()">ປິດ</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Box ແຈ້ງເຕືອນແບບໃໝ່ (Custom Alert Popup) -->
     <div id="custom-alert" class="custom-alert-overlay">
@@ -588,6 +644,10 @@
                         let uniqueKey = `${unitName}_${index}_${fIndex}`;
                         let savedText = localStorage.getItem(`text_${uniqueKey}`) || '';
                         let savedFile = localStorage.getItem(`file_${uniqueKey}`) || '';
+                        let savedFileObj = localStorage.getItem(`fileObj_${uniqueKey}`) || '';
+
+                        let isImage = savedFileObj.startsWith('data:image/');
+                        let fileIcon = isImage ? '🖼️' : '📄';
 
                         tableRows += `<tr>`;
                         if (fIndex === 0) {
@@ -599,10 +659,10 @@
                                 <div class="actual-input-wrapper">
                                     <textarea class="actual-input" placeholder="ປ້ອນຜົນການຈັດຕັ້ງປະຕິບັດ..." oninput="saveText('${uniqueKey}', this)">${savedText}</textarea>
                                     <div class="file-upload-section">
-                                        <label>📎 ອັບໂຫຼດໄຟລ໌ຜົນງານ (PDF, Word, Excel):</label>
-                                        <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileChange(this, '${uniqueKey}')">
+                                        <label>📎 ອັບໂຫຼດໄຟລ໌ / ຮູບພາບຜົນງານ:</label>
+                                        <input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileChange(this, '${uniqueKey}')">
                                         <div class="file-display-area">
-                                            ${savedFile ? `<div class="file-info-display"><span>📄 ${savedFile}</span><button type="button" class="remove-file-btn" onclick="removeFile(this, '${uniqueKey}')">ລົບ</button></div>` : ''}
+                                            ${savedFile ? `<div class="file-info-display"><span onclick="${isImage ? `previewImage('${uniqueKey}')` : 'void(0)'}" title="${isImage ? 'ກົດເພື່ອເບິ່ງຮູບ' : ''}">${fileIcon} ${savedFile}</span><button type="button" class="remove-file-btn" onclick="removeFile(this, '${uniqueKey}')">ລົບ</button></div>` : ''}
                                         </div>
                                     </div>
                                 </div>
@@ -669,6 +729,10 @@
                             let uniqueKey = `${unit}_${index}_${fIndex}`;
                             let savedText = localStorage.getItem(`text_${uniqueKey}`) || '';
                             let savedFile = localStorage.getItem(`file_${uniqueKey}`) || '';
+                            let savedFileObj = localStorage.getItem(`fileObj_${uniqueKey}`) || '';
+
+                            let isImage = savedFileObj.startsWith('data:image/');
+                            let fileIcon = isImage ? '🖼️' : '📄';
 
                             tableRows += `<tr>`;
                             if (fIndex === 0) {
@@ -680,10 +744,10 @@
                                     <div class="actual-input-wrapper">
                                         <textarea class="actual-input" placeholder="ປ້ອນຜົນການຈັດຕັ້ງປະຕິບັດ..." oninput="saveText('${uniqueKey}', this)">${savedText}</textarea>
                                         <div class="file-upload-section">
-                                            <label>📎 ອັບໂຫຼດໄຟລ໌ຜົນງານ (PDF, Word, Excel):</label>
-                                            <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileChange(this, '${uniqueKey}')">
+                                            <label>📎 ອັບໂຫຼດໄຟລ໌ / ຮູບພາບຜົນງານ:</label>
+                                            <input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileChange(this, '${uniqueKey}')">
                                             <div class="file-display-area">
-                                                ${savedFile ? `<div class="file-info-display"><span>📄 ${savedFile}</span><button type="button" class="remove-file-btn" onclick="removeFile(this, '${uniqueKey}')">ລົບ</button></div>` : ''}
+                                                ${savedFile ? `<div class="file-info-display"><span onclick="${isImage ? `previewImage('${uniqueKey}')` : 'void(0)'}" title="${isImage ? 'ກົດເພື່ອເບິ່ງຮູບ' : ''}">${fileIcon} ${savedFile}</span><button type="button" class="remove-file-btn" onclick="removeFile(this, '${uniqueKey}')">ລົບ</button></div>` : ''}
                                             </div>
                                         </div>
                                     </div>
@@ -859,15 +923,19 @@
                         let uniqueKey = `${unit}_${index}_${fIndex}`;
                         let savedText = localStorage.getItem(`text_${uniqueKey}`) || '';
                         let savedFile = localStorage.getItem(`file_${uniqueKey}`) || '';
+                        let savedFileObj = localStorage.getItem(`fileObj_${uniqueKey}`) || '';
 
                         if (savedText || savedFile) {
                             hasData = true;
+                            let isImage = savedFileObj.startsWith('data:image/');
+                            let fileDisplay = savedFile ? (isImage ? `🖼️ ${savedFile}` : `📄 ${savedFile}`) : '<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>';
+
                             tbody.innerHTML += `
                                 <tr>
                                     ${fIndex === 0 ? `<td rowspan="${rowSpan}"><strong>${unit}</strong><br><span style="font-size:11px; color:#b5651d;">${item.strat}</span></td>` : ''}
                                     <td>${fItem.trim()}</td>
                                     <td>${savedText || '<span style="color:#94a3b8; font-style:italic;">(ບໍ່ມີການພິມເນື້ອໃນ)</span>'}</td>
-                                    <td>${savedFile ? `📄 ${savedFile}` : '<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>'}</td>
+                                    <td>${fileDisplay}</td>
                                 </tr>
                             `;
                         }
@@ -878,6 +946,19 @@
             if (!hasData) {
                 tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #666; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນການຈັດຕັ້ງປະຕິບັດ ຫຼື ໄຟລ໌ຖືກບັນທຶກໃນລະບົບ (ກະລຸນາປ້ອນຂໍ້ມູນຜົນການປະຕິບັດກ່ອນ)</td></tr>`;
             }
+        }
+
+        // ຟັງຊັນ Preview ຮູບພາບ
+        function previewImage(key) {
+            const imgData = localStorage.getItem(`fileObj_${key}`);
+            if (imgData) {
+                document.getElementById('modal-img-tag').src = imgData;
+                document.getElementById('image-modal').style.display = 'flex';
+            }
+        }
+
+        function closeImageModal() {
+            document.getElementById('image-modal').style.display = 'none';
         }
 
         // ຟັງຊັນ Export ເປັນ Word (.doc)
@@ -925,28 +1006,40 @@
             localStorage.setItem(`text_${key}`, textarea.value);
         }
 
-        // ຟັງຊັນຈັດການສະແດງຊື່ໄຟລ໌ ແລະ ບັນທຶກຊື່ລົງ LocalStorage
+        // ຟັງຊັນຈັດການສະແດງຊື່ໄຟລ໌ ແລະ ບັນທຶກຊື່ລົງ LocalStorage (ຮອງຮັບຮູບພາບ)
         function handleFileChange(input, key) {
             const displayArea = input.parentElement.querySelector('.file-display-area');
             displayArea.innerHTML = '';
 
             if (input.files && input.files[0]) {
-                const fileName = input.files[0].name;
-                localStorage.setItem(`file_${key}`, fileName);
+                const file = input.files[0];
+                const fileName = file.name;
+                const reader = new FileReader();
 
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-info-display';
-                fileItem.innerHTML = `
-                    <span>📄 ${fileName}</span>
-                    <button type="button" class="remove-file-btn" onclick="removeFile(this, '${key}')">ລົບ</button>
-                `;
-                displayArea.appendChild(fileItem);
+                reader.onload = function(e) {
+                    const fileDataUrl = e.target.result;
+                    localStorage.setItem(`file_${key}`, fileName);
+                    localStorage.setItem(`fileObj_${key}`, fileDataUrl);
+
+                    let isImage = file.type.startsWith('image/');
+                    let fileIcon = isImage ? '🖼️' : '📄';
+
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-info-display';
+                    fileItem.innerHTML = `
+                        <span onclick="${isImage ? `previewImage('${key}')` : 'void(0)'}" title="${isImage ? 'ກົດເພື່ອເບິ່ງຮູບ' : ''}">${fileIcon} ${fileName}</span>
+                        <button type="button" class="remove-file-btn" onclick="removeFile(this, '${key}')">ລົບ</button>
+                    `;
+                    displayArea.appendChild(fileItem);
+                };
+                reader.readAsDataURL(file);
             }
         }
 
         // ຟັງຊັນລົບໄຟລ໌ອອກ
         function removeFile(btn, key) {
             localStorage.removeItem(`file_${key}`);
+            localStorage.removeItem(`fileObj_${key}`);
             const section = btn.closest('.file-upload-section');
             const fileInput = section.querySelector('input[type="file"]');
             fileInput.value = '';
