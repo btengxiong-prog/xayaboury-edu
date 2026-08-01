@@ -230,6 +230,8 @@
             padding: 15px;
             border-radius: 6px;
             border: 1px solid #e2e8f0;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         .report-selectors select {
             padding: 8px 12px;
@@ -238,19 +240,29 @@
             font-size: 13px;
             font-family: inherit;
         }
-        .print-btn {
-            background-color: #3b82f6;
+        .export-btn-group {
+            display: flex;
+            gap: 8px;
+        }
+        .export-btn {
             color: white;
             border: none;
-            padding: 8px 18px;
+            padding: 8px 14px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
-        .print-btn:hover {
-            background-color: #2563eb;
-        }
+        .btn-pdf { background-color: #ef4444; }
+        .btn-pdf:hover { background-color: #dc2626; }
+        .btn-word { background-color: #2563eb; }
+        .btn-word:hover { background-color: #1d4ed8; }
+        .btn-excel { background-color: #10b981; }
+        .btn-excel:hover { background-color: #059669; }
+
         .report-section-title {
             font-weight: bold;
             color: #0f172a;
@@ -478,7 +490,7 @@
                 { strat: "ຍຸດທະສາດ 09: ການສະໜອງ ແລະ ຈັດສັນຊັບພະຍາກອນດ້ານງົບປະມານ ແລະ ບຸກຄະລາກອນຢ່າງພຽງພໍ", focus: "42. ຕິດຕາມ ແລະ ປະເມີນຜົນໄດ້ຮັບ ການສະໜອງເງິນບໍລິຫານສະຖານການສຶກສາ ແລະ ອາຫານທ່ຽງ.<br>43. ທົບທວນ ແລະ ປັບປຸງລະບົບການຈັດສັນຄູ ເພື່ອແຈກຢາຍຄູຢ່າງພຽງພໍ ແລະ ເທົ່າທຽມ." },
                 { strat: "ຍຸດທະສາດ 10: ໂຄສະນາປຸກລະດົມ ແລະ ສົ່ງເສີມການມີສ່ວນຮ່ວມຂອງຊຸມຊົນ", focus: "44. ໂຄສະນາປຸກລະດົມ ແລະ ຈັດກິດຈະກຳສົ່ງເສີມການເຂົ້າຮຽນ ເພື່ອໃຫ້ເຫັນຄວາມສຳຄັນ.<br>45. ຍົກບົດບາດ ແລະ ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ຄະນະພັດທະນາການສຶກສາຂັ້ນບ້ານ (ຄພສບ).<br>46. ຊຸກຍູ້ການມີສ່ວນຮ່ວມຂອງຊຸມຊົນ ແລະ ພໍ່ແມ່ໃນການພົບປະ ແລະ ເຂົ້າຮ່ວມກິດຈະກຳ." },
                 { strat: "ຍຸດທະສາດ 01 (ມ.ຕົ້ນ): ຫຼຸດຜ່ອນຄ່າໃຊ້ຈ່າຍຂອງຄອບຄົວໃນການເຂົ້າຮຽນຊັ້ນ ມ.ຕົ້ນ ຢ່າງເທົ່າທຽມ", focus: "1. ຂະຫຍາຍການສະໜອງເບ້ຍລ້ຽງໃຫ້ນັກຮຽນທຸກຍາກ ແລະ ດ້ອຍໂອກາດຊັ້ນ ມ.ຕົ້ນ.<br>2. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ກົນໄກໃນການຄັດເລືອກກຸ່ມເປົ້າໝາຍທີ່ຈະໄດ້ຮັບເບ້ຍລ້ຽງ ແລະ ຕິດຕາມປະເມີນຜົນ.<br>3. ຈັດຕັ້ງປະຕິບັດນິຕິກຳທີ່ລົບລ້າງຄ່າຮຽນ ຫຼື ຄ່າປະກອບສ່ວນຕ່າງໆ.<br>4. ທົບທວນຄວາມເປັນໄປໄດ້ໃນການຫຼຸດຜ່ອນຄ່າໃຊ້ຈ່າຍຄົວເຮືອນ (ຄ່າຊຸດນັກຮຽນ)." },
-                { strat: "ຍຸດທະສາດ 02 (ມ.ຕົ້ນ): ທົບທວນ ນິຕິກໍາ ກ່ຽວກັບການຊຸກຍູ້, ສົ່ງເສີມການເຂົ້າຮຽນຈົບ ປ.5 ຕໍ່ ມ.ຕົ້ນ", focus: "5. ສ້າງ ແລະ ປັບປຸງນິຕິກຳກ່ຽວກັບການຄຸ້ມຄອງໂຮງຮຽນ ລວມທັງການສຶກສາຮຽນຮ່ວມ.<br>6. ຄົ້ນຄວ້າຄວາມເປັນໄປໄດ້ໃນການຂະຫຍາຍການສະໜອງອາຫານທ່ຽງໃນຊັ້ນ ມ.ຕົ້ນ.<br>7. ສະໜອງສິ່ງອຳນວຍຄວາມສະດວກໃນການເຂົ້າຮຽນ ລວມທັງການສຶກສາຮຽນຮ່ວມ." },
+                { strat: "ຍຸດທະສາດ 02 (ມ.ຕົ້ນ): ທົບທວນ ນິຕິກໍາ ກ່ຽວກັບການຊຸກຍູ້, ສົ່ງເສີມການເຂົ້າຮຽນຈົບ ປ.5 ຕໍ່ ມ.ຕົ້ນ", focus: "5. ສ້າງ ແລະ ປັບປຸງນິຕິກຳກ່ຽວກັບການຄຸ້ມຄອງໂຮງຮຽນ ລວມທັງການສຶກສາຮຽນຮ່ວມ.<br>6. ຄົ້ນຄວ້າຄວາມເປັນໄປໄດ້ໃນການຂະຫຍາຍການສະໜອງອາຫານທ່ຽງໃນຊັ້ນ ມ.ຕົ້ນ.<br>7. ສະໜອງສິ່ງອຳນວຍຄວາມສະດວກໃນການເຂົ້າເຖິງການສຶກສາ ລວມທັງການສຶກສາຮຽນຮ່ວມ." },
                 { strat: "ຍຸດທະສາດ 03 (ມ.ຕົ້ນ): ສົ່ງເສີມການມີສ່ວນຮ່ວມຂອງ ສະມາຄົມພໍ່ແມ່ນັກຮຽນ ແລະ ຊຸມຊົນ", focus: "8. ສ້າງ, ປັບປຸງ ແລະ ເຜີຍແຜ່ນິຕິກຳກ່ຽວກັບການມີສ່ວນຮ່ວມຂອງຊຸມຊົນ ແລະ ສັງຄົມ.<br>9. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ສະມາຄົມພໍ່ແມ່ນັກຮຽນ, ຄພສບ ແລະ ຊຸມຊົນ.<br>10. ປຸກລະດົມຂົນຂວາຍຊຸມຊົນໃຫ້ຊຸກຍູ້ສົ່ງເສີມລູກຫຼານໃຫ້ຮຽນຈົບຊັ້ນມັດທະຍົມສຶກສາຕອນຕົ້ນ.<br>11. ຕິດຕາມ, ຊຸກຍູ້, ຊ່ວຍເຫຼືອການປະຕິບັດໜ້າທີ່ຂອງສະມາຄົມພໍ່ແມ່ນັກຮຽນ ແລະ ຊຸມຊົນ." },
                 { strat: "ຍຸດທະສາດ 03 (ມ.ຕົ້ນ - ສືບຕໍ່): ສົ່ງເສີມສະພາບແວດລ້ອມພາຍໃນໂຮງຮຽນທີ່ປອດໄພ", focus: "12. ສະໜອງ ແລະ ປັບປຸງພື້ນຖານໂຄ່ງລ່າງ (ໄຟຟ້າ, ນ້ຳສະອາດ, ຫ້ອງນ້ຳແຍກຍິງ-ຊາຍ).<br>13. ສະໜອງອຸປະກອນການຮຽນການສອນ ແລະ ອຸປະກອນຊ່ວຍເຫຼືອສຳລັບນັກຮຽນພິການ.<br>14. ສ້າງ, ປັບປຸງ ແລະ ເຜີຍແຜ່ນິຕິກຳກ່ຽວກັບວຽກງານສົ່ງເສີມສຸຂະພາບໃນໂຮງຮຽນ.<br>15. ສົ່ງເສີມທັກສະ, ຄວາມຮູ້ກ່ຽວກັບເພດສຶກສາ, ບົດບາດຍິງ-ຊາຍ, ລະເບີດບໍ່ທັນແຕກ, ສິ່ງເສບຕິດ.<br>16. ສ້າງຄວາມເຂັ້ມແຂງປະສານສາທາລະນະສຸກຂັ້ນທ້ອງຖິ່ນ ເພື່ອສຸຂະພາບ ແລະ ໂພຊະນາການ.<br>17. ສົ່ງເສີມກິດຈະກຳນອກຫຼັກສູດ (ສະໂມສອນເດັກຍິງ, ກິລາ, ສິລະປະ, ວິທະຍາສາດ)." },
                 { strat: "ຍຸດທະສາດ 04 (ມ.ຕົ້ນ): ປັບປຸງຄຸນນະພາບການສຶກສາ ເພື່ອດຶງດູດການເຂົ້າຮຽນ ແລະ ຫຼຸດການປະລະ", focus: "18. ສ້າງ ແລະ ປັບປຸງນິຕິກຳ ແລະ ລະບຽບການກ່ຽວກັບການຮັບຮູ້ຜົນການຮຽນ (ຮຽນຮູ້ຕະຫຼອດຊີວິດ).<br>19. ສົ່ງເສີມການຮຽນການສອນ ການຮຽນຮູ້ຕະຫຼອດຊີວິດທຸກຮູບແບບ.<br>20. ການເຊື່ອມສານການສຶກສາທັງໃນ ແລະ ນອກໂຮງຮຽນຢ່າງເປັນລະບົບ.<br>21. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ຄູສອນນອກໂຮງຮຽນ." },
@@ -711,12 +723,12 @@
             `;
         }
 
-        // ຟັງຊັນສະແດງໜ້າລາຍງານຕາມຮ່າງທາງການ
+        // ຟັງຊັນສະແດງໜ້າລາຍງານ ພ້ອມປຸ່ມ Export PDF, Word, Excel
         function showReportView() {
             const contentDisplay = document.getElementById('content-display');
             
             contentDisplay.innerHTML = `
-                <div class="report-container">
+                <div class="report-container" id="printable-report">
                     <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ</div>
                     <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">ສັນຕິພາບ ເອກະລາດ ປະຊາທິປະໄຕ ເອກະພາບ ວັດຖະນາຖາວອນ</div>
                     <hr style="border: 0; border-top: 1px solid #cbd5e1; width: 180px; margin: 10px auto 20px auto;">
@@ -748,7 +760,11 @@
                                 <option value="12 ເດືອນ ປີ 2026">6) ລາຍງານ 12 ເດືອນ</option>
                             </select>
                         </div>
-                        <button type="button" class="print-btn" onclick="window.print()">🖨️ ພິມ / ບັນທຶກເປັນ PDF</button>
+                        <div class="export-btn-group">
+                            <button type="button" class="export-btn btn-pdf" onclick="window.print()">📥 PDF</button>
+                            <button type="button" class="export-btn btn-word" onclick="exportWord()">📥 Word</button>
+                            <button type="button" class="export-btn btn-excel" onclick="exportExcel()">📥 Excel</button>
+                        </div>
                     </div>
 
                     <p style="margin-bottom: 15px;"><strong>ຮຽນ:</strong> ທ່ານ ຫົວໜ້າພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ</p>
@@ -766,7 +782,7 @@
                     <div class="report-section-title">II. ຜົນການຈັດຕັ້ງປະຕິບັດວຽກງານຕົວຈິງ (Performance Details)</div>
                     <p style="font-size: 12px; color: #64748b; margin-bottom: 10px;">*(ດຶງຂໍ້ມູນຈາກການປ້ອນຕົວຈິງ ແລະ ໄຟລ໌ທີ່ອັບໂຫຼດໃນລະບົບ)*</p>
 
-                    <table class="strategy-table">
+                    <table class="strategy-table" id="report-data-table">
                         <thead>
                             <tr>
                                 <th style="width: 15%;">ແຜນຍຸດທະສາດ</th>
@@ -858,6 +874,36 @@
             if (!hasData) {
                 tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #666; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນການຈັດຕັ້ງປະຕິບັດ ຫຼື ໄຟລ໌ຖືກບັນທຶກໃນລະບົບ (ກະລຸນາປ້ອນຂໍ້ມູນຜົນການປະຕິບັດກ່ອນ)</td></tr>`;
             }
+        }
+
+        // ຟັງຊັນ Export ເປັນ Word (.doc)
+        function exportWord() {
+            const reportHTML = document.getElementById('printable-report').innerHTML;
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Report</title></head><body>";
+            const footer = "</body></html>";
+            const sourceHTML = header + reportHTML + footer;
+            
+            const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+            const fileDownload = document.createElement("a");
+            document.body.appendChild(fileDownload);
+            fileDownload.href = source;
+            fileDownload.download = 'Bot_Rayngan_Xayaboury.doc';
+            fileDownload.click();
+            document.body.removeChild(fileDownload);
+        }
+
+        // ຟັງຊັນ Export ເປັນ Excel (.xls)
+        function exportExcel() {
+            let htmlTable = document.getElementById('report-data-table').outerHTML;
+            const blob = new Blob(['\ufeff' + htmlTable], { type: 'application/vnd.ms-excel' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Rayngan_Data_Xayaboury.xls';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         // ຟັງຊັນແຈ້ງເຕືອນແບບ Custom Alert Popup
