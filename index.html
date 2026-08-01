@@ -255,6 +255,48 @@
             transform: translateY(-1px);
         }
 
+        /* ຕົບແຕ່ງສ່ວນໜ້າເລືອກລາຍງານ (Report Menu Hub) */
+        .report-hub-container {
+            max-width: 800px;
+            margin: 40px auto;
+            text-align: center;
+            font-family: 'Phetsarath OT', 'Saysana', sans-serif;
+        }
+        .report-hub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .report-hub-card {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        .report-hub-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1);
+        }
+        .report-hub-card h3 {
+            color: #1e293b;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .report-hub-card p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
         /* ຕົບແຕ່ງສ່ວນໜ້າລາຍງານ (Report Page Styling) */
         .report-container {
             background: white;
@@ -312,6 +354,18 @@
         .btn-word:hover { background-color: #1d4ed8; }
         .btn-excel { background-color: #10b981; }
         .btn-excel:hover { background-color: #059669; }
+        .back-btn {
+            background-color: #64748b;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .back-btn:hover { background-color: #475569; }
 
         .report-section-title {
             font-weight: bold;
@@ -346,7 +400,7 @@
                 box-shadow: none;
                 padding: 10px;
             }
-            .report-selectors {
+            .report-selectors, .back-btn {
                 display: none;
             }
         }
@@ -419,7 +473,7 @@
                 <span class="icon">📋</span>
                 <span>ປ້ອນວຽກງານຈຸດສຸມ</span>
             </div>
-            <div class="tool-item" onclick="showReportView()">
+            <div class="tool-item" onclick="showReportHub()">
                 <span class="icon">🖨️</span>
                 <span>ລາຍງານ</span>
             </div>
@@ -523,7 +577,7 @@
             ],
             "ຂະແໜງ ການສຶກສານອກໂຮງຮຽນ ແລະ ຝຶກອົບຮົມວິຊາຊີບຂັ້ນພື້ນຖານ": [
                 { strat: "ຍຸດທະສາດ 01: ຂະຫຍາຍໂອກາດໃຫ້ແກ່ເດັກ, ໄວໜຸ່ມ ແລະ ຜູ້ໃຫ່ຍໃຫ້ສາມາດເຂົ້າເຖິງການສຶກສານອກໂຮງຮຽນ", focus: "1. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ບຸກຄະລາກອນໃນການນຳໃຊ້ເຄື່ອງມືເກັບກຳຂໍ້ມູນການປະລະຂອງກຸ່ມເປົ້າໝາຍ ຜູ້ທີ່ບໍ່ໄດ້ເຂົ້າຮຽນ.<br>2. ເກັບກຳຂໍ້ມູນອັດຕາການບໍ່ຮູ້ໜັງສື ໃນເກນອາຍຸ 6 - 14 ປີ, 15 - 35 ປີ ແລະ 40 ປີຂຶ້ນໄປ ແລະ ສະໜອງການສຶກສາ.<br>3. ສຶກສາ, ວິເຄາະ, ວິໄຈ ແລະ ຄົ້ນຄວ້າພັດທະນາວຽກງານການສຶກສານອກໂຮງຮຽນ ເພື່ອປັບປຸງ." },
-                { strat: "ຍຸດທະສາດ 02: ຮັບປະກັນສິດທິເທົ່າທຽມກັນໃນການເຂົ້າເຖິງການສຶກສານອກໂຮງຮຽນສຳລັບເດັກ, ໄວໜຸ່ມ ແລະ ຜູ້ໃຫ່ຍ ໂດຍຄຳນຶງເຖິງຄວາມສະເໜີພາບຍິງ - ຊາຍ ທີ່ມີຫຼາກຫຼາຍທາງເລືອກ", focus: "4. ຊຸກຍູ້ ແລະ ສົ່ງເສີມໃຫ້ຊຸມຊົນ, ອົງການຈັດຕັ້ງທາງສັງຄົມ, ອຳນາດການປົກຄອງທ້ອງຖິ່ນ ເປັນເຈົ້າການ.<br>5. ຊຸກຍູ້ ແລະ ສົ່ງເສີມໃຫ້ກຸ່ມເປົ້າໝາຍ ໄດ້ຮັບການຮຽນ - ການສອນບຳລຸງຍົກລະດັບ ໂດຍບໍ່ແຍກເພດ, ເຜົ່າ.<br>6. ວາງແຜນປະຕິບັດງານສຳລັບວຽກງານບຳລຸງຍົກລະດັບການສຶກສາ ຂອງກຸ່ມເປົ້າໝາຍ ຕາມບົດບາດຍິງ - ຊາຍ." },
+                { strat: "ຍຸດທະສາດ 02: ຮັບປະກັນສິດທິເທົ່າທຽມກັນໃນການເຂົ້າເຖິງການສຶກສານອກໂຮງຮຽນສຳລັບເດັກ, ໄວໜຸ່ມ ແລະ ຜູ້ໃຫຍ່ ໂດຍຄຳນຶງເຖິງຄວາມສະເໜີພາບຍິງ - ຊາຍ ທີ່ມີຫຼາກຫຼາຍທາງເລືອກ", focus: "4. ຊຸກຍູ້ ແລະ ສົ່ງເສີມໃຫ້ຊຸມຊົນ, ອົງການຈັດຕັ້ງທາງສັງຄົມ, ອຳນາດການປົກຄອງທ້ອງຖິ່ນ ເປັນເຈົ້າການ.<br>5. ຊຸກຍູ້ ແລະ ສົ່ງເສີມໃຫ້ກຸ່ມເປົ້າໝາຍ ໄດ້ຮັບການຮຽນ - ການສອນບຳລຸງຍົກລະດັບ ໂດຍບໍ່ແຍກເພດ, ເຜົ່າ.<br>6. ວາງແຜນປະຕິບັດງານສຳລັບວຽກງານບຳລຸງຍົກລະດັບການສຶກສາ ຂອງກຸ່ມເປົ້າໝາຍ ຕາມບົດບາດຍິງ - ຊາຍ." },
                 { strat: "ຍຸດທະສາດ 03: ຊຸກຍູ້ ແລະ ສົ່ງເສີ່ມ ໃຫ້ກຸ່ມເປົ້າໝາຍ ເພື່ອສ້າງຄວາມສົນໃຈຕໍ່ຜູ້ຮຽນ ກສນ", focus: "7. ພັດທະນາເຄື່ອງມືຮັບໃຊ້ການຮຽນ - ການສອນ ໂດຍນຳໃຊ້ ແອັບອອນລາຍ (Online Application) ເພື່ອໃຫ້ເຂົ້າເຖິງ." },
                 { strat: "ຍຸດທະສາດ 01: ພັດທະນາມາດຕະຖານຄຸນນະພາບ ແລະ ເຄື່ອງມື ເພື່ອທຽບໂອນ ແລະ ປະເມີນຄຸນນະພາບການຮຽນຮູ້ຕະຫຼອດຊີວິດ", focus: "8. ປະຕິບັດລະບຽບການ, ເງື່ອນໄຂ ແລະ ກົນໄກ ການຮັບຮູ້, ຮັບຮອງ ການທຽບເທົ່າທຽບໂອນ.<br>9. ສ້າງຕັ້ງຄະນະກຳມະການຄົ້ນຄວ້າການຮັບຮອງ ແລະ ຢັ້ງຢືນຜົນການຮຽນຮູ້ຕະຫຼອດຊີວິດ.<br>10. ຊຸກຍູ້ ແລະ ສົ່ງເສີມໃຫ້ມີການຈັດຕັ້ງປະຕິບັດວຽກງານການຮຽນຮູ້ຕະຫຼອດຊີວິດ ທົ່ວສັງຄົມ.<br>11. ຊຸກຍູ້ ແລະ ສົ່ງເສີມໃຫ້ປະຊາຊົນບັນດາເຜົ່າໄດ້ຮັບການສຶກສາຕໍ່ເນື່ອງ ຜ່ານຮູບແບບທີ່ຫຼາກຫຼາຍ.<br>12. ພັດທະນາລະບຽບການ, ມາດຕະຖານ ການປະກັນຄຸນນະພາບ, ການຮັບຮູ້, ຢັ້ງຢືນ, ທຽບເທົ່າ, ທຽບໂອນ.<br>13. ສົ່ງເສີມວິຊາຊີບຂັ້ນພື້ນຖານຄວບຄູ່ກັບການບຳລຸງຍົກລະດັບການສຶກສາ.<br>14. ສ້າງໂອກາດໃຫ້ຊາວໜຸ່ມ ແລະ ຜູ້ໃຫຍ່ ໄດ້ຮັບການຝຶກອົບຮົມວິຊາຊີບຂັ້ນພື້ນຖານທີ່ແທດເໝາະ.<br>15. ຊຸກຍູ້ ແລະ ປະສານສົມທົບກັບພາກສ່ວນ ທັງພາກລັດ ແລະ ເອກະຊົນ ພາຍໃນ ແລະ ຕ່າງປະເທດ.<br>16. ຊຸກຍູ້ ແລະ ປະສານສົມທົບກັບພາກສ່ວນ ທັງພາກລັດ ແລະ ເອກະຊົນ (ເພີ່ມເຕີມຕາມແຜນ).<br>17. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ຄູຝຶກວິຊາຊີບຂັ້ນພື້ນຖານ ການສຶກສານອກໂຮງຮຽນ." },
                 { strat: "ຍຸດທະສາດ 02: ສົ່ງເສີມການຝຶກອົບຮົມ ໃຫ້ມີຫຼາກຫຼາຍຮູບແບບ ແລະ ສອດຄ່ອງກັບຄວາມຕ້ອງການຂອງຜູ້ຮຽນ.", focus: "18. ສົ່ງເສີມວິຊາຊີບຂັ້ນພື້ນຖານຄວບຄູ່ກັບການບຳລຸງຍົກລະດັບການສຶກສາ.<br>19. ພັດທະນາສື່ການຮຽນ - ການສອນ ກ່ຽວກັບການຝຶກອົບຮົມວິຊາຊີບຂັ້ນພື້ນຖານ ແລະ ທັກສະອາຊີບ.<br>20. ສ້າງໂອກາດໃຫ້ຊາວໜຸ່ມ ແລະ ຜູ້ໃຫຍ່ ໄດ້ຮັບການຝຶກອົບຮົມວິຊາຊີບຂັ້ນພື້ນຖານທີ່ແທດເໝາະ.<br>21. ຊຸກຍູ້ ແລະ ປະສານສົມທົບກັບພາກສ່ວນ ທັງພາກລັດ ແລະ ເອກະຊົນ ທັງພາຍໃນ ແລະ ຕ່າງປະເທດ.<br>22. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ຄູຝຶກວິຊາຊີບຂັ້ນພື້ນຖານ ການສຶກສານອກໂຮງຮຽນ." },
@@ -791,18 +845,63 @@
             `;
         }
 
-        // ຟັງຊັນເລືອກປະເພດລາຍງານ (ມີ 2 ຮ່າງລາຍງານຕາມ yêu cầu)
-        function showReportView() {
+        // ຫນ້າເລືອກເມນູລາຍງານ (Report Hub - ມີ 2 ລາຍການໃຫ້ເລືອກ)
+        function showReportHub() {
             const contentDisplay = document.getElementById('content-display');
-            
             contentDisplay.innerHTML = `
-                <div class="report-container">
+                <div class="report-hub-container">
+                    <h2 style="color: #1e293b; margin-bottom: 10px;">ລະບົບສ້າງ ແລະ ຈັດການບົດລາຍງານ</h2>
+                    <p style="color: #64748b; font-size: 14px;">ກະລຸນາເລືອກປະເພດບົດລາຍງານທີ່ທ່ານຕ້ອງການຈັດທຳ:</p>
+                    
+                    <div class="report-hub-grid">
+                        <div class="report-hub-card" onclick="showGeneralReport()">
+                            <h3>📁 1) ລາຍງານວຽກທົ່ວໄປ</h3>
+                            <p>ລາຍງານຜົນການຈັດຕັ້ງປະຕິບັດແຜນຍຸດທະສາດ ແລະ ວຽກງານຈຸດສຸມປະຈຳ (ອາທິດ, ເດືອນ, 3 ເດືອນ, 6 ເດືອນ, 9 ເດືອນ, 12 ເດືອນ) ພ້ອມຕາຕະລາງຜົນງານຕົວຈິງ ແລະ ໄຟລ໌ແນບ.</p>
+                        </div>
+                        <div class="report-hub-card" onclick="showStrategyPlanReport()">
+                            <h3>📊 2) ລາຍງານແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</h3>
+                            <p>ລາຍງານຕາມຮ່າງແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ 5 ປີ ຄັ້ງທີ X (2026 - 2030) ຢ່າງລະອຽດ.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 1) ຟັງຊັນສະແດງ "ລາຍງານວຽກທົ່ວໄປ" (ຕາມຮ່າງເກົ່າ)
+        function showGeneralReport() {
+            const contentDisplay = document.getElementById('content-display');
+            contentDisplay.innerHTML = `
+                <button type="button" class="back-btn" onclick="showReportHub()">⬅️ ກັບຄືນໜ້າເລືອກລາຍງານ</button>
+                <div class="report-container" id="printable-report">
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ</div>
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">ສັນຕິພາບ ເອກະລາດ ປະຊາທິປະໄຕ ເອກະພາບ ວັດຖະນາຖາວອນ</div>
+                    <hr style="border: 0; border-top: 1px solid #cbd5e1; width: 180px; margin: 10px auto 20px auto;">
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-weight: bold;">
+                        <div>
+                            ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ<br>
+                            <span style="font-weight: normal; font-size: 13px;">[ພະແນກ / ຂະແໜງການ ຜູ້ລາຍງານ]</span>
+                        </div>
+                        <div style="text-align: right;">
+                            ໂຕະວຽກ: ....................................
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <h2 style="color: #0f172a; margin-bottom: 10px;">ບົດລາຍງານວຽກທົ່ວໄປ</h2>
+                        <h3 style="color: #b5651d; font-size: 15px;">ກ່ຽວກັບການຈັດຕັ້ງປະຕິບັດແຜນຍຸດທະສາດ ແລະ ວຽກງານຈຸດສຸມ</h3>
+                    </div>
+
                     <div class="report-selectors">
                         <div>
-                            <label style="font-weight: bold; font-size: 13px; margin-right: 5px;">ເລືອກຮ່າງບົດລາຍງານ:</label>
-                            <select id="report-template-selector" onchange="switchReportTemplate()">
-                                <option value="general">1) ລາຍງານວຽກທົ່ວໄປ (ຕາມຮ່າງເກົ່າ)</option>
-                                <option value="strategy_plan">2) ລາຍງານແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ຕາມຮ່າງແຜນ 5 ປີ X)</option>
+                            <label style="font-weight: bold; font-size: 13px; margin-right: 5px;">ປະຈຳໄລຍະເວລາ:</label>
+                            <select id="report-type" onchange="updateReportTitle()">
+                                <option value="ອາທິດທີ... ປີ 2026">1) ລາຍງານເປັນອາທິດ</option>
+                                <option value="ເດືອນ... ປີ 2026">2) ລາຍງານເປັນເດືອນ</option>
+                                <option value="3 ເດືອນ ປີ 2026">3) ລາຍງານເປັນ 3 ເດືອນ</option>
+                                <option value="6 ເດືອນ ປີ 2026">4) ລາຍງານ 6 ເດືອນ</option>
+                                <option value="9 ເດືອນ ປີ 2026">5) ລາຍງານ 9 ເດືອນ</option>
+                                <option value="12 ເດືອນ ປີ 2026">6) ລາຍງານ 12 ເດືອນ</option>
                             </select>
                         </div>
                         <div class="export-btn-group">
@@ -811,186 +910,191 @@
                             <button type="button" class="export-btn btn-excel" onclick="exportExcel()">📥 ດາວໂຫຼດ Excel</button>
                         </div>
                     </div>
-                    
-                    <div id="report-content-area">
-                        <!-- ເນື້ອໃນລາຍງານຈະຖືກສະແດງຢູ່ນີ້ -->
+
+                    <p style="margin-bottom: 15px;"><strong>ຮຽນ:</strong> ທ່ານ ຫົວໜ້າພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ</p>
+                    <p style="margin-bottom: 20px;"><strong>ຈາກ:</strong> ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ (ຜູ້ລາຍງານ)</p>
+
+                    <div class="report-section-title">I. ພາກສະຫຼຸບຫຍໍ້ (Executive Summary)</div>
+                    <p style="margin-bottom: 15px; text-align: justify;">
+                        ໃນໄລຍະ <span id="report-period-label" style="font-weight: bold; color: #b5651d;">ອາທິດທີ... ປີ 2026</span> ຜ່ານມາ, ທຸກຂະແໜງການໄດຸ້ມໃສ່ຊີ້ນຳ-ນຳພາ ແລະ ຈັດຕັ້ງປະຕິບັດບັນດາວຽກງານຈຸດສຸມຕາມແຜນຍຸດທະສາດຂອງຂະແໜງການ ໂດຍຕິດພັນກັບການນຳໃຊ້ຂໍ້ມູນຕົວຈິງ ແລະ ເອກະສານຜົນງານທີ່ໄດ້ອັບໂຫຼດເຂົ້າລະບົບຕິດຕາມ ເຊິ່ງສາມາດຍາດໄດ້ຜົນງານພົ້ນເດັ່ນດັ່ງລຸ່ມນີ້:
+                    </p>
+                    <ul style="margin-bottom: 20px; padding-left: 20px;">
+                        <li><strong>ອັດຕາຄວາມຄືບໜ້າໂດຍລວມ:</strong> ປະຕິບັດໄດ້ ຕາມແຜນການທີ່ກຳນົດ.</li>
+                        <li><strong>ຈຸດເດັ່ນໃນໄລຍະນີ້:</strong> ບັນດາຫົວໜ່ວຍງານໄດ້ເອົາໃຈໃສ່ຕິດຕາມ ແລະ ບັນທຶກຜົນງານລົງໃນລະບົບຢ່າງເປັນລະບົບ.</li>
+                    </ul>
+
+                    <div class="report-section-title">II. ຜົນການຈັດຕັ້ງປະຕິບັດວຽກງານຕົວຈິງ (Performance Details)</div>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 10px;">*(ດຶງຂໍ້ມູນຈາກການປ້ອນຕົວຈິງ ແລະ ໄຟລ໌ທີ່ອັບໂຫຼດໃນລະບົບ)*</p>
+
+                    <table class="strategy-table" id="report-data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%;">ແຜນຍຸດທະສາດ</th>
+                                <th style="width: 30%;">ວຽກງານຈຸດສຸມ</th>
+                                <th style="width: 40%;">ຜົນການຈັດຕັ້ງປະຕິບັດຕົວຈິງ & ເນື້ອໃນສັງລວມ</th>
+                                <th style="width: 15%;">ເອກະສານອ້າງອີງ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body">
+                            <!-- ຂໍ້ມູນຈະຖືກໂຫຼດໃສ່ທີ່ນີ້ -->
+                        </tbody>
+                    </table>
+
+                    <div class="report-section-title">III. ດ້ານວຽກງານທີ່ຕັ້ງໜ້າ ແລະ ຂໍ້ສະດວກ (Advantages)</div>
+                    <ul style="margin-bottom: 20px; padding-left: 20px;">
+                        <li><strong>ການຊີ້ນຳ-ນຳພາ:</strong> ໄດ້ຮັບຄວາມເອົາໃຈໃສ່ຊີ້ນຳຢ່າງໃກ້ຊິດຈາກຄະນະພະແນກ.</li>
+                        <li><strong>ການມີສ່ວນຮ່ວມ:</strong> ພະນັກງານ-ລັດຖະກອນພາຍໃນຂະແໜງ ແລະ ທ້ອງຖິ່ນ ໄດ້ເປັນເຈົ້າການຈັດຕັ້ງປະຕິບັດ.</li>
+                        <li><strong>ເຄື່ອງມືຕິດຕາມ:</strong> ການນຳໃຊ້ລະບົບອັບໂຫຼດໄຟລ໌ ແລະ ບັນທຶກຜ່ານເວັບໄຊ ເຮັດໃຫ້ການເກັບກຳຂໍ້ມູນວ່ອງໄວ ແລະ ເປັນລະບົບຂຶ້ນ.</li>
+                    </ul>
+
+                    <div class="report-section-title">IV. ຂໍ້ຄົງຄ້າງ, ສິ່ງທ້າທາຍ ແລະ ວິທີແກ້ໄຂ (Challenges & Solutions)</div>
+                    <p><strong>1. ຂໍ້ຄົງຄ້າງ ແລະ ສິ່ງທ້າທາຍ:</strong></p>
+                    <ul style="margin-bottom: 10px; padding-left: 20px;">
+                        <li>ງົບປະມານ ແລະ ເວລາໃນການລົງຕິດຕາມຕົວຈິງບາງພື້ນທີ່ຍັງຈຳກັດ.</li>
+                        <li>ການສົ່ງລາຍງານ ແລະ ໄຟລ໌ຂໍ້ມູນຂອງບາງຫົວໜ່ວຍຍັງຊັກຊ້າກຳນົດເວລາ.</li>
+                    </ul>
+                    <p><strong>2. ທິດທາງແກ້ໄຂໃນໄລຍະຕໍ່ໄປ:</strong></p>
+                    <ul style="margin-bottom: 20px; padding-left: 20px;">
+                        <li>ເພີ່ມທະວີການຕິດຕາມ, ຊຸກຍູ້ ແລະ ກວດສອບຜ່ານລະບົບອອນລາຍໃຫ້ເປັນປະຈຳ.</li>
+                        <li>ສືບຕໍ່ປະສານສົມທົບກັບພາກສ່ວນກ່ຽວຂ້ອງ ເພື່ອແກ້ໄຂບັນຫາຕິດຂັດຢ່າງຮ່ວມມື.</li>
+                    </ul>
+
+                    <div class="report-section-title">V. ທິດທາງແຜນການຈຸດສຸມ ໄລຍະຕໍ່ໄປ (Future Plan)</div>
+                    <ul style="margin-bottom: 30px; padding-left: 20px;">
+                        <li>ສືບຕໍ່ຊຸກຍູ້ວຽກງານທີ່ຍັງຄ້າງຄາ ໃຫ້ບັນລຸຕາມຕົວຊີ້ບອກຂອງແຜນການປະຈຳໄລຍະຕໍ່ໄປ.</li>
+                        <li>ກຽມຄວາມພ້ອມສຳລັບການປະເມີນຜົນ ແລະ ສ້າງບົດລາຍງານສະຫຼຸບຂັ້ນສູງຕໍ່ໄປ.</li>
+                    </ul>
+
+                    <div style="margin-top: 40px; display: flex; justify-content: flex-end;">
+                        <div style="text-align: center;">
+                            <p><strong>ວັນທີ:</strong> ............/............/2026</p>
+                            <p style="margin-top: 5px; font-weight: bold;">ຜູ້ລາຍງານ</p>
+                            <p style="font-size: 12px; color: #64748b;">(ເຊັນ ແລະ ປະທັບຕາ)</p>
+                            <br><br><br>
+                            <p>..................................................</p>
+                        </div>
                     </div>
                 </div>
             `;
-            switchReportTemplate();
+            loadReportData();
         }
 
-        function switchReportTemplate() {
-            const templateType = document.getElementById('report-template-selector').value;
-            const area = document.getElementById('report-content-area');
+        // 2) ຟັງຊັນສະແດງ "ລາຍງານແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ" (ຕາມຮ່າງໄຟລ໌ແຜນ 5 ປີ X)
+        function showStrategyPlanReport() {
+            const contentDisplay = document.getElementById('content-display');
+            contentDisplay.innerHTML = `
+                <button type="button" class="back-btn" onclick="showReportHub()">⬅️ ກັບຄືນໜ້າເລືອກລາຍງານ</button>
+                <div class="report-container" id="printable-report">
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ</div>
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">ສັນຕິພາບ ເອກະລາດ ປະຊາທິປະໄຕ ເອກະພາບ ວັດທະນະຖາວອນ</div>
+                    <hr style="border: 0; border-top: 1px solid #cbd5e1; width: 180px; margin: 10px auto 20px auto;">
+                    
+                    <div style="text-align: center; margin-bottom: 15px; font-weight: bold;">
+                        ແຂວງໄຊຍະບູລີ<br>
+                        ພະແນກສຶກສາທິການ ແລະ ກິລາແຂວງ
+                    </div>
 
-            if (templateType === 'general') {
-                area.innerHTML = `
-                    <div id="printable-report">
-                        <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ</div>
-                        <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">ສັນຕິພາບ ເອກະລາດ ປະຊາທິປະໄຕ ເອກະພາບ ວັດຖະນາຖາວອນ</div>
-                        <hr style="border: 0; border-top: 1px solid #cbd5e1; width: 180px; margin: 10px auto 20px auto;">
-                        
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-weight: bold;">
-                            <div>
-                                ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ<br>
-                                <span style="font-weight: normal; font-size: 13px;">[ພະແນກ / ຂະແໜງການ ຜູ້ລາຍງານ]</span>
-                            </div>
-                            <div style="text-align: right;">
-                                ໂຕະວຽກ: ....................................
-                            </div>
+                    <div class="report-selectors">
+                        <div>
+                            <span style="font-weight: bold; font-size: 13px; color: #b5651d;">📋 ບົດລາຍງານແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (2026 - 2030)</span>
                         </div>
-
-                        <div style="text-align: center; margin-bottom: 25px;">
-                            <h2 style="color: #0f172a; margin-bottom: 10px;">ບົດລາຍງານ</h2>
-                            <h3 style="color: #b5651d; font-size: 15px;">ກ່ຽວກັບການຈັດຕັ້ງປະຕິບັດແຜນຍຸດທະສາດ ແລະ ວຽກງານຈຸດສຸມ</h3>
-                        </div>
-
-                        <div style="margin-bottom: 20px;">
-                            <label style="font-weight: bold; font-size: 13px; margin-right: 5px;">ປະຈຳໄລຍະເວລາ:</label>
-                            <select id="report-type" onchange="updateReportTitle()" style="padding: 5px 10px; border: 1px solid #cbd5e1; border-radius: 4px;">
-                                <option value="ອາທິດທີ... ປີ 2026">ລາຍງານເປັນອາທິດ</option>
-                                <option value="ເດືອນ... ປີ 2026">ລາຍງານເປັນເດືອນ</option>
-                                <option value="3 ເດືອນ ປີ 2026">ລາຍງານເປັນ 3 ເດືອນ</option>
-                                <option value="6 ເດືອນ ປີ 2026">ລາຍງານ 6 ເດືອນ</option>
-                                <option value="9 ເດືອນ ປີ 2026">ລາຍງານ 9 ເດືອນ</option>
-                                <option value="12 ເດືອນ ປີ 2026">ລາຍງານ 12 ເດືອນ</option>
-                            </select>
-                        </div>
-
-                        <p style="margin-bottom: 15px;"><strong>ຮຽນ:</strong> ທ່ານ ຫົວໜ້າພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ</p>
-                        <p style="margin-bottom: 20px;"><strong>ຈາກ:</strong> ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ (ຜູ້ລາຍງານ)</p>
-
-                        <div class="report-section-title">I. ພາກສະຫຼຸບຫຍໍ້ (Executive Summary)</div>
-                        <p style="margin-bottom: 15px; text-align: justify;">
-                            ໃນໄລຍະ <span id="report-period-label" style="font-weight: bold; color: #b5651d;">ອາທິດທີ... ປີ 2026</span> ຜ່ານມາ, ທຸກຂະແໜງການໄດຸ້ມໃສ່ຊີ້ນຳ-ນຳພາ ແລະ ຈັດຕັ້ງປະຕິບັດບັນດາວຽກງານຈຸດສຸມຕາມແຜນຍຸດທະສາດຂອງຂະແໜງການ ໂດຍຕິດພັນກັບການນຳໃຊ້ຂໍ້ມູນຕົວຈິງ ແລະ ເອກະສານຜົນງານທີ່ໄດ້ອັບໂຫຼດເຂົ້າລະບົບຕິດຕາມ ເຊິ່ງສາມາດຍາດໄດ້ຜົນງານພົ້ນເດັ່ນດັ່ງລຸ່ມນີ້:
-                        </p>
-                        <ul style="margin-bottom: 20px; padding-left: 20px;">
-                            <li><strong>ອັດຕາຄວາມຄືບໜ້າໂດຍລວມ:</strong> ປະຕິບັດໄດ້ ຕາມແຜນການທີ່ກຳນົດ.</li>
-                            <li><strong>ຈຸດເດັ່ນໃນໄລຍະນີ້:</strong> ບັນດາຫົວໜ່ວຍງານໄດ້ເອົາໃຈໃສ່ຕິດຕາມ ແລະ ບັນທຶກຜົນງານລົງໃນລະບົບຢ່າງເປັນລະບົບ.</li>
-                        </ul>
-
-                        <div class="report-section-title">II. ຜົນການຈັດຕັ້ງປະຕິບັດວຽກງານຕົວຈິງ (Performance Details)</div>
-                        <table class="strategy-table" id="report-data-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 15%;">ແຜນຍຸດທະສາດ</th>
-                                    <th style="width: 30%;">ວຽກງານຈຸດສຸມ</th>
-                                    <th style="width: 40%;">ຜົນການຈັດຕັ້ງປະຕິບັດຕົວຈິງ & ເນື້ອໃນສັງລວມ</th>
-                                    <th style="width: 15%;">ເອກະສານອ້າງອີງ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="report-table-body">
-                                <!-- ຂໍ້ມູນຈະຖືກໂຫຼດໃສ່ທີ່ນີ້ -->
-                            </tbody>
-                        </table>
-
-                        <div class="report-section-title">III. ດ້ານວຽກງານທີ່ຕັ້ງໜ້າ ແລະ ຂໍ້ສະດວກ (Advantages)</div>
-                        <ul style="margin-bottom: 20px; padding-left: 20px;">
-                            <li><strong>ການຊີ້ນຳ-ນຳພາ:</strong> ໄດ້ຮັບຄວາມເອົາໃຈໃສ່ຊີ້ນຳຢ່າງໃກ້ຊິດຈາກຄະນະພະແນກ.</li>
-                            <li><strong>ການມີສ່ວນຮ່ວມ:</strong> ພະນັກງານ-ລັດຖະກອນພາຍໃນຂະແໜງ ແລະ ທ້ອງຖິ່ນ ໄດ້ເປັນເຈົ້າການຈັດຕັ້ງປະຕິບັດ.</li>
-                            <li><strong>ເຄື່ອງມືຕິດຕາມ:</strong> ການນຳໃຊ້ລະບົບອັບໂຫຼດໄຟລ໌ ແລະ ບັນທຶກຜ່ານເວັບໄຊ ເຮັດໃຫ້ການເກັບກຳຂໍ້ມູນວ່ອງໄວ ແລະ ເປັນລະບົບຂຶ້ນ.</li>
-                        </ul>
-
-                        <div class="report-section-title">IV. ຂໍ້ຄົງຄ້າງ, ສິ່ງທ້າທາຍ ແລະ ວິທີແກ້ໄຂ (Challenges & Solutions)</div>
-                        <p><strong>1. ຂໍ້ຄົງຄ້າງ ແລະ ສິ່ງທ້າທາຍ:</strong></p>
-                        <ul style="margin-bottom: 10px; padding-left: 20px;">
-                            <li>ງົບປະມານ ແລະ ເວລາໃນການລົງຕິດຕາມຕົວຈິງບາງພື້ນທີ່ຍັງຈຳກັດ.</li>
-                            <li>ການສົ່ງລາຍງານ ແລະ ໄຟລ໌ຂໍ້ມູນຂອງບາງຫົວໜ່ວຍຍັງຊັກຊ້າກຳນົດເວລາ.</li>
-                        </ul>
-                        <p><strong>2. ທິດທາງແກ້ໄຂໃນໄລຍະຕໍ່ໄປ:</strong></p>
-                        <ul style="margin-bottom: 20px; padding-left: 20px;">
-                            <li>ເພີ່ມທະວີການຕິດຕາມ, ຊຸກຍູ້ ແລະ ກວດສອບຜ່ານລະບົບອອນລາຍໃຫ້ເປັນປະຈຳ.</li>
-                            <li>ສືບຕໍ່ປະສານສົມທົບກັບພາກສ່ວນກ່ຽວຂ້ອງ ເພື່ອແກ້ໄຂບັນຫາຕິດຂັດຢ່າງຮ່ວມມື.</li>
-                        </ul>
-
-                        <div class="report-section-title">V. ທິດທາງແຜນການຈຸດສຸມ ໄລຍະຕໍ່ໄປ (Future Plan)</div>
-                        <ul style="margin-bottom: 30px; padding-left: 20px;">
-                            <li>ສືບຕໍ່ຊຸກຍູ້ວຽກງານທີ່ຍັງຄ້າງຄາ ໃຫ້ບັນລຸຕາມຕົວຊີ້ບອກຂອງແຜນການປະຈຳໄລຍະຕໍ່ໄປ.</li>
-                            <li>ກຽມຄວາມພ້ອມສຳລັບການປະເມີນຜົນ ແລະ ສ້າງບົດລາຍງານສະຫຼຸບຂັ້ນສູງຕໍ່ໄປ.</li>
-                        </ul>
-
-                        <div style="margin-top: 40px; display: flex; justify-content: flex-end;">
-                            <div style="text-align: center;">
-                                <p><strong>ວັນທີ:</strong> ............/............/2026</p>
-                                <p style="margin-top: 5px; font-weight: bold;">ຜູ້ລາຍງານ</p>
-                                <p style="font-size: 12px; color: #64748b;">(ເຊັນ ແລະ ປະທັບຕາ)</p>
-                                <br><br><br>
-                                <p>..................................................</p>
-                            </div>
+                        <div class="export-btn-group">
+                            <button type="button" class="export-btn btn-pdf" onclick="window.print()">📥 ພິມ / PDF</button>
+                            <button type="button" class="export-btn btn-word" onclick="exportWord()">📥 ດາວໂຫຼດ Word</button>
+                            <button type="button" class="export-btn btn-excel" onclick="exportExcel()">📥 ດາວໂຫຼດ Excel</button>
                         </div>
                     </div>
-                `;
-                loadReportData();
-            } else {
-                area.innerHTML = `
-                    <div id="printable-report">
-                        <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ</div>
-                        <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">ສັນຕິພາບ ເອກະລາດ ປະຊາທິປະໄຕ ເອກະພາບ ວັດທະນະຖາວອນ</div>
-                        <hr style="border: 0; border-top: 1px solid #cbd5e1; width: 180px; margin: 10px auto 20px auto;">
-                        
-                        <div style="text-align: center; margin-bottom: 15px; font-weight: bold;">
-                            ແຂວງໄຊຍະບູລີ<br>
-                            ພະແນກສຶກສາທິການ ແລະ ກິລາແຂວງ
-                        </div>
 
-                        <div style="text-align: center; margin-bottom: 25px;">
-                            <h2 style="color: #b5651d; font-size: 18px; margin-bottom: 5px;">ແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ</h2>
-                            <h3 style="color: #0f172a; font-size: 16px;">ແຂວງໄຊຍະບູລີ 5 ປີ ຄັ້ງທີ X (2026 - 2030)</h3>
-                        </div>
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <h2 style="color: #b5651d; font-size: 18px; margin-bottom: 5px;">ແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ</h2>
+                        <h3 style="color: #0f172a; font-size: 16px;">ແຂວງໄຊຍະບູລີ 5 ປີ ຄັ້ງທີ X (2026 - 2030)</h3>
+                    </div>
 
-                        <div class="report-section-title">ຄໍານໍາ</div>
-                        <p style="margin-bottom: 15px; text-align: justify;">
-                            ແຜນພັດທະນາຂະແໜງການສຶກສາ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ X (2026 - 2030) ສະແດງເຖິງຄວາມມຸ່ງໝັ້ນຢ່າງຕໍ່ເນື່ອງຂອງແຂວງ ເວົ້າລວມ ເວົ້າສະເພາະກໍ່ຄື ຂະແໜງການສຶກສາ ແລະ ກິລາ ໃນການພັດທະນາການສຶກສາ ແລະ ກິລາ ຢ່າງມີຄຸນນະພາບ, ເທົ່າທຽມ ແລະ ຮອບດ້ານ ເພື່ອເປັນພື້ນຖານໃນການພັດທະນາເສດຖະກິດ - ສັງຄົມ ແລະ ການພັດທະນາແບບຍືນຍົງ.
-                        </p>
+                    <div class="report-section-title">ຄໍານໍາ</div>
+                    <p style="margin-bottom: 15px; text-align: justify;">
+                        ແຜນພັດທະນາຂະແໜງການສຶກສາ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ X (2026 - 2030) ສະແດງເຖິງຄວາມມຸ່ງໝັ້ນຢ່າງຕໍ່ເນື່ອງຂອງແຂວງ ເວົ້າລວມ ເວົ້າສະເພາະກໍ່ຄື ຂະແໜງການສຶກສາ ແລະ ກິລາ ໃນການພັດທະນາການສຶກສາ ແລະ ກິລາ ຢ່າງມີຄຸນນະພາບ, ເທົ່າທຽມ ແລະ ຮອບດ້ານ ເພື່ອເປັນພື້ນຖານໃນການພັດທະນາເສດຖະກິດ - ສັງຄົມ ແລະ ການພັດທະນາແບບຍືນຍົງ.
+                    </p>
 
-                        <div class="report-section-title">ພາກສະເໜີ</div>
-                        <p style="margin-bottom: 15px; text-align: justify;">
-                            ແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ X (2026 – 2030) ປະກອບດ້ວຍ 7 ພາກ ໂດຍພາກສໍາຄັນປະກອບມີ: ການຕີລາຄາຜົນການດໍາເນີນແຜນ 5 ປີ ຄັ້ງທີ IX (2021 – 2025); ການວິເຄາະບໍລິບົດ ແລະ ນະໂຍບາຍ; ເປົ້າໝາຍລວມ, ຕົວຊີ້ບອກ ແລະ ຄາດໝາຍສູ້ຊົນ 2026 – 2030; ຍຸດທະສາດ ແລະ ຄາດໝາຍຜົນໄດ້ຮັບຕາມ 6 ເປົ້າໝາຍສະເພາະຂອງແຜນ.
-                        </p>
+                    <div class="report-section-title">ພາກສະເໜີ</div>
+                    <p style="margin-bottom: 15px; text-align: justify;">
+                        ແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ X (2026 – 2030) ປະກອບດ້ວຍ 7 ພາກ ໂດຍພາກສໍາຄັນປະກອບມີ: ການຕີລາຄາຜົນການດໍາເນີນແຜນ 5 ປີ ຄັ້ງທີ IX (2021 – 2025); ການວິເຄາະບໍລິບົດ ແລະ ນະໂຍບາຍ; ເປົ້າໝາຍລວມ, ຕົວຊີ້ບອກ ແລະ ຄາດໝາຍສູ້ຊົນ 2026 – 2030; ຍຸດທະສາດ ແລະ ຄາດໝາຍຜົນໄດ້ຮັບຕາມ 6 ເປົ້າໝາຍສະເພາະຂອງແຜນ.
+                    </p>
 
-                        <div class="report-section-title">ພາກທີ I: ຜົນການຈັດຕັ້ງປະຕິບັດແຜນພັດທະນາ 5 ປີ ຄັ້ງທີ IX (2021 - 2025)</div>
-                        <p style="margin-bottom: 15px; text-align: justify;">
-                            ໃນໄລຍະ 5 ປີຜ່ານມາ ພະແນກສຶກສາທິການ ແລະ ກິລາແຂວງ ໄດ້ມີຄວາມພະຍາຍາມຢ່າງຕັ້ງໜ້າໃນການຈັດຕັ້ງຜັນຂະຫຍາຍແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ IX ໂດຍສຸມຊັບພະຍາກອນທີ່ມີຈຳກັດ ເຂົ້າໃສ່ການສົ່ງເສີມການເຂົ້າຮຽນໃນທຸກຊັ້ນທຸກສາຍ ແລະ ຍົກສູງປະສິດທິພາບການຄຸ້ມຄອງບໍລິຫານ.
-                        </p>
+                    <div class="report-section-title">ພາກທີ I: ຜົນການຈັດຕັ້ງປະຕິບັດແຜນພັດທະນາ 5 ປີ ຄັ້ງທີ IX (2021 - 2025)</div>
+                    <p style="margin-bottom: 15px; text-align: justify;">
+                        ໃນໄລຍະ 5 ປີຜ່ານມາ ພະແນກສຶກສາທິການ ແລະ ກິລາແຂວງ ໄດ້ມີຄວາມພະຍາຍາມຢ່າງຕັ້ງໜ້າໃນການຈັດຕັ້ງຜັນຂະຫຍາຍແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ IX ໂດຍສຸມຊັບພະຍາກອນທີ່ມີຈຳກັດ ເຂົ້າໃສ່ການສົ່ງເສີມການເຂົ້າຮຽນໃນທຸກຊັ້ນທຸກສາຍ ແລະ ຍົກສູງປະສິດທິພາບການຄຸ້ມຄອງບໍລິຫານ.
+                    </p>
 
-                        <div class="report-section-title">ພາກທີ II: ບໍລິບົດທາງດ້ານນະໂຍບາຍ</div>
-                        <p style="margin-bottom: 15px; text-align: justify;">
-                            - <strong>ສະພາບແວດລ້ອມພາຍນອກ:</strong> ປະເຊີນໜ້າກັບຄວາມທ້າທາຍຈາກສະພາບເສດຖະກິດໂລກ, ໄພທຳມະຊາດ, ອັດຕາເງິນເຟີ້ ແລະ ຜົນກະທົບຕ່າງໆ.<br>
-                            - <strong>ສະພາບແວດລ້ອມພາຍໃນ:</strong> ແຂວງໄຊຍະບູລີ ມີ 11 ເມືອງ, 430 ບ້ານ, ມີພົນລະເມືອງ 402,691 ຄົນ ໂດຍມີການຈັດຕັ້ງປະຕິບັດວາລະແຫ່ງຊາດຢ່າງຕັ້ງໜ້າ.
-                        </p>
+                    <div class="report-section-title">ພາກທີ II: ບໍລິບົດທາງດ້ານນະໂຍບາຍ</div>
+                    <p style="margin-bottom: 15px; text-align: justify;">
+                        - <strong>ສະພາບແວດລ້ອມພາຍນອກ:</strong> ປະເຊີນໜ້າກັບຄວາມທ້າທາຍຈາກສະພາບເສດຖະກິດໂລກ, ໄພທຳມະຊາດ, ອັດຕາເງິນເຟີ້ ແລະ ຜົນກະທົບຕ່າງໆ.<br>
+                        - <strong>ສະພາບແວດລ້ອມພາຍໃນ:</strong> ແຂວງໄຊຍະບູລີ ມີ 11 ເມືອງ, 430 ບ້ານ, ມີພົນລະເມືອງ 402,691 ຄົນ ໂດຍມີການຈັດຕັ້ງປະຕິບັດວາລະແຫ່ງຊາດຢ່າງຕັ້ງໜ້າ.
+                    </p>
 
-                        <div class="report-section-title">ພາກທີ III: ເປົ້າໝາຍລວມ ແລະ ຈຸດປະສົງນະໂຍບາຍທີ່ເປັນບູລິມະສິດ</div>
-                        <p style="margin-bottom: 15px; text-align: justify;">
-                            <strong>ເປົ້າໝາຍລວມ:</strong> ຮອດປີ 2030, ພົນລະເມືອງລາວທຸກຄົນໄດ້ຮັບການສຶກສາຂັ້ນພື້ນຖານຢ່າງທົ່ວເຖິງຢ່າງມີຄຸນນະພາບ, ໄດ້ຮັບໂອກາດໃນການສຶກສາຢ່າງຕໍ່ເນື່ອງ ແລະ ເທົ່າທຽມ...
-                        </p>
+                    <div class="report-section-title">ພາກທີ III: ເປົ້າໝາຍລວມ ແລະ ຈຸດປະສົງນະໂຍບາຍທີ່ເປັນບູລິມະສິດ</div>
+                    <p style="margin-bottom: 15px; text-align: justify;">
+                        <strong>ເປົ້າໝາຍລວມ:</strong> ຮອດປີ 2030, ພົນລະເມືອງລາວທຸກຄົນໄດ້ຮັບການສຶກສາຂັ້ນພື້ນຖານຢ່າງທົ່ວເຖິງຢ່າງມີຄຸນນະພາບ, ໄດ້ຮັບໂອກາດໃນການສຶກສາຢ່າງຕໍ່ເນື່ອງ ແລະ ເທົ່າທຽມ...
+                    </p>
 
-                        <div class="report-section-title">ພາກທີ IV: ຍຸດທະສາດ ແລະ ຄາດໝາຍຜົນໄດ້ຮັບ (6 ເປົ້າໝາຍສະເພາະ)</div>
-                        <ul style="margin-bottom: 20px; padding-left: 20px;">
-                            <li><strong>ເປົ້າໝາຍສະເພາະທີ 1:</strong> ການເຂົ້າເຖິງການສຶກສາກ່ອນໄວຮຽນ, ປະຖົມ ແລະ ມັດທະຍົມ ທີ່ມີຄຸນນະພາບ ແລະ ເທົ່າທຽມ.</li>
-                            <li><strong>ເປົ້າໝາຍສະເພາະທີ 2:</strong> ອັດຕາການຮູ້ໜັງສື ແລະ ທັກສະຊີວິດໃນໄວໜຸ່ມ ແລະ ຜູ້ໃຫຍ່ເພີ່ມຂຶ້ນ (ກສນ).</li>
-                            <li><strong>ເປົ້າໝາຍສະເພາະທີ 3:</strong> ຄຸນນະພາບ ແລະ ຄວາມສອດຄ່ອງຂອງອາຊີວະສຶກສາ ແລະ ຊັ້ນສູງ ຕອບສະໜອງຕະຫຼາດແຮງງານ.</li>
-                            <li><strong>ເປົ້າໝາຍສະເພາະທີ 4:</strong> ຂະແໜງການສຶກສາມີງົບປະມານ ແລະ ຊັບພະຍາກອນພຽງພໍ ພ້ອມຄຸ້ມຄອງຢ່າງມີປະສິດທິພາບ.</li>
-                            <li><strong>ເປົ້າໝາຍສະເພາະທີ 5:</strong> ວຽກງານກິລາ - ກາຍະກຳ ແລະ ສິລະປະສຶກສາ ໄດ້ມາດຕະຖານ ເຊີດຊູຖານະບົດບາດຊາດ.</li>
-                            <li><strong>ເປົ້າໝາຍສະເພາະທີ 6:</strong> ຂັບເຄື່ອນດ້ວຍການພັດທະນາ ແລະ ນຳໃຊ້ຄວາມກ້າວໜ້າທາງວິທະຍາສາດ, ເຕັກໂນໂລຊີ ແລະ ນະວັດຕະກຳ.</li>
-                        </ul>
+                    <div class="report-section-title">ພາກທີ IV: ຍຸດທະສາດ ແລະ ຄາດໝາຍຜົນໄດ້ຮັບ (6 ເປົ້າໝາຍສະເພາະ)</div>
+                    <ul style="margin-bottom: 20px; padding-left: 20px;">
+                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 1:</strong> ການເຂົ້າເຖິງການສຶກສາກ່ອນໄວຮຽນ, ປະຖົມ ແລະ ມັດທະຍົມ ທີ່ມີຄຸນນະພາບ ແລະ ເທົ່າທຽມ.</li>
+                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 2:</strong> ອັດຕາການຮູ້ໜັງສື ແລະ ທັກສະຊີວິດໃນໄວໜຸ່ມ ແລະ ຜູ້ໃຫຍ່ເພີ່ມຂຶ້ນ (ກສນ).</li>
+                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 3:</strong> ຄຸນນະພາບ ແລະ ຄວາມສອດຄ່ອງຂອງອາຊີວະສຶກສາ ແລະ ຊັ້ນສູງ ຕອບສະໜອງຕະຫຼາດແຮງງານ.</li>
+                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 4:</strong> ຂະແໜງການສຶກສາມີງົບປະມານ ແລະ ຊັບພະຍາກອນພຽງພໍ ພ້ອມຄຸ້ມຄອງຢ່າງມີປະສິດທິພາບ.</li>
+                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 5:</strong> ວຽກງານກິລາ - ກາຍະກຳ ແລະ ສິລະປະສຶກສາ ໄດ້ມາດຕະຖານ ເຊີດຊູຖານະບົດບາດຊາດ.</li>
+                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 6:</strong> ຂັບເຄື່ອນດ້ວຍການພັດທະນາ ແລະ ນຳໃຊ້ຄວາມກ້າວໜ້າທາງວິທະຍາສາດ, ເຕັກໂນໂລຊີ ແລະ ນະວັດຕະກຳ.</li>
+                    </ul>
 
-                        <div class="report-section-title">ພາກທີ V, VI ແລະ VII: ງົບປະມານ, ຕິດຕາມປະເມີນຜົນ ແລະ ຄວາມສ່ຽງ</div>
-                        <p style="margin-bottom: 30px; text-align: justify;">
-                            ກຳນົດຄາດຄະເນການໃຊ້ຈ່າຍງົບປະມານພາຍໃຕ້ 2 ສົມມຸດຖານ (ງົບເທົ່າເດີມ ແລະ ງົບເພີ່ມຂຶ້ນ), ພ້ອມທັງກົນໄກຕິດຕາມປະເມີນຜົນ ແລະ ຍຸດທະສາດຫຼຸດຜ່ອນຄວາມສ່ຽງ.
-                        </p>
+                    <div class="report-section-title">ພາກທີ V, VI ແລະ VII: ງົບປະມານ, ຕິດຕາມປະເມີນຜົນ ແລະ ຄວາມສ່ຽງ</div>
+                    <p style="margin-bottom: 30px; text-align: justify;">
+                        ກຳນົດຄາດຄະເນການໃຊ້ຈ່າຍງົບປະມານພາຍໃຕ້ 2 ສົມມຸດຖານ (ງົບເທົ່າເດີມ ແລະ ງົບເພີ່ມຂຶ້ນ), ພ້ອມທັງກົນໄກຕິດຕາມປະເມີນຜົນ ແລະ ຍຸດທະສາດຫຼຸດຜ່ອນຄວາມສ່ຽງ.
+                    </p>
 
-                        <div style="margin-top: 40px; display: flex; justify-content: flex-end;">
-                            <div style="text-align: center;">
-                                <p><strong>ວັນທີ:</strong> ............/............/2026</p>
-                                <p style="margin-top: 5px; font-weight: bold;">ພະແນກສຶກສາທິການ ແລະ ກິລາແຂວງໄຊຍະບູລີ</p>
-                                <br><br><br>
-                                <p>..................................................</p>
-                            </div>
+                    <div style="margin-top: 40px; display: flex; justify-content: flex-end;">
+                        <div style="text-align: center;">
+                            <p><strong>ວັນທີ:</strong> ............/............/2026</p>
+                            <p style="margin-top: 5px; font-weight: bold;">ພະແນກສຶກສາທິການ ແລະ ກິລາແຂວງໄຊຍະບູລີ</p>
+                            <br><br><br>
+                            <p>..................................................</p>
                         </div>
                     </div>
-                `;
+                </div>
+            `;
+        }
+
+        // ປຸ່ມລັດເມນູຫຼັກ "ລາຍງານ" ໃຫ້ເປີດໜ້າ Hub ໃຫ້ເລືອກ
+        function showReportHub() {
+            const contentDisplay = document.getElementById('content-display');
+            if (contentDisplay) {
+                showReportHubView();
             }
+        }
+
+        function showReportHubView() {
+            const contentDisplay = document.getElementById('content-display');
+            contentDisplay.innerHTML = `
+                <div class="report-hub-container">
+                    <h2 style="color: #1e293b; margin-bottom: 10px;">ລະບົບສ້າງ ແລະ ຈັດການບົດລາຍງານ</h2>
+                    <p style="color: #64748b; font-size: 14px;">ກະລຸນາເລືອກປະເພດບົດລາຍງານທີ່ທ່ານຕ້ອງການຈັດທຳ:</p>
+                    
+                    <div class="report-hub-grid">
+                        <div class="report-hub-card" onclick="showGeneralReport()">
+                            <h3>📁 1) ລາຍງານວຽກທົ່ວໄປ</h3>
+                            <p>ລາຍງານຜົນການຈັດຕັ້ງປະຕິບັດແຜນຍຸດທະສາດ ແລະ ວຽກງານຈຸດສຸມປະຈຳ (ອາທິດ, ເດືອນ, 3 ເດືອນ, 6 ເດືອນ, 9 ເດືອນ, 12 ເດືອນ) ພ້ອມຕາຕະລາງຜົນງານຕົວຈິງ ແລະ ໄຟລ໌ແນບ.</p>
+                        </div>
+                        <div class="report-hub-card" onclick="showStrategyPlanReport()">
+                            <h3>📊 2) ລາຍງານແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</h3>
+                            <p>ລາຍງານຕາມຮ່າງແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ 5 ປີ ຄັ້ງທີ X (2026 - 2030) ຢ່າງລະອຽດ.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Override ຟັງຊັນ showReportView ເກົ່າ ໃຫ້ເປັນ showReportHubView
+        function showReportView() {
+            showReportHubView();
         }
 
         function updateReportTitle() {
