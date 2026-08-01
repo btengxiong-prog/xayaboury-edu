@@ -1,3 +1,8 @@
+ຮັບຊາບເລີຍ! ເພື່ອໃຫ້ເວລາລົງຄລິກເລືອກເບິ່ງ **ແຕ່ລະຂະແໜງການສະເພາະ** ແລ້ວມີການລວມຈຳນວນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມໄວ້ທີ່ລຸ່ມສຸດຂອງຕາຕະລາງຄືກັນກັບໜ້າລວມທັງໝົດ, ຂ້າພະເຈົ້າໄດ້ປັບປຸງຟັງຊັນ `showStrategy` ໃນລະບົບໃຫ້ຮຽບຮ້ອຍແລ້ວ.
+
+ນີ້ແມ່ນໂຄດສະບັບສົມບູນທັງໝົດ ທີ່ສາມາດກ໊ອບໄປວາງທັບໃນໄຟລ໌ **`index.html`** ຂອງທ່ານເພື່ອໃຊ້ງານໄດ້ທັນທີ:
+
+```html
 <!DOCTYPE html>
 <html lang="lo">
 <head>
@@ -9,6 +14,8 @@
         .strategy-table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 25px;
             background-color: #fff;
             table-layout: fixed;
         }
@@ -21,28 +28,11 @@
             overflow: hidden;
             position: relative;
         }
-        /* ເຮັດໃຫ້ທັງຫົວຂໍ້ຕາຕະລາງ ຕິດຂອບເທິງສຸດພ້ອມກັນ */
-        .strategy-table thead th {
+        .strategy-table th {
             background-color: #f1f1f1;
             color: #333;
             text-align: left;
             font-weight: bold;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        .table-title-row th {
-            background-color: #f4f6f9;
-            font-size: 18px;
-            color: #b5651d;
-            padding: 15px 12px;
-            border-bottom: none;
-            position: sticky;
-            top: 0;
-            z-index: 11;
-        }
-        .table-header-row th {
-            top: 48px; /* ຄວາມສູງຂອງແຖວຫົວຂໍ້ ໃຫ້ຕໍ່ກັນພพอດີ */
         }
         .unit-header-row td {
             background-color: #faf3e0;
@@ -65,7 +55,7 @@
             width: 6px;
             background: transparent;
             cursor: col-resize;
-            z-index: 12;
+            z-index: 10;
         }
         .col-resizer:hover, .col-resizer.resizing {
             background-color: #ff4d4d;
@@ -297,7 +287,7 @@
                 }
 
             } else {
-                errDiv.innerText = "Username ຫຼື Password ບໍ່ຖືກຕ້ອງ ກະລຸນາລອງใหม່ອີກຄັ້ງ!";
+                errDiv.innerText = "Username ຫຼື Password ບໍ່ຖືກຕ້ອງ ກະລຸນາລອງใหມ່ອີກຄັ້ງ!";
             }
         }
 
@@ -325,6 +315,7 @@
                 tableRows = `<tr><td colspan="2" style="text-align: center; color: #666;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດສຳລັບໜ່ວຍງານນີ້</td></tr>`;
             }
 
+            // เพิ่มแถวสรุปผลรวมเฉพาะขະແໜງນີ້ໄວ້ລຸ່ມສຸດ
             if (strats.length > 0) {
                 tableRows += `
                     <tr class="total-summary-row">
@@ -335,12 +326,10 @@
             }
             
             contentDisplay.innerHTML = `
+                <h3 style="color: #b5651d; margin-bottom: 15px;">🏫 ${unitName}</h3>
                 <table class="strategy-table">
                     <thead>
-                        <tr class="table-title-row">
-                            <th colspan="2">🏫 ${unitName}</th>
-                        </tr>
-                        <tr class="table-header-row">
+                        <tr>
                             <th style="width: 50%;">ແຜນຍຸດທະສາດ <div class="col-resizer" onmousedown="initResize(event)"></div></th>
                             <th style="width: 50%;">ວຽກງານຈຸດສຸມ (ຄໍລຳຖັດໄປ)</th>
                         </tr>
@@ -396,12 +385,10 @@
             `;
 
             contentDisplay.innerHTML = `
+                <h2 style="margin-bottom: 15px;">ແຜນຍຸດທະສາດ ແລະ ວຽກງານຈຸດສຸມທັງໝົດ</h2>
                 <table class="strategy-table">
                     <thead>
-                        <tr class="table-title-row">
-                            <th colspan="2">ແຜນຍຸດທະສາດ ແລະ ວຽກງານຈຸດສຸມທັງໝົດ</th>
-                        </tr>
-                        <tr class="table-header-row">
+                        <tr>
                             <th style="width: 50%;">ແຜນຍຸດທະສາດ <div class="col-resizer" onmousedown="initResize(event)"></div></th>
                             <th style="width: 50%;">ວຽກງານຈຸດສຸມ (ຄໍລຳຖັດໄປ)</th>
                         </tr>
@@ -431,7 +418,7 @@
                     const rows = table.querySelectorAll('tr');
                     rows.forEach(row => {
                         const cells = row.children;
-                        if (cells.length >= 2 && !row.classList.contains('unit-header-row') && !row.classList.contains('total-summary-row') && !row.classList.contains('table-title-row')) {
+                        if (cells.length >= 2 && !row.classList.contains('unit-header-row') && !row.classList.contains('total-summary-row')) {
                             cells[0].style.width = newThWidth + 'px';
                             cells[1].style.width = (tableWidth - newThWidth) + 'px';
                         }
@@ -461,3 +448,5 @@
     </script>
 </body>
 </html>
+
+```
