@@ -288,7 +288,7 @@
             color: #2563eb;
         }
 
-        /* ຕົບແຕ່ງສ່ວນໜ້າລາຍງານ (Report Page Styling) */
+        /* ຕົບແຕ່ງສ່ວນໜ້າລາຍງານ ແລະ ນຳເຂົ້າແຜນ */
         .report-container {
             background: white;
             padding: 40px;
@@ -387,7 +387,7 @@
 </head>
 <body onclick="closeAllDropdowns(event)">
 
-    <!-- Modal ສຳລັບສະແດງຮູບພາບຕົວຈິງ -->
+    <!-- Modal ສຳລັບສະແດງຮູບພາບຂະໜາດໃຫຍ່ -->
     <div id="image-modal" class="image-modal-overlay" onclick="closeImageModal()">
         <div class="image-modal-content" onclick="event.stopPropagation()">
             <img id="modal-img-tag" src="" alt="Preview">
@@ -439,8 +439,8 @@
                     <span>ນຳເຂົ້າແຜນ ▾</span>
                 </div>
                 <div id="import-dropdown-menu" class="dropdown-menu">
-                    <div onclick="showImportGeneral()">📁 ວຽກທົ່ວໄປ</div>
-                    <div onclick="showImportStrategy()">📊 ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</div>
+                    <div onclick="showImportManagerPage('import_general', 'ວຽກທົ່ວໄປ')">📁 ວຽກທົ່ວໄປ</div>
+                    <div onclick="showImportManagerPage('import_strategy', 'ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ')">📊 ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</div>
                 </div>
             </div>
 
@@ -753,23 +753,6 @@
             `;
         }
 
-        // ຟັງຊັນສຳລັບเมນູ "ນຳເຂົ້າແຜນ -> ວຽກທົ່ວໄປ" (ສະແດງໜ້າທັງໝົດ ຫຼື ເລືອກຂະແໜງການ)
-        function showImportGeneral() {
-            closeAllDropdowns();
-            showAllStrategies();
-        }
-
-        // ຟັງຊັນສຳລັບເມນູ "ນຳເຂົ້າແຜນ -> ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ"
-        function showImportStrategy() {
-            closeAllDropdowns();
-            const contentDisplay = document.getElementById('content-display');
-            contentDisplay.innerHTML = `
-                <h2>ນຳເຂົ້າແຜນ: ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</h2>
-                <p>ສ່ວນນີ້ສຳລັບການຈັດການ ແລະ ນຳເຂົ້າໂຄງສ້າງແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມຂອງແຕ່ລະຂະແໜງການ.</p>
-                <button type="button" class="save-btn" onclick="showAllStrategies()">ໄປທີ່ຕາຕະລາງຍຸດທະສາດທັງໝົດ</button>
-            `;
-        }
-
         function showAllStrategies() {
             const contentDisplay = document.getElementById('content-display');
             let tableRows = '';
@@ -883,6 +866,86 @@
             }
         }
 
+        // ຟັງຊັນສະແດງໜ້າຈໍຈັດການໄຟລ໌ແຜນ ພ້ອມກ່ອງ input file ທີ່ສາມາດກົດເລືອກໄຟລ໌ໄດ້ໂດຍກົງ
+        function showImportManagerPage(key, titleName) {
+            closeAllDropdowns();
+            const contentDisplay = document.getElementById('content-display');
+            let savedFile = localStorage.getItem(`plan_file_${key}`);
+            let savedFileObj = localStorage.getItem(`plan_fileObj_${key}`);
+            let hasFile = savedFile && savedFileObj;
+            let isImage = hasFile && savedFileObj.startsWith('data:image/');
+            let fileIcon = isImage ? '🖼️' : '📄';
+
+            contentDisplay.innerHTML = `
+                <div class="report-container">
+                    <h2 style="color: #0f172a; margin-bottom: 10px;">ນຳເຂົ້າແຜນ: ${titleName}</h2>
+                    <p style="color: #64748b; margin-bottom: 20px;">ອັບໂຫຼດ ແລະ ຈັດເກັບໄຟລ໌ເອກະສານແຜນງານທີ່ໄດ້ຮັບຮອງແລ້ວ (PDF, Word, Excel, ຮູບພາບທຸກຊະນິດ)</p>
+                    
+                    <div style="padding: 30px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 6px; text-align: center;">
+                        <input type="file" id="real-file-${key}" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" style="margin: 0 auto 15px auto; display: block; font-size: 14px; padding: 10px; background: #fff; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer;" onchange="handleDirectFileChange(event, '${key}', '${titleName}')">
+                        
+                        <div id="${key}_display">
+                            ${hasFile ? `
+                                <div class="file-info-display" style="max-width: 500px; margin: 15px auto 0 auto; padding: 12px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; background: #e2e8f0; border-radius: 6px;">
+                                    <span onclick="${isImage ? `previewPlanImage('${key}')` : `downloadPlanFile('${key}')`}" title="${isImage ? 'ກົດເພື່ອເບິ່ງຮູບ' : 'ກົດເພື່ອດາວໂຫຼດໄຟລ໌'}" style="cursor:pointer; color: #2563eb; text-decoration: underline; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        ${fileIcon} ${savedFile} (ຄລິກເພື່ອເບິ່ງ/ດາວໂຫຼດ)
+                                    </span>
+                                    <button type="button" class="remove-file-btn" style="padding: 6px 12px; font-size: 12px; background: #ef4444; border-radius: 4px;" onclick="removeImportFile('${key}', '${titleName}')">ລົບໄຟລ໌</button>
+                                </div>
+                            ` : `<p style="color: #666; font-style: italic; margin-top: 10px;">(ກະລຸນາເລືອກໄຟລ໌ເອກະສານແຜນຈາກປຸ່ມ Choose File ດ້ານເທິງ)</p>`}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleDirectFileChange(event, key, titleName) {
+            const input = event.target;
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const fileName = file.name;
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const fileDataUrl = e.target.result;
+                    localStorage.setItem(`plan_file_${key}`, fileName);
+                    localStorage.setItem(`plan_fileObj_${key}`, fileDataUrl);
+                    
+                    showImportManagerPage(key, titleName);
+                    showCustomAlert('ນຳເຂົ້າ ແລະ ບັນທຶກໄຟລ໌ແຜນສຳເລັດແລ້ວ!');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function previewPlanImage(key) {
+            const imgData = localStorage.getItem(`plan_fileObj_${key}`);
+            if (imgData) {
+                document.getElementById('modal-img-tag').src = imgData;
+                document.getElementById('image-modal').style.display = 'flex';
+            }
+        }
+
+        function downloadPlanFile(key) {
+            const fileData = localStorage.getItem(`plan_fileObj_${key}`);
+            const fileName = localStorage.getItem(`plan_file_${key}`);
+            if (fileData && fileName) {
+                const a = document.createElement('a');
+                a.href = fileData;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        }
+
+        function removeImportFile(key, titleName) {
+            localStorage.removeItem(`plan_file_${key}`);
+            localStorage.removeItem(`plan_fileObj_${key}`);
+            showCustomAlert('ລົບໄຟລ໌ແຜນສຳເລັດແລ້ວ!');
+            showImportManagerPage(key, titleName);
+        }
+
         // 1) ຟັງຊັນສະແດງ "ວຽກທົ່ວໄປ" (ລາຍງານ)
         function showGeneralReport() {
             closeAllDropdowns();
@@ -890,7 +953,7 @@
             contentDisplay.innerHTML = `
                 <div class="report-container" id="printable-report">
                     <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ</div>
-                    <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">ສັນຕິພາບ ເອກະລາດ ປະຊາທິປະໄຕ ເອກະພາບ ວັດຖະນາຖາວອນ</div>
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">ສັນຕິພາບ ເອກະລາດ ປະຊາທິປະໄຕ ເອກະພາບ ວັດທະນະຖາວອນ</div>
                     <hr style="border: 0; border-top: 1px solid #cbd5e1; width: 180px; margin: 10px auto 20px auto;">
                     
                     <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-weight: bold;">
@@ -1028,50 +1091,50 @@
 
                     <div class="report-section-title">ຄໍານໍາ</div>
                     <p style="margin-bottom: 15px; text-align: justify;">
-                        ແຜນພັດທະນາຂະແໜງການສຶກສາ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ X (2026 - 2030) ສະແດງເຖິງຄວາມມຸ່ງໝັ້ນຢ່າງຕໍ່ເນື່ອງຂອງແຂວງ ເວົ້າລວມ ເວົ້າສະເພາະກໍ່ຄື ຂະແໜງການສຶກສາ ແລະ ກິລາ ໃນການພັດທະນາການສຶກສາ ແລະ ກິລາ ຢ່າງມີຄຸນນະພາບ, ເທົ່າທຽມ ແລະ ຮອບດ້ານ ເພື່ອເປັນພື້ນຖານໃນການພັດທະນາເສດຖະກິດ - ສັງຄົມ ແລະ ການພັດທະນາແບບຍືນຍົງ. ແຜນດັ່ງກ່າວນີ້ ແມ່ນໄດ້ຖອດຖອນບົດຮຽນຈາກ ແຜນພັດທະນາຂະແໜງການສຶກສາ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ IX (2021 - 2025) ລວມທັງ ຄວາມພະຍາຍາມໃນການແກ້ໄຂບັນດາສິ່ງທ້າທາຍທີ່ຍັງຄົງຄ້າງ ເພື່ອພັດທະນາການສຶກສາ ກໍ່ຄື ການພັດທະນາຊັບພະຍາກອນມະນຸດ ໄປຕາມບູລິມະສິດຂອງແຜນລັດຖະບານ ຕາມທິດສີຂຽວ ແລະ ຍືນຍົງ[cite: 2].
+                        ແຜນພັດທະນາຂະແໜງການສຶກສາ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ X (2026 - 2030) ສະແດງເຖິງຄວາມມຸ່ງໝັ້ນຢ່າງຕໍ່ເນື່ອງຂອງແຂວງ ເວົ້າລວມ ເວົ້າສະເພາະກໍ່ຄື ຂະແໜງການສຶກສາ ແລະ ກິລາ ໃນການພັດທະນາການສຶກສາ ແລະ ກິລາ ຢ່າງມີຄຸນນະພາບ, ເທົ່າທຽມ ແລະ ຮອບດ້ານ ເພື່ອເປັນພື້ນຖານໃນການພັດທະນາເສດຖະກິດ - ສັງຄົມ ແລະ ການພັດທະນາແບບຍືນຍົງ. ແຜນດັ່ງກ່າວນີ້ ແມ່ນໄດ້ຖອດຖອນບົດຮຽນຈາກ ແຜນພັດທະນາຂະແໜງການສຶກສາ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ IX (2021 - 2025) ລວມທັງ ຄວາມພະຍາຍາມໃນການແກ້ໄຂບັນດາສິ່ງທ້າທາຍທີ່ຍັງຄົງຄ້າງ ເພື່ອພັດທະນາການສຶກສາ ກໍ່ຄື ການພັດທະນາຊັບພະຍາກອນມະນຸດ ໄປຕາມບູລິມະສິດຂອງແຜນລັດຖະບານ ຕາມທິດສີຂຽວ ແລະ ຍືນຍົງ.
                     </p>
 
                     <div class="report-section-title">ຄໍາຂອບໃຈ</div>
                     <p style="margin-bottom: 15px; text-align: justify;">
-                        ພະແນກສຶກສາທິການ ແລະ ກິລາແຂວງ ໄດ້ຈັດຕັ້ງປະຕິບັດແຜນພັດທະນາຂະແໜງການສຶກສາ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ IX (2020 – 2025) ປະສົບຜົນສໍາເລັດຕາມຄາດໝາຍ[cite: 2]. ຂະແໜງສະຖິຕິ – ແຜນການ ແລະ ຮ່ວມມືກັບຕ່າງປະເທດ ໃນນາມຄະນະຮັບຜິດຊອບການຮຽບຮຽງເນື້ອໃນ ໄດ້ສ້າງແຜນພັດທະນາຂະແໜງການສຶກສາ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ X (2026 – 2030) ສໍາເລັດລົງດ້ວຍດີ[cite: 2]. ຂໍສະແດງຄວາມຂອບໃຈ ແລະ ຮູ້ບຸນຄຸນຢ່າງສູງ ຕໍ່ບັນດາຂະແໜງການ, ສູນ, ໂຮງຮຽນ, ຫ້ອງການສຶກສາທິການ ແລະ ກິລາເມືອງ ພ້ອມທັງບຸກຄົນທີ່ໄດ້ໃຫ້ຂໍ້ມູນ ແລະ ປະກອບຄຳເຫັນອັນມີຄຸນຄ່າ[cite: 2].
+                        ພະແນກສຶກສາທິການ ແລະ ກິລາແຂວງ ໄດ້ຈັດຕັ້ງປະຕິບັດແຜນພັດທະນາຂະແໜງການສຶກສາ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ IX (2020 – 2025) ປະສົບຜົນສໍາເລັດຕາມຄາດໝາຍ. ຂະແໜງສະຖິຕິ – ແຜນການ ແລະ ຮ່ວມມືກັບຕ່າງປະເທດ ໃນນາມຄະນະຮັບຜິດຊອບການຮຽບຮຽງເນື້ອໃນ ໄດ້ສ້າງແຜນພັດທະນາຂະແໜງການສຶກສາ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ X (2026 – 2030) ສໍາເລັດລົງດ້ວຍດີ. ຂໍສະແດງຄວາມຂອບໃຈ ແລະ ຮູ້ບຸນຄຸນຢ່າງສູງ ຕໍ່ບັນດາຂະແໜງການ, ສູນ, ໂຮງຮຽນ, ຫ້ອງການສຶກສາທິການ ແລະ ກິລາເມືອງ ພ້ອມທັງບຸກຄົນທີ່ໄດ້ໃຫ້ຂໍ້ມູນ ແລະ ປະກອບຄຳເຫັນອັນມີຄຸນຄ່າ.
                     </p>
 
                     <div class="report-section-title">ພາກສະເໜີ</div>
                     <p style="margin-bottom: 15px; text-align: justify;">
-                        ແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ X (2026 – 2030) ປະກອບດ້ວຍ 7 ພາກ ໂດຍພາກສໍາຄັນປະກອບມີ: ການຕີລາຄາຜົນການດໍາເນີນແຜນ 5 ປີ ຄັ້ງທີ IX (2021 – 2025) ໃນດ້ານການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ – ກາຍະກໍາ; ການວິເຄາະບໍລິບົດ ແລະ ນະໂຍບາຍ ທັງລະດັບສາກົນ, ພາຍໃນປະເທດ ແລະ ທ້ອງຖິ່ນ; ການກໍານົດເປົ້າໝາຍລວມ, ຕົວຊີ້ບອກ ແລະ ຄາດໝາຍສູ້ຊົນ 2026 – 2030; ຍຸດທະສາດ ແລະ ຄາດໝາຍຜົນໄດ້ຮັບຕາມ 6 ເປົ້າໝາຍສະເພາະຂອງແຜນ[cite: 2].
+                        ແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ X (2026 – 2030) ປະກອບດ້ວຍ 7 ພາກ ໂດຍພາກສໍາຄັນປະກອບມີ: ການຕີລາຄາຜົນການດໍາເນີນແຜນ 5 ປີ ຄັ້ງທີ IX (2021 – 2025) ໃນດ້ານການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ – ກາຍະກໍາ; ການວິເຄາະບໍລິບົດ ແລະ ນະໂຍບາຍ ທັງລະດັບສາກົນ, ພາຍໃນປະເທດ ແລະ ທ້ອງຖິ່ນ; ການກໍານົດເປົ້າໝາຍລວມ, ຕົວຊີ້ບອກ ແລະ ຄາດໝາຍສູ້ຊົນ 2026 – 2030; ຍຸດທະສາດ ແລະ ຄາດໝາຍຜົນໄດ້ຮັບຕາມ 6 ເປົ້າໝາຍສະເພາະຂອງແຜນ.
                     </p>
 
                     <div class="report-section-title">ພາກທີ I: ຜົນການຈັດຕັ້ງປະຕິບັດແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ IX (2021 - 2025)</div>
                     <p style="margin-bottom: 15px; text-align: justify;">
-                        ໃນໄລຍະ 5 ປີຜ່ານມາ ພະແນກສຶກສາທິການ ແລະ ກິລາແຂວງ ໄດ້ມີຄວາມພະຍາມຢ່າງຕັ້ງໜ້າໃນການຈັດຕັ້ງຜັນຂະຫຍາຍແຜນພັດທະນາເສດຖະກິດ - ສັງຄົມ ແລະ ແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ IX ເພື່ອບັນລຸຄາດໝາຍການພັດທະນາເສດຖະກິດ - ສັງຄົມຂອງແຂວງ[cite: 2]. ໄດ້ສຸມທຸກຊັບພະຍາກອນທີ່ມີຈຳກັດ ເຂົ້າໃສ່ການສົ່ງເສີມການເຂົ້າຮຽນໃນທຸກຊັ້ນທຸກສາຍ, ລະດົມນັກຮຽນທີ່ປະລະ ແລະ ຍົກສູງປະສິດທິພາບໃນການຄຸ້ມຄອງບໍລິຫານການສຶກສາ ແລະ ກິລາ[cite: 2].
+                        ໃນໄລຍະ 5 ປີຜ່ານມາ ພະແນກສຶກສາທິການ ແລະ ກິລາແຂວງ ໄດ້ມີຄວາມພະຍາມຢ່າງຕັ້ງໜ້າໃນການຈັດຕັ້ງຜັນຂະຫຍາຍແຜນພັດທະນາເສດຖະກິດ - ສັງຄົມ ແລະ ແຜນພັດທະນາຂະແໜງການສຶກສາ, ວິທະຍາສາດ ແລະ ກິລາ 5 ປີ ຄັ້ງທີ IX ເພື່ອບັນລຸຄາດໝາຍການພັດທະນາເສດຖະກິດ - ສັງຄົມຂອງແຂວງ. ໄດ້ສຸມທຸກຊັບພະຍາກອນທີ່ມີຈຳກັດ ເຂົ້າໃສ່ການສົ່ງເສີມການເຂົ້າຮຽນໃນທຸກຊັ້ນທຸກສາຍ, ລະດົມນັກຮຽນທີ່ປະລະ ແລະ ຍົກສູງປະສິດທິພາບໃນການຄຸ້ມຄອງບໍລິຫານການສຶກສາ ແລະ ກິລາ.
                     </p>
 
                     <div class="report-section-title">ພາກທີ II: ບໍລິບົດທາງດ້ານນະໂຍບາຍ</div>
                     <p style="margin-bottom: 15px; text-align: justify;">
-                        <strong>2.1. ສະພາບແວດລ້ອມພາຍນອກ:</strong> ປະເຊີນໜ້າກັບຄວາມທ້າທາຍຈາກສະພາບເສດຖະກິດໂລກ, ໄພທຳມະຊາດ, ອັດຕາເງິນເຟີ້ ແລະ ຜົນກະທົບຈາກການແຜ່ລະບາດຂອງພະຍາດຕ່າງໆ[cite: 2].<br>
-                        <strong>2.2. ສະພາບແວດລ້ອມພາຍໃນ:</strong> ແຂວງໄຊຍະບູລີ ມີ 11 ເມືອງ, 430 ບ້ານ, ມີພົນລະເມືອງ 402,691 ຄົນ (ຍິງ 200,304 ຄົນ) ປະກອບດ້ວຍ 8 ຊົນເຜົ່າ ໂດຍມີການຈັດຕັ້ງປະຕິບັດວາລະແຫ່ງຊາດຢ່າງຕັ້ງໜ້າ ແລະ ມີສະຖຽນລະພາບທາງດ້ານການເມືອງ[cite: 2].
+                        <strong>2.1. ສະພາບແວດລ້ອມພາຍນອກ:</strong> ປະເຊີນໜ້າກັບຄວາມທ້າທາຍຈາກສະພາບເສດຖະກິດໂລກ, ໄພທຳມະຊາດ, ອັດຕາເງິນເຟີ້ ແລະ ຜົນກະທົບຈາກການແຜ່ລະບາດຂອງພະຍາດຕ່າງໆ.<br>
+                        <strong>2.2. ສະພາບແວດລ້ອມພາຍໃນ:</strong> ແຂວງໄຊຍະບູລີ ມີ 11 ເມືອງ, 430 ບ້ານ, ມີພົນລະເມືອງ 402,691 ຄົນ (ຍິງ 200,304 ຄົນ) ປະກອບດ້ວຍ 8 ຊົນເຜົ່າ ໂດຍມີການຈັດຕັ້ງປະຕິບັດວາລະແຫ່ງຊາດຢ່າງຕັ້ງໜ້າ ແລະ ມີສະຖຽນລະພາບທາງດ້ານການເມືອງ.
                     </p>
 
                     <div class="report-section-title">ພາກທີ III: ເປົ້າໝາຍລວມ ແລະ ຈຸດປະສົງນະໂຍບາຍທີ່ເປັນບູລິມະສິດ</div>
                     <p style="margin-bottom: 15px; text-align: justify;">
-                        <strong>ເປົ້າໝາຍລວມ:</strong> ຮອດປີ 2030, ພົນລະເມືອງລາວທຸກຄົນໄດ້ຮັບການສຶກສາຂັ້ນພື້ນຖານຢ່າງທົ່ວເຖິງຢ່າງມີຄຸນນະພາບ, ໄດ້ຮັບໂອກາດໃນການສຶກສາຢ່າງຕໍ່ເນື່ອງ ແລະ ເທົ່າທຽມ ເພື່ອສະໜັບສະໜູນການປັບປຸງການຮຽນຮູ້ ແລະ ທັກສະທີ່ຈໍາເປັນ... ພ້ອມທັງໄດ້ເຂົ້າຮ່ວມກິດຈະກຳການອອກກຳລັງກາຍ ແລະ ຫຼີ້ນກິລາເພີ່ມຫລາຍຂຶ້ນ[cite: 2].
+                        <strong>ເປົ້າໝາຍລວມ:</strong> ຮອດປີ 2030, ພົນລະເມືອງລາວທຸກຄົນໄດ້ຮັບການສຶກສາຂັ້ນພື້ນຖານຢ່າງທົ່ວເຖິງຢ່າງມີຄຸນນະພາບ, ໄດ້ຮັບໂອກາດໃນການສຶກສາຢ່າງຕໍ່ເນື່ອງ ແລະ ເທົ່າທຽມ ເພື່ອສະໜັບສະໜູນການປັບປຸງການຮຽນຮູ້ ແລະ ທັກສະທີ່ຈໍາເປັນ... ພ້ອມທັງໄດ້ເຂົ້າຮ່ວມກິດຈະກຳການອອກກຳລັງກາຍ ແລະ ຫຼີ້ນກິລາເພີ່ມຫລາຍຂຶ້ນ.
                     </p>
 
                     <div class="report-section-title">ພາກທີ IV: ຍຸດທະສາດ ແລະ ຄາດໝາຍຜົນໄດ້ຮັບ (6 ເປົ້າໝາຍສະເພາະ)</div>
                     <ul style="margin-bottom: 20px; padding-left: 20px;">
-                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 1:</strong> ການເຂົ້າເຖິງການສຶກສາກ່ອນໄວຮຽນ, ປະຖົມ ແລະ ມັດທະຍົມ ທີ່ມີຄຸນນະພາບ ແລະ ເທົ່າທຽມ[cite: 2].</li>
-                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 2:</strong> ອັດຕາການຮູ້ໜັງສື ແລະ ທັກສະຊີວິດໃນໄວໜຸ່ມ ແລະ ຜູ້ໃຫຍ່ເພີ່ມຂຶ້ນ (ກສນ)[cite: 2].</li>
-                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 3:</strong> ຄຸນນະພາບ ແລະ ຄວາມສອດຄ່ອງຂອງອາຊີວະສຶກສາ ແລະ ຊັ້ນສູງ ຕອບສະໜອງຕະຫຼາດແຮງງານ[cite: 2].</li>
-                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 4:</strong> ຂະແໜງການສຶກສາມີງົບປະມານ ແລະ ຊັບພະຍາກອນພຽງພໍ ພ້ອມຄຸ້ມຄອງຢ່າງມີປະສິດທິພາບ[cite: 2].</li>
-                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 5:</strong> ວຽກງານກິລາ - ກາຍະກຳ ແລະ ສິລະປະສຶກສາ ໄດ້ມາດຕະຖານ ເຊີດຊູຖານະບົດບາດຊາດ[cite: 2].</li>
-                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 6:</strong> ຂັບເຄື່ອນດ້ວຍການພັດທະນາ ແລະ ນຳໃຊ້ຄວາມກ້າວໜ້າທາງວິທະຍາສາດ, ເຕັກໂນໂລຊີ ແລະ ນະວັດຕະກຳ[cite: 2].</li>
+                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 1:</strong> ການເຂົ້າເຖິງການສຶກສາກ່ອນໄວຮຽນ, ປະຖົມ ແລະ ມັດທະຍົມ ທີ່ມີຄຸນນະພາບ ແລະ ເທົ່າທຽມ.</li>
+                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 2:</strong> ອັດຕາການຮູ້ໜັງສື ແລະ ທັກສະຊີວິດໃນໄວໜຸ່ມ ແລະ ຜູ້ໃຫຍ່ເພີ່ມຂຶ້ນ (ກສນ).</li>
+                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 3:</strong> ຄຸນນະພາບ ແລະ ຄວາມສອດຄ່ອງຂອງອາຊີວະສຶກສາ ແລະ ຊັ້ນສູງ ຕອບສະໜອງຕະຫຼາດແຮງງານ.</li>
+                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 4:</strong> ຂະແໜງການສຶກສາມີງົບປະມານ ແລະ ຊັບພະຍາກອນພຽງພໍ ພ້ອມຄຸ້ມຄອງຢ່າງມີປະສິດທິພາບ.</li>
+                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 5:</strong> ວຽກງານກິລາ - ກາຍະກຳ ແລະ ສິລະປະສຶກສາ ໄດ້ມາດຕະຖານ ເຊີດຊູຖານະບົດບາດຊາດ.</li>
+                        <li><strong>ເປົ້າໝາຍສະເພາະທີ 6:</strong> ຂັບເຄື່ອນດ້ວຍການພັດທະນາ ແລະ ນຳໃຊ້ຄວາມກ້າວໜ້າທາງວິທະຍາສາດ, ເຕັກໂນໂລຊີ ແລະ ນະວັດຕະກຳ.</li>
                     </ul>
 
                     <div class="report-section-title">ພາກທີ V, VI ແລະ VII: ງົບປະມານ, ຕິດຕາມປະເມີນຜົນ ແລະ ຄວາມສ່ຽງ</div>
                     <p style="margin-bottom: 30px; text-align: justify;">
-                        - <strong>ພາກທີ V (ແຜນງົບປະມານ ແລະ ການເງິນ):</strong> ພາຍໃຕ້ 2 ສົມມຸດຖານ (ງົບເທົ່າເດີມ ແລະ ງົບເພີ່ມຂຶ້ນ)[cite: 2].<br>
-                        - <strong>ພາກທີ VI (ການຕິດຕາມ ແລະ ປະເມີນຜົນ):</strong> ຕົວຊີ້ບອກ ແລະ ໜ້າທີ່ຮັບຜິດຊອບ[cite: 2].<br>
-                        - <strong>ພາກທີ VII (ຄວາມສ່ຽງ ແລະ ຍຸດທະສາດການຫຼຸດຜ່ອນຄວາມສ່ຽງ).</strong>[cite: 2]
+                        - <strong>ພາກທີ V (ແຜນງົບປະມານ ແລະ ການເງິນ):</strong> ພາຍໃຕ້ 2 ສົມມຸດຖານ (ງົບເທົ່າເດີມ ແລະ ງົບເພີ່ມຂຶ້ນ).<br>
+                        - <strong>ພາກທີ VI (ການຕິດຕາມ ແລະ ປະເມີນຜົນ):</strong> ຕົວຊີ້ບອກ ແລະ ໜ້າທີ່ຮັບຜິດຊອບ.<br>
+                        - <strong>ພາກທີ VII (ຄວາມສ່ຽງ ແລະ ຍຸດທະສາດການຫຼຸດຜ່ອນຄວາມສ່ຽງ).</strong>
                     </p>
 
                     <div style="margin-top: 40px; display: flex; justify-content: flex-end;">
@@ -1190,46 +1253,6 @@
         // ຟັງຊັນບັນທຶກຂໍ້ຄວາມອັດຕະໂນມັດລົງ LocalStorage
         function saveText(key, textarea) {
             localStorage.setItem(`text_${key}`, textarea.value);
-        }
-
-        // ຟັງຊັນຈັດການສະແດງຊື່ໄຟລ໌ ແລະ ບັນທຶກຊື່ລົງ LocalStorage (ຮອງຮັບຮູບພາບ)
-        function handleFileChange(input, key) {
-            const displayArea = input.parentElement.querySelector('.file-display-area');
-            displayArea.innerHTML = '';
-
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                const fileName = file.name;
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    const fileDataUrl = e.target.result;
-                    localStorage.setItem(`file_${key}`, fileName);
-                    localStorage.setItem(`fileObj_${key}`, fileDataUrl);
-
-                    let isImage = file.type.startsWith('image/');
-                    let fileIcon = isImage ? '🖼️' : '📄';
-
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'file-info-display';
-                    fileItem.innerHTML = `
-                        <span onclick="${isImage ? `previewImage('${key}')` : 'void(0)'}" title="${isImage ? 'ກົດເພື່ອເບິ່ງຮູບ' : ''}">${fileIcon} ${fileName}</span>
-                        <button type="button" class="remove-file-btn" onclick="removeFile(this, '${key}')">ລົບ</button>
-                    `;
-                    displayArea.appendChild(fileItem);
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // ຟັງຊັນລົບໄຟລ໌ອອກ
-        function removeFile(btn, key) {
-            localStorage.removeItem(`file_${key}`);
-            localStorage.removeItem(`fileObj_${key}`);
-            const section = btn.closest('.file-upload-section');
-            const fileInput = section.querySelector('input[type="file"]');
-            fileInput.value = '';
-            section.querySelector('.file-display-area').innerHTML = '';
         }
 
         function initResize(e) {
