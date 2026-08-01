@@ -56,26 +56,35 @@
             background-color: #ff4d4d;
         }
         
-        /* ຕົບແຕ່ງກ່ອງປ້ອນຂໍ້ມູນປະຕິບັດຕົວຈິງໃຫ້ງາມຂຶ້ນ */
+        /* ຕົບແຕ່ງກ່ອງປ້ອນຂໍ້ມູນປະຕິບັດຕົວຈິງ */
         .actual-input {
             width: 100%;
-            height: 100%;
-            min-height: 80px;
+            min-height: 50px;
             box-sizing: border-box;
             border: 1px solid #cbd5e1;
             border-radius: 4px;
-            padding: 8px;
+            padding: 6px 8px;
             font-family: inherit;
             font-size: 13px;
             resize: vertical;
             background-color: #f8fafc;
             color: #333;
+            margin-bottom: 6px;
+        }
+        .actual-input:last-child {
+            margin-bottom: 0;
         }
         .actual-input:focus {
             outline: none;
             border-color: #3b82f6;
             background-color: #fff;
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        .focus-item {
+            margin-bottom: 8px;
+        }
+        .focus-item:last-child {
+            margin-bottom: 0;
         }
     </style>
 </head>
@@ -265,7 +274,7 @@
                 { strat: "ຍຸດທະສາດ 02 (ມ.ຕົ້ນ - ຕໍ່): ການສະໜອງອຸປະກອນ ແລະ ສິ່ງອໍານວຍຄວາມສະດວກ ມ.ຕົ້ນ", focus: "28. ສະໜອງປຶ້ມແບບຮຽນ, ຄູ່ມືຄູ, ປຶ້ມອ່ານເສີມ, ສື່, ອຸປະກອນການຮຽນການສອນໃຫ້ພຽງພໍ.<br>29. ສະໜອງຫ້ອງທົດລອງວິທະຍາສາດ, ຫ້ອງຮຽນ ICT, ພາສາຕ່າງປະເທດ, ຫ້ອງສະໝຸດ.<br>30. ສະໜອງອຸປະກອນ ແລະ ສື່ ICT ພື້ນຖານ ສຳລັບການພັດທະນາວິຊາຊີບຄູ.<br>31. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ກຸ່ມໂຮງຮຽນ, ຜູ້ອຳນວຍການ, ຄູປະຈຳການ ແລະ ສຶກສານິເທດ.<br>32. ຕິດຕາມ, ຊຸກຍູ້, ຊ່ວຍເຫຼືອ ແລະ ປະເມີນການປະຕິບັດໜ້າທີ່ຜູ້ເຮັດວຽກສຶກສານິເທດ.<br>33. ຊຸກຍູ້ ແລະ ສົ່ງເສີມຄູທີ່ໄດ້ຮັບຕຳແໜ່ງວິຊາການ ແລະ ການນິເທດພາຍໃນ." },
                 { strat: "ຍຸດທະສາດ 01 (ມ.ຕົ້ນ - ຄຸ້ມຄອງ): ສ້າງຄວາມເຂັ້ມແຂງການສ້າງແຜນ ແລະ ພາວະຜູ້ນຳ", focus: "34. ປະຕິບັດນິຕິກຳໃນການບໍລິຫານຄຸ້ມຄອງໂຮງຮຽນມັດທະຍົມຕອນຕົ້ນ.<br>35. ພັດທະນາວິຊາຊີບແບບຕໍ່ເນື່ອງໃຫ້ແກ່ຜູ້ອຳນວຍການໂຮງຮຽນກ່ຽວກັບການຄຸ້ມຄອງ.<br>36. ປະຕິບັດລະບົບຄັດເລືອກ ແລະ ແຕ່ງຕັ້ງຜູ້ອຳນວຍການຊັ້ນມັດທະຍົມ (ຍົກສູງເພດຍິງ).<br>37. ສະໜອງອຸປະກອນ ICT ພື້ນຖານໃຫ້ແກ່ໂຮງຮຽນມັດທະຍົມ ສຳລັບການຄຸ້ມຄອງ.<br>38. ສ້າງຄວາມເຂັ້ມແຂງໃນວຽກງານການຄຸ້ມຄອງຄວາມສ່ຽງຕໍ່ໄພພິບັດ ແລະ ດິນຟ້າອາກາດ.<br>39. ພັດທະນາກຸ່ມໂຮງຮຽນມັດທະຍົມ ແລະ ກຸ່ມໂຮງຮຽນຕົວແບບໃຫ້ມີຄຸນນະພາບ." },
                 { strat: "ຍຸດທະສາດ 02 (ມ.ຕົ້ນ - ຄຸ້ມຄອງ): ການສະໜອງ ແລະ ຈັດສັນຊັບພະຍາກອນ ມ.ຕົ້ນ", focus: "40. ຕິດຕາມການນຳໃຊ້ເງິນບໍລິຫານສະຖານການສຶກສາ.<br>41. ປັບປຸງການຈັດສັນ - ສັບຊ້ອນຄູໃນຊັ້ນມັດທະຍົມຕອນຕົ້ນ ຕາມລາຍວິຊາ." },
-                { strat: "ຍຸດທະສາດ 03 (ມ.ຕົ້ນ - ຄຸ້ມຄອງ): ສົ່ງເສີມການມີສ່ວນຮ່ວມຂອງຊຸມຊົນ ມ.ຕົ້ນ", focus: "42. ສ້າງ, ປັບປຸງ ແລະ ເຜີຍແຜ່ນິຕິກຳກ່ຽວກັບການມີສ່ວນຮ່ວມຂອງຊຸມຊົນຕໍ່ການພັດທະນາ.<br>43. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ສະມາຄົມພໍ່ແມ່ນັກຮຽນ ແລະ ຊຸມຊົນ.<br>44. ປຸກລະດົມຂົນຂວາຍຊຸມຊົນໃຫ້ຊຸກຍູ້ສົ່ງເສີມລູກຫຼານໃຫ້ຮຽນຈົບມັດທະຍົມຕອນຕົ້ນ.<br>45. ຕິດຕາມ, ຊຸກຍູ້, ຊ່ວຍເຫຼືອການປະຕິບັດໜ້າທີ່ຂອງສະມາຄົມພໍ່ແມ່ນັກຮຽນ ແລະ ຊຸມຊົນ." },
+                { strat: "ຍຸດທະສາດ 03 (ມ.ຕົ້ນ - ຄຸ້ມຄອງ): ສົ່ງເສີມການມີສ່ວນຮ່ວມຂອງຊຸມຊົນ ມ.ຕົ້ນ", focus: "42. ສ້າງ, ປັບປຸງ ແລະ ເຜີຍແຜ່ນິຕິກຳກ່ຽວກັບການມີສ່ວນຮ່ວມຂອງຊຸມຊົນຕໍ່ການພັດທະນາ.<br>43. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ສະມາຄົມພໍ່ແມ່ນັກຮຽນ ແລະ ຊຸມຊົນ.<br>44. ປຸກລະດົມຂົນຂວາຍຊຸມຊົນໃຫ້ຊຸກຍູ້ສົ່ງເສີມລູກຫຼານໃຫ້ຮຽນຈົບມັດທະຍົມສຶກສາຕອນຕົ້ນ.<br>45. ຕິດຕາມ, ຊຸກຍູ້, ຊ່ວຍເຫຼືອການປະຕິບັດໜ້າທີ່ຂອງສະມາຄົມພໍ່ແມ່ນັກຮຽນ ແລະ ຊຸມຊົນ." },
                 { strat: "ຍຸດທະສາດ 01 (ມ.ປາຍ): ເພີ່ມອັດຕາ ການເຂົ້າຮຽນ ຊັ້ນມັດທະຍົມຕອນປາຍ ໃຫ້ບັນລຸ 39.6%", focus: "1. ປະຕິບັດນິຕິກຳສົ່ງເສີມໃຫ້ນັກຮຽນຈົບ ມ.ຕົ້ນ ຕໍ່ ມ.ປາຍ ໂດຍຫຼຸດຜ່ອນຄ່າໃຊ້ຈ່າຍ.<br>2. ສ້າງຄວາມເຂັ້ມແຂງກົນໄກຄັດເລືອກກຸ່ມເປົ້າໝາຍຮັບເບ້ຍລ້ຽງ ແລະ ຕິດຕາມປະເມີນຜົນ.<br>3. ສືບຕໍ່ ແລະ ຂະຫຍາຍການສະໜອງເບ້ຍລ້ຽງ/ທຶນການສຶກສາ ໃຫ້ແກ່ນັກຮຽນທຸກຍາກ ມ.ປາຍ.<br>4. ສະໜອງທຶນການສຶກສາທັງພາຍໃນ ແລະ ຕ່າງປະເທດ ໃຫ້ແກ່ນັກຮຽນເກັ່ງລະດັບຊາດ.<br>5. ສະໜອງຄ່າເດີນທາງໄປໂຮງຮຽນ ສຳລັບໂຮງຮຽນຫ່າງໄກຈາກບ້ານ ຕາມເງື່ອນໄຂ." },
                 { strat: "ຍຸດທະສາດ 02 (ມ.ປາຍ): ສົ່ງເສີມ ການເຂົ້າຮຽນສາມັນວິຊາຊີບ ຢ່າງເທົ່າທຽມທຸກເພດ", focus: "6. ຂະຫຍາຍການຈັດຕັ້ງການຮຽນ-ການສອນສາມັນວິຊາຊີບ ຢູ່ໂຮງຮຽນກິນນອນຊົນເຜົ່າ ແລະ ມັດທະຍົມ.<br>7. ຕິດຕາມ ແລະ ປະເມີນຜົນການສະໜອງເບ້ຍລ້ຽງ ແລະ ການຈັດການຮຽນການສອນ.<br>8. ສະໜອງເບ້ຍລ້ຽງໃຫ້ແກ່ນັກຮຽນທີ່ເຂົ້າຮຽນຫ້ອງສາມັນວິຊາຊີບ.<br>9. ສົ່ງເສີມການແນະນຳເສັ້ນທາງໄປສູ່ອາຊີບ ໃນຊັ້ນມັດທະຍົມສຶກສາ.<br>10. ສຶກສາ ແລະ ຄົ້ນຄວ້າແຜນຄວາມຕ້ອງການຮຽນວິຊາຊີບຂອງນັກຮຽນໂຮງຮຽນຊົນເຜົ່າ." },
                 { strat: "ຍຸດທະສາດ 03 (ມ.ປາຍ): ສົ່ງເສີມສະພາບແວດລ້ອມພາຍໃນໂຮງຮຽນທີ່ປອດໄພ ແລະ ສຸຂະພາບ", focus: "11. ສະໜອງນ້ຳສະອາດ, ສິ່ງອຳນວຍຄວາມສະດວກ, ອາຄານຮຽນ, ຫໍພັກ, ຫ້ອງນ້ຳ ແຍກຍິງ-ຊາຍ.<br>12. ສົ່ງເສີມກິດຈະກຳນອກຫຼັກສູດ (ສະໂມສອນເດັກຍິງ, ການຫຼິ້ນກິລາ ແລະ ສິລະປະ)." },
@@ -347,35 +356,31 @@
                     
                     tableRows += `
                         <tr>
-                            <td style="width: 35%;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}</td>
-                            <td style="width: 35%;">${item.focus}</td>
-                            <td style="width: 30%;"><textarea class="actual-input" placeholder="ປ້ອນຜົນການຈັດຕັ້ງປະຕິບັດຢູ່ທີ່ນີ້..."></textarea></td>
+                            <td style="width: 50%;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}</td>
+                            <td style="width: 50%;">${item.focus}</td>
                         </tr>
                     `;
                 });
             } else {
-                tableRows = `<tr><td colspan="3" style="text-align: center; color: #666;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດສຳລັບໜ່ວຍງານນີ້</td></tr>`;
+                tableRows = `<tr><td colspan="2" style="text-align: center; color: #666;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດສຳລັບໜ່ວຍງານນີ້</td></tr>`;
             }
 
             if (strats.length > 0) {
                 tableRows += `
                     <tr class="total-summary-row">
-                        <td colspan="2" style="text-align: right;">ລວມແຜນຍຸດທະສາດ: ${totalStrategies} ຂໍ້</td>
-                        <td>ລວມແຜນວຽກຈຸດສຸມ: ${totalFocus} ຂໍ້</td>
+                        <td style="width: 50%; text-align: right;">ລວມແຜນຍຸດທະສາດ: ${totalStrategies} ຂໍ້</td>
+                        <td style="width: 50%;">ລວມແຜນວຽກຈຸດສຸມ: ${totalFocus} ຂໍ້</td>
                     </tr>
                 `;
             }
             
             contentDisplay.innerHTML = `
+                <h3 style="color: #b5651d; margin-bottom: 15px;">🏫 ${unitName}</h3>
                 <table class="strategy-table">
                     <thead>
                         <tr>
-                            <th colspan="3" class="table-title-th">🏫 ${unitName}</th>
-                        </tr>
-                        <tr>
-                            <th style="width: 35%;">ແຜນຍຸດທະສາດ <div class="col-resizer" onmousedown="initResize(event)"></div></th>
-                            <th style="width: 35%;">ວຽກງານຈຸດສຸມ (ຄໍລຳຖັດໄປ) <div class="col-resizer" onmousedown="initResize(event)"></div></th>
-                            <th style="width: 30%;">ປະຕິບັດຕົວຈິງ</th>
+                            <th style="width: 50%;">ແຜນຍຸດທະສາດ <div class="col-resizer" onmousedown="initResize(event)"></div></th>
+                            <th style="width: 50%;">ວຽກງານຈຸດສຸມ (ຄໍລຳຖັດໄປ)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -396,7 +401,7 @@
                 
                 tableRows += `
                     <tr class="unit-header-row">
-                        <td colspan="3">🏫 ${unit}</td>
+                        <td colspan="2">🏫 ${unit}</td>
                     </tr>
                 `;
 
@@ -407,16 +412,15 @@
                         
                         tableRows += `
                             <tr>
-                                <td style="width: 35%;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}</td>
-                                <td style="width: 35%;">${item.focus}</td>
-                                <td style="width: 30%;"><textarea class="actual-input" placeholder="ປ້ອນຜົນການຈັດຕັ້ງປະຕິບັດຢູ່ທີ່ນີ້..."></textarea></td>
+                                <td style="width: 50%;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}</td>
+                                <td style="width: 50%;">${item.focus}</td>
                             </tr>
                         `;
                     });
                 } else {
                     tableRows += `
                         <tr>
-                            <td colspan="3" style="color: #666; font-style: italic; padding-left: 20px;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດ</td>
+                            <td colspan="2" style="color: #666; font-style: italic; padding-left: 20px;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດ</td>
                         </tr>
                     `;
                 }
@@ -424,21 +428,18 @@
 
             tableRows += `
                 <tr class="total-summary-row">
-                    <td colspan="2" style="text-align: right;">ລວມແຜນຍຸດທະສາດທັງໝົດ: ${totalStrategies} ຂໍ້</td>
-                    <td>ລວມແຜນວຽກຈຸດສຸມທັງໝົດ: ${totalFocus} ຂໍ້</td>
+                    <td style="width: 50%; text-align: right;">ລວມແຜນຍຸດທະສາດທັງໝົດ: ${totalStrategies} ຂໍ້</td>
+                    <td style="width: 50%;">ລວມແຜນວຽກຈຸດສຸມທັງໝົດ: ${totalFocus} ຂໍ້</td>
                 </tr>
             `;
 
             contentDisplay.innerHTML = `
+                <h2 style="margin-bottom: 15px;">ແຜນຍຸດທະສາດ ແລະ ວຽກງານຈຸດສຸມທັງໝົດ</h2>
                 <table class="strategy-table">
                     <thead>
                         <tr>
-                            <th colspan="3" class="table-title-th">ແຜນຍຸດທະສາດ ແລະ ວຽກງານຈຸດສຸມທັງໝົດ</th>
-                        </tr>
-                        <tr>
-                            <th style="width: 35%;">ແຜນຍຸດທະສາດ <div class="col-resizer" onmousedown="initResize(event)"></div></th>
-                            <th style="width: 35%;">ວຽກງານຈຸດສຸມ (ຄໍລຳຖັດໄປ) <div class="col-resizer" onmousedown="initResize(event)"></div></th>
-                            <th style="width: 30%;">ປະຕິບັດຕົວຈິງ</th>
+                            <th style="width: 50%;">ແຜນຍຸດທະສາດ <div class="col-resizer" onmousedown="initResize(event)"></div></th>
+                            <th style="width: 50%;">ວຽກງານຈຸດສຸມ (ຄໍລຳຖັດໄປ)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -453,33 +454,26 @@
             const table = th.closest('table');
             const startX = e.clientX;
             const startWidth = th.offsetWidth;
-            
-            // ຊອກຫາຕຳແໜ່ງ (Index) ຂອງຄໍລຳທີ່ກຳລັງດຶງ
-            const thIndex = Array.from(th.parentElement.children).indexOf(th);
             const nextTh = th.nextElementSibling;
             const startNextWidth = nextTh ? nextTh.offsetWidth : 0;
+            const tableWidth = table.offsetWidth;
 
             e.target.classList.add('resizing');
 
             function onMouseMove(e) {
                 const dx = e.clientX - startX;
                 const newThWidth = startWidth + dx;
-                const newNextWidth = startNextWidth - dx;
-
-                if (newThWidth > 50 && newNextWidth > 50) {
+                if (newThWidth > 50 && newThWidth < tableWidth - 50) {
                     const rows = table.querySelectorAll('tr');
                     rows.forEach(row => {
                         const cells = row.children;
-                        // ປັບຂະໜາດສະເພາະແຖວທີ່ມີຈຳນວນຄໍລຳຄົບ (ບໍ່ແມ່ນຫົວຂໍ້ໃຫຍ່ ຫຼື ຜົນລວມ)
-                        if (!row.classList.contains('unit-header-row') && !row.classList.contains('total-summary-row') && cells.length >= 3) {
-                            cells[thIndex].style.width = newThWidth + 'px';
-                            if (cells[thIndex + 1]) {
-                                cells[thIndex + 1].style.width = newNextWidth + 'px';
-                            }
+                        if (cells.length >= 2 && !row.classList.contains('unit-header-row') && !row.classList.contains('total-summary-row')) {
+                            cells[0].style.width = newThWidth + 'px';
+                            cells[1].style.width = (tableWidth - newThWidth) + 'px';
                         }
                     });
                     th.style.width = newThWidth + 'px';
-                    if (nextTh) nextTh.style.width = newNextWidth + 'px';
+                    if (nextTh) nextTh.style.width = (tableWidth - newThWidth) + 'px';
                 }
             }
 
