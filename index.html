@@ -255,6 +255,60 @@
             transform: translateY(-1px);
         }
 
+        /* Modal ສຳລັບຟອມປ້ອນຂໍ້ມູນເອກະສານໃໝ່ */
+        .input-modal-box {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            width: 450px;
+            max-width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            border: 1px solid #cbd5e1;
+            text-align: left;
+        }
+        .input-modal-box h3 {
+            margin-top: 0;
+            color: #0f172a;
+            font-size: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .form-field {
+            margin-bottom: 12px;
+        }
+        .form-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #334155;
+            margin-bottom: 4px;
+        }
+        .form-field input[type="text"], .form-field input[type="date"], .form-field textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .modal-btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-cancel {
+            background: #94a3b8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
         /* ຕົບແຕ່ງ Dropdown Menu ຂອງປຸ່ມຕ່າງໆ */
         .dropdown-container {
             position: relative;
@@ -392,9 +446,8 @@
 </head>
 <body onclick="closeAllDropdowns(event)">
 
-    <!-- Hidden File Inputs ສຳລັບtrigger ເປີດປ່ອງຢ້ຽມເລືອກໄຟລ໌ທັນທີ -->
-    <input type="file" id="hidden-file-general" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleHiddenFileChange(event, 'import_general', 'ແຜນວຽກທົ່ວໄປ')">
-    <input type="file" id="hidden-file-strategy" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleHiddenFileChange(event, 'import_strategy', 'ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ')">
+    <!-- Hidden File Inputs ສຳລັບtrigger ເປີດເລືອກໄຟລ໌ -->
+    <input type="file" id="hidden-file-input" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileSelected(event)">
 
     <!-- Modal ສຳລັບສະແດງຮູບພາບຂະໜາດໃຫຍ່ -->
     <div id="image-modal" class="image-modal-overlay" onclick="closeImageModal()">
@@ -402,6 +455,36 @@
             <img id="modal-img-tag" src="" alt="Preview">
             <div>
                 <button type="button" class="image-modal-close" onclick="closeImageModal()">ປິດ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal ສຳລັບປ້ອນຂໍ້ມູນເອກະສານເບື້ອງຕົ້ນ -->
+    <div id="doc-input-modal" class="custom-alert-overlay">
+        <div class="input-modal-box">
+            <h3 id="doc-modal-title">📝 ປ້ອນຂໍ້ມູນເອກະສານ</h3>
+            <div class="form-field">
+                <label>ເລືອກໄຟລ໌ເອກະສານ / ຮູບພາບ:</label>
+                <div style="display:flex; gap:8px;">
+                    <button type="button" onclick="document.getElementById('hidden-file-input').click()" style="padding:6px 12px; background:#e2e8f0; border:1px solid #cbd5e1; border-radius:4px; cursor:pointer; font-size:12px;">📎 ເລືອກໄຟລ໌</button>
+                    <span id="selected-filename-display" style="font-size:12px; color:#2563eb; align-self:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px;">ຍັງບໍ່ໄດ້ເລືອກໄຟລ໌</span>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>ເນື້ອໃນເອກະສານ:</label>
+                <textarea id="modal-doc-content" rows="3" placeholder="ປ້ອນເນື້ອໃນ ຫຼື ສັງລວມຫຍໍ້ຂອງເອກະສານ..."></textarea>
+            </div>
+            <div class="form-field">
+                <label>ເລກທີເອກະສານ:</label>
+                <input type="text" id="modal-doc-no" placeholder="ຕົວຢ່າງ: 123/ພສກ.ຊບ">
+            </div>
+            <div class="form-field">
+                <label>ວັນ/ເດືອນ/ປີ ເອກະສານ:</label>
+                <input type="date" id="modal-doc-date">
+            </div>
+            <div class="modal-btn-group">
+                <button type="button" class="btn-cancel" onclick="closeDocModal()">ຍົກເລີກ</button>
+                <button type="button" class="save-btn" onclick="saveDocEntry()">💾 ບັນທຶກເອກະສານ</button>
             </div>
         </div>
     </div>
@@ -441,18 +524,18 @@
         
         <!-- ເມນູລວງນອນດ້ານເທິງ -->
         <div class="top-toolbar">
-            <!-- ປຸ່ມ ນຳເຂົ້າແຜນ ແບບ Dropdown Menu (ອັບເດດແລ້ວ) -->
+            <!-- ປຸ່ມ ນຳເຂົ້າແຜນ ແບບ Dropdown Menu -->
             <div class="dropdown-container">
                 <div class="tool-item" onclick="toggleDropdown(event, 'import-dropdown-menu')">
                     <span class="icon">📥</span>
                     <span>ນຳເຂົ້າແຜນ ▾</span>
                 </div>
                 <div id="import-dropdown-menu" class="dropdown-menu">
-                    <div onclick="triggerImport('general')">📁 ນຳເຂົ້າແຜນວຽກທົ່ວໄປ</div>
-                    <div onclick="triggerImport('strategy')">📊 ນຳເຂົ້າແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</div>
+                    <div onclick="openImportModal('general')">📁 ນຳເຂົ້າແຜນວຽກທົ່ວໄປ</div>
+                    <div onclick="openImportModal('strategy')">📊 ນຳເຂົ້າແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</div>
                     <div class="dropdown-divider"></div>
-                    <div onclick="showImportInfo('general')">📄 ຂໍ້ມູນວຽກທົ່ວໄປ</div>
-                    <div onclick="showImportInfo('strategy')">📈 ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</div>
+                    <div onclick="showDocListTable('general')">📄 ຂໍ້ມູນວຽກທົ່ວໄປ</div>
+                    <div onclick="showDocListTable('strategy')">📈 ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</div>
                 </div>
             </div>
 
@@ -636,7 +719,7 @@
             ],
             "ຂະແໜງ ພັດທະນາຄູ": [
                 { strat: "ຍຸດທະສາດ 01: ຮັບປະກັນການກໍ່ສ້າງຄູໃໝ່ໃຫ້ໄດ້ມາດຕະຖານ ໃຫ້ສອດຄ່ອງກັບແຜນຄວາມຕ້ອງການຄູ", focus: "1. ຜັນຂະຫຍາຍແຜນກໍ່ສ້າງຄູເປັນອັນລະອຽດ ແລະ ສ້າງລະບົບກ່ຽວກັບການຄາດຄະເນຕົວເລກການກໍ່ສ້າງຄູ ອີງຕາມແຜນຄວາມຕ້ອງການຄູ ແລະ ການກໍ່ສ້າງຄູ 10 ປີ (2026 - 2035).<br>2. ລະດົມຊຸກຍູ້ອຳນາດການປົກຄອງທ້ອງຖິ່ນ, ພໍ່ແມ່ໃນການສົ່ງເສີມ ແລະ ແນະນຳວິຊາຊີບຄູໃຫ້ແກ່ນັກຮຽນທີ່ຈົບຊັ້ນມັດທະຍົມ.<br>3. ສົ່ງເສີມການເຂົ້າຮຽນໃນສະຖານການສຶກສາຄູໃນເຂດທີ່ຂາດເຂີນຄູ (ເຂດດ້ອຍໂອກາດ, ຊົນນະບົດ ແລະ ຫ່າງໄກສອກຫຼີກ) ເພື່ອເພີ່ມການສັບຊ້ອນຄູ ແລະ ການຮັກສາຄູໃນເຂດດັ່ງກ່າວ.<br>4. ສົ່ງເສີມການເຂົ້າຮຽນໃນຫຼັກສູດຝຶກອົບຮົມຄູລະດັບມັດທະຍົມໃນສາຂາທີ່ຂາດແຄນ (ໂດຍສະເພາະວິທະຍາສາດ).<br>5. ກຳນົດເງື່ອນໄຂ ແລະ ມາດຕະຖານນັກສຶກສາໃນສາຍສ້າງຄູ, ພ້ອມທັງຄັດເລືອກ ແລະ ສະໜອງເບ້ຍລ້ຽງໃຫ້ແກ່ນັກສຶກສາຄູທີ່ເໝາະສົມ ໃນແຕ່ລະສະຖານການສຶກສາຄູ ຕາມຕົວເລກທີ່ໄດ້ກຳນົດ ໂດຍສະເພາະໃນວິຊາວິທະຍາສາດທຳມະຊາດ.<br>6. ຕິດຕາມ ແລະ ຊຸກຍູ້ການຈັດຕັ້ງປະຕິບັດວຽກງານວິຊາການຮອບດ້ານ ເພື່ອຍົກສູງຂີດຄວາມສາມາດຂອງຄູໃນສະຖານການສຶກສາຄູ." },
-                { strat: "ຍຸດທະສາດ 02: ຮັບປະກັນ ການສະໜອງ ຫຼັກສູດສ້າງຄູ ທຸກຊັ້ນທຸກສາຍ ໃຫ້ສອດຄ່ອງກັບຫຼັກສູດການ ສຶກສາກ່ອນໄວຮຽນ (ກວຮ) ແລະ ສາມັນສຶກສາ", focus: "7. ທົບທວນ ແລະ ປັບປຸງຫຼັກສູດການຍົກລະດັບຄູລະບົບຕໍ່ເນື່ອງ ແລະ ຫຼັກສູດປະລິນຍາຕີ ສາຍການສຶກສາກ່ອນໄວຮຽນ ແລະ ປະຖົມສຶກສາ ໃຫ້ສອດຄ່ອງກັບຫຼັກສູດການສຶກສາກ່ອນໄວຮຽນ ແລະ ສາມັນສຶກສາ.<br>8. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ຄູໃນວິທະຍາໄລຄູ ໃນການຈັດຕັ້ງປະຕິບັດຫຼັກສູດປະລິນຍາຕີ ແລະ ຫຼັກສູດຍົກລະດັບທີ່ໄດ້ປັບປຸງ, ເຊິ່ງກວມເອົາທັງເນື້ອໃນ ແລະ ວິທີການສອນ, ລວມທັງວິທີການສອນທີ່ນຳໃຊ້ ICT ແລະ AI.<br>9. ທົບທວນຄືນການກຳນົດຂອບເຂດ, ພາລະບົດບາດ ແລະ ແຜນປະຕິບັດວຽກຍົກຖານະວິທະຍາໄລຄູ ເປັນສະຖາບັນສ້າງຄູ.<br>10. ສຳຫຼວດ ແລະ ວິເຄາະຂໍ້ມູນຄວາມເປັນໄປໄດ້ຢ່າງຮອບດ້ານ ທີ່ກ່ຽວຂ້ອງໃນການໂຮມສະຖາບັນສ້າງຄູ ແລະ ຄະນະສຶກສາສາດ ເປັນມະຫາວິທະຍາໄລສ້າງຄູແຫ່ງຊາດ." },
+                { strat: "ຍຸດທະສາດ 02: ຮັບປະກັນ ການສະໜອງ ຫຼັກສູດສ້າງຄູ ທຸກຊັ້ນທຸກສາຍ ໃຫ້ສອດຄ່ອງກັບຫຼັກສູດການ ສຶກສາກ່ອນໄວຮຽນ (ກວຮ) ແລະ ສາມັນສຶກສາ", focus: "7. ທົບທວນ ແລະ ປັບປຸງຫຼັກສູດການຍົກລະດັບຄູລະບົບຕໍ່ເນື່ອງ ແລະ ຫຼັກສູດປະລິນຍາຕີ ສາຍການສຶກສາກ່ອນໄວຮຽນ ແລະ ປະຖົມສຶກສາ ໃຫ້ສອດຄ່ອງກັບຫຼັກສູດການສຶກສາກ່ອນໄວຮຽນ ແລະ ສາມັນສຶກສາ.<br>8. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ຄູໃນວິທະຍາໄລຄູ ໃນການຈັດຕັ້ງປະຕິບັດຫຼັກສູດປະລິນຍາຕີ ແລະ ຫຼັກສູດຍົກລະດັບທີ່ໄດ້ປັບປຸງ, ເຊິ່ງກວມເອົາທັງເນື້ອໃນ ແລະ ວິທີການສອນ, ລວມທັງວິທີການສອນທີ່ນຳໃຊ້ ICT ແລະ AI.<br>9. ທົບທວນຄືນການກຳນົດຂອບເຂດ, ພາລະບົດບາດ ແລະ ແຜນປະຕິບັດວຽກຍົກຖານະວິທະຍາໄລຄູ ເປັນສະຖາບັນສ້າງຄູ.<br>10. ສຳຫຼວດ ແລະ ວິເຄາະຂໍ້ມູນຄວາມເປັນໄປໄດ້ຢ່າງຮອບດ້ານ ທີ່ກ່ຽວຂ້ອງໃນການໂຮມສະຖາບັນສ້າງຄູ ແລະ ຄະນະສຶກສາສາດ ເປັນມະຫາວິທະຍາໄລສ້າງຄູແ່ງຊາດ." },
                 { strat: "ຍຸດທະສາດ 03: ທົບທວນ ແລະ ປັບປຸງນິຕິກໍາການຍົກຖານະເປັນສະຖາບັນສ້າງຄູ ແລະ ກະກຽມຍົກສະຖານະເປັນມະຫາວິທະຍາໄລສ້າງຄູ ແຫ່ງຊາດ", focus: "11. ພັດທະນາ, ເຜີຍແຜ່ ແລະ ຈັດຕັ້ງຜັນຂະຫຍາຍບັນດານິຕິກຳ ແລະ ຂະບວນການກ່ຽວກັບການສ້າງຕັ້ງມະຫາວິທະຍາໄລສ້າງຄູແຫ່ງຊາດ." },
                 { strat: "ຍຸດທະສາດ 04: ສ້າງຄວາມເຂັ້ມແຂງໃນການພັດທະນາອາຊີບຄູແບບຕໍ່ເນື່ອງ ໃນແຕ່ລະຂັ້ນຢ່າງມີປະສິດທິພາບ ແລະ ຫັນເປັນທັນສະໄໝ", focus: "12. ທົບທວນ ແລະ ພັດທະນານິຕິກຳ, ຄູ່ມືກ່ຽວກັບການພັດທະນາວິຊາຊີບຄູແບບຕໍ່ເນື່ອງ ລວມທັງການຄິດໄລ່ໜ່ວຍກິດສຳລັບການຝຶກອົບຮົມຕ່າງໆ ພາຍໃຕ້ການພັດທະນາວິຊາຊີບແບບຕໍ່ເນື່ອງ ທຸກຊັ້ນທຸກສາຍໃຫ້ສອດຄ່ອງກັບຫຼັກສູດການສ້າງຄູທຸກລະດັບ.<br>13. ພັດທະນາຄູ່ມືການພັດທະນາວິຊາຊີບຄູແບບຕໍ່ເນື່ອງ ການສຶກສາກ່ອນໄວຮຽນ ແລະ ສາມັນສຶກສາ.<br>14. ສ້າງຄວາມເຂັ້ມແຂງໃນການຜັນຂະຫຍາຍວຽກງານເຄືອຂ່າຍການພັດທະນາວິຊາຊີບຄູແບບຕໍ່ເນື່ອງ ຮ່ວມກັບ ແຂວງ, ເມືອງ ແລະ ກຸ່ມໂຮງຮຽນ ຕາມຂັ້ນຄຸ້ມຄອງ.<br>15. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ສະຖານການສ້າງຄູ ແລະ ສູນພັດທະນາຄູ ໃຫ້ກາຍເປັນສູນກາງແຫ່ງການພັດທະນາວິຊາຊີບຄູ.<br>16. ສ້າງຕັ້ງກົນໄກ ແລະ ສະໜອງການສະໜັບສະໜູນດ້ານວິຊາການທີ່ຈຳເປັນ ແລະ ການສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ກຸ່ມໂຮງຮຽນ ແລະ ໂຮງຮຽນ ສຳລັບວຽກງານ CPD ໃນສະຖານການສຶກສາຄູ ແລະ ສູນພັດທະນາຄູຂັ້ນແຂວງໃນທົ່ວປະເທດ.<br>17. ສ້າງຕັ້ງເວທີສົນທະນາການສຶກສາຄູ ແລະ ທົບທວນຄືນການຈັດຕັ້ງປະຕິບັດສະພາການສຶກສາຄູ.<br>18. ພັດທະນາລະບົບການຝຶກອົບຮົມແບບອອນລາຍ ສຳລັບຄູຊັ້ນປະຖົມສຶກສາ." },
                 { strat: "ຍຸດທະສາດ 05: ທົບທວນ ແລະ ປັບປຸງລະບົບການສະໜັບສະໜູນການພັດທະນາອາຊີບ ສໍາລັບວຽກງານການສືກສານິເທດ ທຸກຊັ້ນ", focus: "19. ພັດທະນາລະບົບການຕິດຕາມການປະຕິບັດໜ້າທີ່ຂອງຜູ້ເຮັດວຽກສຶກສານິເທດທຸກຊັ້ນ.<br>20. ປະເມີນຄວາມຕ້ອງການໃນການພັດທະນາວິຊາຊີບຂອງຜູ້ເຮັດວຽກສຶກສານິເທດທຸກຊັ້ນ.<br>21. ສ້າງຄວາມເຂັ້ມແຂງໃນການສະໜັບສະໜູນຊ່ວຍເຫຼືອຄູໃຫ້ແກ່ຜູ້ເຮັດວຽກສຶກສານິເທດ ພາຍໃນ ແລະ ພາຍນອກ." },
@@ -659,6 +742,10 @@
                 { strat: "ຍຸດທະສາດ 01: ປັບປຸງ ແລະ ຄຸ້ມຄອງກົງຈັກການຈັດຕັ້ງ , ການຄຸ້ມຄອງ ແລະ ການບໍລິຫານ ໃນ ສະຖານການສຶກສາຊັ້ນສູງ ໃຫ້ມີປະສິດ ທິພາບ", focus: "19. ປັບປຸງກົງຈັກການຈັດຕັ້ງ ແລະ ການຄຸ້ມຄອງບຸກຄະລາກອນ ຂອງມະຫາວິທະຍາໄລ 04 ແຫ່ງ ທີ່ຂຶ້ນກັບກະຊວງສຶກສາທິການ ແລະ ກິລາ ໃຫ້ມີປະສິດທິພາບ.<br>20. ສ້າງຄວາມເຂັ້ມແຂງດ້ານການບໍລິຫານ ແລະ ການຄຸ້ມຄອງ ໃນ ສະຖານການສຶກສາຊັ້ນສູງ ໃຫ້ມີຄວາມທັນສະໃໝ ເພື່ອຫັນໄປສູ່ ການກຸ້ມຕົນເອງເທື່ອລະກ້າວທາງດ້ານການເງິນ.<br>21. ຄຸ້ມຄອງຂໍ້ມູນຂ່າວສານການສຶກສາຊັ້ນສູງ ໃຫ້ເປັນລະບົບ ແລະ ເຊື່ອມໂຍງຂໍ້ມູນຂ່າວສານການສຶກສາແຫ່ງຊາດ (LEMIS).<br>22. ພັດທະນາລະບົບຖາມຂໍ້ມູນຄຸ້ມຄອງຜວ້ຮຽນໄປ ແລະ ກັບຈາກຕ່າງປະເທດໃຫ້ທັນສະໄໝ.<br>23. ພັດທະນາເວັບໄຊວຽກງານການສຶກສາຕ່າງປະເທດໃຫ້ທັນສະໄໝ.<br>24. ພັດທະນາເຄື່ອງມືຕິດຕາມການມີວຽກເຮັດງານທໍາຂອງຜູ້ຮຽນ ກັບຈາກຕ່າງປະເທດ.<br>25. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ບຸກຄະລາກອນນໍາໃຊ້ເຄື່ອງມື ຕິດຕາມການມີວຽກເຮັດງານທຳຂອງຜູ້ຮຽນກັບຈາກຕ່າງປະເທດ.<br>26. ສຶກສາຄວາມຕ້ອງການຂອງສັງຄົມ ແລະ ນໍາໃຊ້ຂໍ້ມູນເພື່ອວາງ ແຜນການພັດທະນາຊັບພະກອນມະນຸດຢູ່ຕ່າງປະເທດ.<br>27. ປັບປຸງນິຕິກຳກ່ຽວກັບການຄົ້ນຄວ້າ ແລະ ຄັດເລືອກຜູ້ສະໝັກ ທຶນການສຶກສາຕ່າງປະເທດສອດຄ່ອງກັບຍຸດທະສາດການ ພັດທະນາຊັບພະຍາ ກອນມະນຸດແຫ່ງຊາດ.<br>28. ສ້າງຄວາມເຂັ້ມແຂງວຽກງານການຕິດຕາມ ແລະ ປະເມີນຜົນ." }
             ]
         };
+
+        // 변수: ປະເພດເອກະສານທີ່ກຳລັງປະຕິບັດງານຢູ່ ('general' ຫຼື 'strategy')
+        let currentImportType = '';
+        let tempFileData = null;
 
         function handleLogin(event) {
             event.preventDefault();
@@ -872,112 +959,184 @@
             });
         }
 
-        function closeDropdownOnOutside(event) {
-            if (!event.target.closest('.dropdown-container')) {
-                closeAllDropdowns();
-            }
-        }
-
-        // ຟັງຊັນສຳລັບທຣິກເປີດໜ້າຕ່າງເລືອກໄຟລ໌
-        function triggerImport(type) {
+        /* ----------------------------------------------------
+           ລະບົບຄຸ້ມຄອງການນຳເຂົ້າ ແລະ ສະແດງຂໍ້ມູນເອກະສານ (ອັບເດດໃໝ່)
+        ---------------------------------------------------- */
+        
+        // ເປີດ Modal ປ້ອນຂໍ້ມູນເອກະສານ
+        function openImportModal(type) {
             closeAllDropdowns();
-            if (type === 'general') {
-                document.getElementById('hidden-file-general').click();
-            } else if (type === 'strategy') {
-                document.getElementById('hidden-file-strategy').click();
-            }
-        }
-
-        // ຟັງຊັນສະແດງຂໍ້ມູນໄຟລ໌ແຜນທີ່ໄດ້ນຳເຂົ້າແລ້ວ
-        function showImportInfo(type) {
-            closeAllDropdowns();
-            const key = type === 'general' ? 'import_general' : 'import_strategy';
-            const titleName = type === 'general' ? 'ແຜນວຽກທົ່ວໄປ' : 'ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ';
+            currentImportType = type;
+            tempFileData = null;
             
-            const fileName = localStorage.getItem(`plan_file_${key}`) || 'ຍັງບໍ່ມີໄຟລ໌';
-            const fileDataUrl = localStorage.getItem(`plan_fileObj_${key}`) || '';
-            const isImage = fileDataUrl.startsWith('data:image/');
+            document.getElementById('doc-modal-title').innerText = (type === 'general') ? '📁 ນຳເຂົ້າແຜນວຽກທົ່ວໄປ' : '📊 ນຳເຂົ້າແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ';
+            document.getElementById('modal-doc-content').value = '';
+            document.getElementById('modal-doc-no').value = '';
+            document.getElementById('modal-doc-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('selected-filename-display').innerText = 'ຍັງບໍ່ໄດ້ເລືອກໄຟລ໌';
+            document.getElementById('hidden-file-input').value = '';
 
-            showImportManagerPage(key, titleName, fileName, fileDataUrl, isImage);
+            document.getElementById('doc-input-modal').style.display = 'flex';
         }
 
-        // ຟັງຊັນຮັບໄຟລ໌ທີ່ອັບໂຫຼດແລ້ວບັນທຶກລົງ LocalStorage ພ້ອມສະແດງໜ້າຈໍຈັດການໄຟລ໌ແຜນ
-        function handleHiddenFileChange(event, key, titleName) {
+        function closeDocModal() {
+            document.getElementById('doc-input-modal').style.display = 'none';
+        }
+
+        // ເມື່ອເລືອກໄຟລ໌ຈາກເຄື່ອງ
+        function handleFileSelected(event) {
             const input = event.target;
             if (input.files && input.files[0]) {
                 const file = input.files[0];
-                const fileName = file.name;
                 const reader = new FileReader();
 
                 reader.onload = function(e) {
-                    const fileDataUrl = e.target.result;
-                    localStorage.setItem(`plan_file_${key}`, fileName);
-                    localStorage.setItem(`plan_fileObj_${key}`, fileDataUrl);
-                    
-                    showImportManagerPage(key, titleName, fileName, fileDataUrl, file.type.startsWith('image/'));
-                    showCustomAlert('ນຳເຂົ້າ ແລະ ບັນທຶກໄຟລ໌ແຜນສຳເລັດແລ້ວ!');
+                    tempFileData = {
+                        fileName: file.name,
+                        fileDataUrl: e.target.result,
+                        isImage: file.type.startsWith('image/')
+                    };
+                    document.getElementById('selected-filename-display').innerText = '📎 ' + file.name;
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function showImportManagerPage(key, titleName, fileName, fileDataUrl, isImage) {
+        // ບັນທຶກຂໍ້ມູນເອກະສານລົງ LocalStorage
+        function saveDocEntry() {
+            const content = document.getElementById('modal-doc-content').value.trim();
+            const docNo = document.getElementById('modal-doc-no').value.trim();
+            const docDate = document.getElementById('modal-doc-date').value;
+
+            if (!tempFileData) {
+                alert('ກະລຸນາເລືອກໄຟລ໌ເອກະສານ/ຮູບພາບກ່ອນ!');
+                return;
+            }
+            if (!content) {
+                alert('ກະລຸນາປ້ອນເນື້ອໃນເອກະສານ!');
+                return;
+            }
+
+            const storageKey = (currentImportType === 'general') ? 'docs_list_general' : 'docs_list_strategy';
+            let existingDocs = JSON.parse(localStorage.getItem(storageKey) || '[]');
+
+            const now = new Date();
+            const recordDate = now.toLocaleDateString('lo-LA') + ' ' + now.toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit' });
+
+            const newDoc = {
+                id: Date.now(),
+                content: content,
+                docNo: docNo || '-',
+                docDate: docDate || '-',
+                fileName: tempFileData.fileName,
+                fileDataUrl: tempFileData.fileDataUrl,
+                isImage: tempFileData.isImage,
+                recordDate: recordDate
+            };
+
+            existingDocs.push(newDoc);
+            localStorage.setItem(storageKey, JSON.stringify(existingDocs));
+
+            closeDocModal();
+            showCustomAlert('ບັນທຶກ ແລະ ນຳເຂົ້າເອກະສານສຳເລັດແລ້ວ!');
+
+            // ນຳໄປສະແດງຜົນໃນຕາຕະລາງທັນທີ
+            showDocListTable(currentImportType);
+        }
+
+        // ສະແດງຕາຕະລາງຂໍ້ມູນເອກະສານ ຢູ່ສ່ວນກາງ (ຮູບ 2 ທີ່ 4 ລ່ຽມສີແດງ)
+        function showDocListTable(type) {
+            closeAllDropdowns();
+            const storageKey = (type === 'general') ? 'docs_list_general' : 'docs_list_strategy';
+            const titleName = (type === 'general') ? 'ຂໍ້ມູນວຽກທົ່ວໄປ' : 'ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ';
+            const docsList = JSON.parse(localStorage.getItem(storageKey) || '[]');
+
             const contentDisplay = document.getElementById('content-display');
-            let fileIcon = isImage ? '🖼️' : '📄';
-            const hasFile = fileDataUrl && fileName !== 'ຍັງບໍ່ມີໄຟລ໌';
+
+            let rowsHTML = '';
+            if (docsList.length > 0) {
+                docsList.forEach((doc, idx) => {
+                    let fileIcon = doc.isImage ? '🖼️' : '📄';
+                    rowsHTML += `
+                        <tr>
+                            <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                            <td>${doc.content}</td>
+                            <td style="text-align: center;">${doc.docNo}</td>
+                            <td style="text-align: center;">${doc.docDate}</td>
+                            <td style="text-align: center;">
+                                <span onclick="viewDocFile('${doc.id}', '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເບິ່ງ/ດາວໂຫຼດ">
+                                    ${fileIcon} ${doc.fileName}
+                                </span>
+                            </td>
+                            <td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td>
+                            <td style="text-align: center;">
+                                <button type="button" class="remove-file-btn" onclick="deleteDocEntry(${doc.id}, '${type}')">ລົບ</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                rowsHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານທີ່ນຳເຂົ້າໃນລະບົບ (ກະລຸນາກົດເມນູ "ນຳເຂົ້າແຜນ..." ເພື່ອເພີ່ມເອກະສານ)</td></tr>`;
+            }
 
             contentDisplay.innerHTML = `
-                <div class="report-container">
-                    <h2 style="color: #0f172a; margin-bottom: 10px;">ຂໍ້ມູນນຳເຂົ້າ: ${titleName}</h2>
-                    <p style="color: #64748b; margin-bottom: 20px;">ໄຟລ໌ແຜນງານທີ່ໄດ້ຮັບຮອງ ແລະ ນຳເຂົ້າໃນລະບົບແລ້ວ:</p>
-                    <div style="padding: 20px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center;">
-                        ${hasFile ? `
-                            <div class="file-info-display" style="max-width: 550px; margin: 0 auto; padding: 12px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; background: #e2e8f0; border-radius: 6px;">
-                                <span onclick="${isImage ? `previewPlanImage('${key}')` : `downloadPlanFile('${key}')`}" title="${isImage ? 'ກົດເພື່ອເບິ່ງຮູບ' : 'ກົດເພື່ອດາວໂຫຼດໄຟລ໌'}" style="cursor:pointer; color: #2563eb; text-decoration: underline; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                    ${fileIcon} ${fileName} (ຄລິກເພື່ອເບິ່ງ/ດາວໂຫຼດ)
-                                </span>
-                                <button type="button" class="remove-file-btn" style="padding: 6px 12px; font-size: 12px; background: #ef4444; border-radius: 4px;" onclick="removeImportFile('${key}', '${titleName}')">ລົບໄຟລ໌</button>
-                            </div>
-                        ` : `
-                            <p style="color: #94a3b8; font-style: italic; margin: 10px 0;">ຍັງບໍ່ມີໄຟລ໌ແຜນງານໃນລະບົບ. ກະລຸນານຳເຂົ້າໄຟລ໌ແຜນໃໝ່.</p>
-                        `}
+                <div class="report-container" style="max-width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #b5651d; padding-bottom: 10px;">
+                        <h2 style="color: #b5651d; margin: 0;">📋 ${titleName}</h2>
+                        <button type="button" class="save-btn" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າເອກະສານໃໝ່</button>
                     </div>
-                    <div style="margin-top: 20px; text-align: center;">
-                        <label style="cursor:pointer; display:inline-block; padding:10px 20px; background:#2563eb; color:white; border-radius:6px; font-weight:bold; font-size:13px; transition: background 0.2s;">
-                            🔄 ${hasFile ? 'ປ່ຽນໄຟລ໌ແຜນໃໝ່' : '➕ ນຳເຂົ້າໄຟລ໌ແຜນ'}
-                            <input type="file" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleHiddenFileChange(event, '${key}', '${titleName}')">
-                        </label>
-                    </div>
+
+                    <table class="strategy-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%; text-align: center;">ລຳດັບ</th>
+                                <th style="width: 30%;">ເນື້ອໃນເອກະສານ</th>
+                                <th style="width: 15%; text-align: center;">ເລກທີເອກະສານ</th>
+                                <th style="width: 15%; text-align: center;">ວັນ/ເດືອນ/ປີເອກະສານ</th>
+                                <th style="width: 15%; text-align: center;">ເອກະສານອ້າງອີງ</th>
+                                <th style="width: 13%; text-align: center;">ວັນທີບັນທຶກເອກະສານ</th>
+                                <th style="width: 7%; text-align: center;">ຈັດການ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHTML}
+                        </tbody>
+                    </table>
                 </div>
             `;
         }
 
-        function previewPlanImage(key) {
-            const imgData = localStorage.getItem(`plan_fileObj_${key}`);
-            if (imgData) {
-                document.getElementById('modal-img-tag').src = imgData;
-                document.getElementById('image-modal').style.display = 'flex';
+        // ເບິ່ງ/ດາວໂຫຼດ ໄຟລ໌ເອກະສານ
+        function viewDocFile(id, type) {
+            const storageKey = (type === 'general') ? 'docs_list_general' : 'docs_list_strategy';
+            const docsList = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            const doc = docsList.find(d => d.id == id);
+
+            if (doc) {
+                if (doc.isImage) {
+                    document.getElementById('modal-img-tag').src = doc.fileDataUrl;
+                    document.getElementById('image-modal').style.display = 'flex';
+                } else {
+                    const a = document.createElement('a');
+                    a.href = doc.fileDataUrl;
+                    a.download = doc.fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
             }
         }
 
-        function downloadPlanFile(key) {
-            const fileData = localStorage.getItem(`plan_fileObj_${key}`);
-            const fileName = localStorage.getItem(`plan_file_${key}`);
-            if (fileData && fileName) {
-                const a = document.createElement('a');
-                a.href = fileData;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+        // ລົບເອກະສານ
+        function deleteDocEntry(id, type) {
+            if (confirm('ທ່ານຕ້ອງການລົບເອກະສານລາຍການນີ້ແທ້ ຫຼື ບໍ່?')) {
+                const storageKey = (type === 'general') ? 'docs_list_general' : 'docs_list_strategy';
+                let docsList = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                docsList = docsList.filter(d => d.id != id);
+                localStorage.setItem(storageKey, JSON.stringify(docsList));
+                showCustomAlert('ລົບເອກະສານเรียບຮ້ອຍແລ້ວ!');
+                showDocListTable(type);
             }
-        }
-
-        function removeImportFile(key, titleName) {
-            localStorage.removeItem(`plan_file_${key}`);
-            localStorage.removeItem(`plan_fileObj_${key}`);
-            showCustomAlert('ລົບໄຟລ໌ແຜນສຳເລັດແລ້ວ!');
-            showImportManagerPage(key, titleName, 'ຍັງບໍ່ມີໄຟລ໌', '', false);
         }
 
         // 1) ຟັງຊັນສະແດງ "ວຽກທົ່ວໄປ" (ລາຍງານ)
