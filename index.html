@@ -15,8 +15,8 @@
             table-layout: fixed;
         }
         .strategy-table th, .strategy-table td {
-            border: 1px solid #ddd;
-            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            padding: 8px 10px;
             vertical-align: top;
             font-size: 13px;
             word-break: break-word;
@@ -24,8 +24,8 @@
             position: relative;
         }
         .strategy-table th {
-            background-color: #f1f1f1;
-            color: #333;
+            background-color: #f1f5f9;
+            color: #0f172a;
             text-align: left;
             font-weight: bold;
         }
@@ -219,25 +219,12 @@
             margin: 0 auto;
             font-family: 'Phetsarath OT', 'Saysana', sans-serif;
             color: #1e293b;
-        }
-        .report-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .report-header h3 {
-            font-size: 16px;
-            margin-bottom: 5px;
-            color: #0f172a;
-        }
-        .report-header h4 {
-            font-size: 15px;
-            color: #b5651d;
-            margin-bottom: 15px;
+            line-height: 1.6;
         }
         .report-selectors {
             display: flex;
-            justify-content: center;
-            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 25px;
             background: #f8fafc;
             padding: 15px;
@@ -263,6 +250,13 @@
         }
         .print-btn:hover {
             background-color: #2563eb;
+        }
+        .report-section-title {
+            font-weight: bold;
+            color: #0f172a;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
 
         @keyframes fadeIn {
@@ -488,7 +482,7 @@
                 { strat: "ຍຸດທະສາດ 03 (ມ.ຕົ້ນ): ສົ່ງເສີມການມີສ່ວນຮ່ວມຂອງ ສະມາຄົມພໍ່ແມ່ນັກຮຽນ ແລະ ຊຸມຊົນ", focus: "8. ສ້າງ, ປັບປຸງ ແລະ ເຜີຍແຜ່ນິຕິກຳກ່ຽວກັບການມີສ່ວນຮ່ວມຂອງຊຸມຊົນ ແລະ ສັງຄົມ.<br>9. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ສະມາຄົມພໍ່ແມ່ນັກຮຽນ, ຄພສບ ແລະ ຊຸມຊົນ.<br>10. ປຸກລະດົມຂົນຂວາຍຊຸມຊົນໃຫ້ຊຸກຍູ້ສົ່ງເສີມລູກຫຼານໃຫ້ຮຽນຈົບຊັ້ນມັດທະຍົມສຶກສາຕອນຕົ້ນ.<br>11. ຕິດຕາມ, ຊຸກຍູ້, ຊ່ວຍເຫຼືອການປະຕິບັດໜ້າທີ່ຂອງສະມາຄົມພໍ່ແມ່ນັກຮຽນ ແລະ ຊຸມຊົນ." },
                 { strat: "ຍຸດທະສາດ 03 (ມ.ຕົ້ນ - ສືບຕໍ່): ສົ່ງເສີມສະພາບແວດລ້ອມພາຍໃນໂຮງຮຽນທີ່ປອດໄພ", focus: "12. ສະໜອງ ແລະ ປັບປຸງພື້ນຖານໂຄ່ງລ່າງ (ໄຟຟ້າ, ນ້ຳສະອາດ, ຫ້ອງນ້ຳແຍກຍິງ-ຊາຍ).<br>13. ສະໜອງອຸປະກອນການຮຽນການສອນ ແລະ ອຸປະກອນຊ່ວຍເຫຼືອສຳລັບນັກຮຽນພິການ.<br>14. ສ້າງ, ປັບປຸງ ແລະ ເຜີຍແຜ່ນິຕິກຳກ່ຽວກັບວຽກງານສົ່ງເສີມສຸຂະພາບໃນໂຮງຮຽນ.<br>15. ສົ່ງເສີມທັກສະ, ຄວາມຮູ້ກ່ຽວກັບເພດສຶກສາ, ບົດບາດຍິງ-ຊາຍ, ລະເບີດບໍ່ທັນແຕກ, ສິ່ງເສບຕິດ.<br>16. ສ້າງຄວາມເຂັ້ມແຂງປະສານສາທາລະນະສຸກຂັ້ນທ້ອງຖິ່ນ ເພື່ອສຸຂະພາບ ແລະ ໂພຊະນາການ.<br>17. ສົ່ງເສີມກິດຈະກຳນອກຫຼັກສູດ (ສະໂມສອນເດັກຍິງ, ກິລາ, ສິລະປະ, ວິທະຍາສາດ)." },
                 { strat: "ຍຸດທະສາດ 04 (ມ.ຕົ້ນ): ປັບປຸງຄຸນນະພາບການສຶກສາ ເພື່ອດຶງດູດການເຂົ້າຮຽນ ແລະ ຫຼຸດການປະລະ", focus: "18. ສ້າງ ແລະ ປັບປຸງນິຕິກຳ ແລະ ລະບຽບການກ່ຽວກັບການຮັບຮູ້ຜົນການຮຽນ (ຮຽນຮູ້ຕະຫຼອດຊີວິດ).<br>19. ສົ່ງເສີມການຮຽນການສອນ ການຮຽນຮູ້ຕະຫຼອດຊີວິດທຸກຮູບແບບ.<br>20. ການເຊື່ອມສານການສຶກສາທັງໃນ ແລະ ນອກໂຮງຮຽນຢ່າງເປັນລະບົບ.<br>21. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ຄູສອນນອກໂຮງຮຽນ." },
-                { strat: "ຍຸດທະສາດ 01 (ມ.ຕົ້ນ - ຕໍ່): ສ້າງຄວາມເຂັ້ມແຂງໃນການຈັດຕັ້ງປະຕິບັດຫຼັກສູດ ແລະ ການປະເມີນ", focus: "22. ດຳເນີນການປະເມີນຜົນການຈັດຕັ້ງປະຕິບັດການສະໜອງສາມັນວິຊາຊີບໃນໂຮງຮຽນມັດທະຍົມ.<br>23. ສ້າງແຜນຍຸດທະສາດການຂະຫຍາຍສາມັນວິຊາຊີບ ໃນຊັ້ນມັດທະຍົມຕອນຕົ້ນ ຕາມຜົນປະເມີນ.<br>24. ພັດທະນາ ແລະ ຈັດຕັ້ງປະຕິບັດລະບົບປະສານງານຕິດຕາມການຈ້າງງານຜູ້ຮຽນຈົບ.<br>25. ພັດທະນາຂໍ້ສອບເສັງຈົບຂັ້ນ ປ.5 ລວມທັງສ້າງມາດຕະຖານການອອກຫົວບົດ.<br>26. ຊຸກຍູ້, ສົ່ງເສີມການນຳໃຊ້ ICT, ວິທະຍາສາດ ແລະ ພາສາຕ່າງປະເທດໃນຊັ້ນ ມ.ຕົ້ນ.<br>27. ຄົ້ນຄວ້າ, ພັດທະນາ, ປັບປຸງຫຼັກສູດ, ປຶ້ມແບບຮຽນ ມ.ຕົ້ນ ຈາກ 4 ປີ ມາເປັນ 3 ປີ." },
+                { strat: "ຍຸດທະສາດ 01 (ມ.ຕົ້ນ - ຕໍ່): ສ້າງຄວາມເຂັ້ມແຂງໃນການຈັດຕັ້ງປະຕິບັດຫຼັກສູດ ແລະ ການປະເມີນ", focus: "22. ດຳເນີນການປະເມີນຜົນການຈັດຕັ້ງປະຕິບັດການສະໜອງສາມັນວິຊາຊີບໃນໂຮງຮຽນມັດທະຍົມ.<br>23. ສ້າງແຜນຍຸດທະສາດການຂະຫຍາຍສາມັນວິຊາຊີບ ໃນຊັ້ນມັດທະຍົມຕອນຕົ້ນ ຕາມຜົນປະເມີນ.<br>24. ພັດທະນາ ແລະ ຈັດຕັ້ງປະຕິບັດລະບົບປະສານງານຕິດຕາມການຈ້າງງານຜູ້ຮຽນຈົບ.<br>25. ພັດທະນາຂໍ້ສອບເສັງຈົບຊັ້ນ ແລະ ສອບເສັງນັກຮຽນເກັ່ງຊັ້ນ ມ.ຕົ້ນ.<br>26. ຊຸກຍູ້, ສົ່ງເສີມການນຳໃຊ້ ICT, ວິທະຍາສາດ ແລະ ພາສາຕ່າງປະເທດໃນຊັ້ນ ມ.ຕົ້ນ.<br>27. ຄົ້ນຄວ້າ, ພັດທະນາ, ປັບປຸງຫຼັກສູດ, ປຶ້ມແບບຮຽນ ມ.ຕົ້ນ ຈາກ 4 ປີ ມາເປັນ 3 ປີ." },
                 { strat: "ຍຸດທະສາດ 02 (ມ.ຕົ້ນ - ຕໍ່): ການສະໜອງອຸປະກອນ ແລະ ສິ່ງອໍານວຍຄວາມສະດວກ ມ.ຕົ້ນ", focus: "28. ສະໜອງປຶ້ມແບບຮຽນ, ຄູ່ມືຄູ, ປຶ້ມອ່ານເສີມ, ສື່, ອຸປະກອນການຮຽນການສອນໃຫ້ພຽງພໍ.<br>29. ສະໜອງຫ້ອງທົດລອງວິທະຍາສາດ, ຫ້ອງຮຽນ ICT, ພາສາຕ່າງປະເທດ, ຫ້ອງສະໝຸດ.<br>30. ສະໜອງອຸປະກອນ ແລະ ສື່ ICT ພື້ນຖານ ສຳລັບການພັດທະນາວິຊາຊີບຄູ.<br>31. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ກຸ່ມໂຮງຮຽນ, ຜູ້ອຳນວຍການ, ຄູປະຈຳການ ແລະ ສຶກສານິເທດ.<br>32. ຕິດຕາມ, ຊຸກຍູ້, ຊ່ວຍເຫຼືອ ແລະ ປະເມີນການປະຕິບັດໜ້າທີ່ຜູ້ເຮັດວຽກສຶກສານິເທດ.<br>33. ຊຸກຍູ້ ແລະ ສົ່ງເສີມຄູທີ່ໄດ້ຮັບຕຳແໜ່ງວິຊາການ ແລະ ການນິເທດພາຍໃນ." },
                 { strat: "ຍຸດທະສາດ 01 (ມ.ຕົ້ນ - ຄຸ້ມຄອງ): ສ້າງຄວາມເຂັ້ມແຂງການສ້າງແຜນ ແລະ ພາວະຜູ້ນຳ", focus: "34. ປະຕິບັດນິຕິກຳໃນການບໍລິຫານຄຸ້ມຄອງໂຮງຮຽນມັດທະຍົມຕອນຕົ້ນ.<br>35. ພັດທະນາວິຊາຊີບແບບຕໍ່ເນື່ອງໃຫ້ແກ່ຜູ້ອຳນວຍການໂຮງຮຽນກ່ຽວກັບການຄຸ້ມຄອງ.<br>36. ປະຕິບັດລະບົບຄັດເລືອກ ແລະ ແຕ່ງຕັ້ງຜູ້ອຳນວຍການຊັ້ນມັດທະຍົມ (ຍົກສູງເພດຍິງ).<br>37. ສະໜອງອຸປະກອນ ICT ພື້ນຖານໃຫ້ແກ່ໂຮງຮຽນມັດທະຍົມ ສຳລັບການຄຸ້ມຄອງ.<br>38. ສ້າງຄວາມເຂັ້ມແຂງໃນວຽກງານການຄຸ້ມຄອງຄວາມສ່ຽງຕໍ່ໄພພິບັດ ແລະ ດິນຟ້າອາກາດ.<br>39. ພັດທະນາກຸ່ມໂຮງຮຽນມັດທະຍົມ ແລະ ກຸ່ມໂຮງຮຽນຕົວແບບໃຫ້ມີຄຸນນະພາບ." },
                 { strat: "ຍຸດທະສາດ 02 (ມ.ຕົ້ນ - ຄຸ້ມຄອງ): ການສະໜອງ ແລະ ຈັດສັນຊັບພະຍາກອນ ມ.ຕົ້ນ", focus: "40. ຕິດຕາມການນຳໃຊ້ເງິນບໍລິຫານສະຖານການສຶກສາ.<br>41. ປັບປຸງການຈັດສັນ - ສັບຊ້ອນຄູໃນຊັ້ນມັດທະຍົມຕອນຕົ້ນ ຕາມລາຍວິຊາ." },
@@ -717,57 +711,105 @@
             `;
         }
 
-        // ຟັງຊັນສະແດງໜ້າລາຍງານ 6 ຮູບແບບ
+        // ຟັງຊັນສະແດງໜ້າລາຍງານຕາມຮ່າງທາງການ
         function showReportView() {
             const contentDisplay = document.getElementById('content-display');
             
             contentDisplay.innerHTML = `
                 <div class="report-container">
-                    <div class="report-header">
-                        <h3>ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ</h3>
-                        <h4>ສັນຕິພາບ ເອກະລາດ ປະຊາທິປະໄຕ ເອກະພາບ ວັດຖະນາຖາວອນ</h4>
-                        <hr style="border: 0; border-top: 1px solid #cbd5e1; width: 200px; margin: 10px auto;">
-                        <h2 style="color: #1e293b; margin-top: 15px;">ບົດລາຍງານການຈັດຕັ້ງປະຕິບັດແຜນຍຸດທະສາດ</h2>
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ</div>
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">ສັນຕິພາບ ເອກະລາດ ປະຊາທິປະໄຕ ເອກະພາບ ວັດຖະນາຖາວອນ</div>
+                    <hr style="border: 0; border-top: 1px solid #cbd5e1; width: 180px; margin: 10px auto 20px auto;">
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-weight: bold;">
+                        <div>
+                            ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ<br>
+                            <span style="font-weight: normal; font-size: 13px;">[ພະແນກ / ຂະແໜງການ ຜູ້ລາຍງານ]</span>
+                        </div>
+                        <div style="text-align: right;">
+                            ໂຕະວຽກ: ....................................
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <h2 style="color: #0f172a; margin-bottom: 10px;">ບົດລາຍງານ</h2>
+                        <h3 style="color: #b5651d; font-size: 15px;">ກ່ຽວກັບການຈັດຕັ້ງປະຕິບັດແຜນຍຸດທະສາດ ແລະ ວຽກງານຈຸດສຸມ</h3>
                     </div>
 
                     <div class="report-selectors">
                         <div>
-                            <label style="font-weight: bold; font-size: 13px; margin-right: 5px;">ເລືອກປະເພດລາຍງານ:</label>
+                            <label style="font-weight: bold; font-size: 13px; margin-right: 5px;">ປະຈຳໄລຍະເວລາ:</label>
                             <select id="report-type" onchange="updateReportTitle()">
-                                <option value="ລາຍງານເປັນອາທິດ">1) ລາຍງານເປັນອາທິດ</option>
-                                <option value="ລາຍງານເປັນເດືອນ">2) ລາຍງານເປັນເດືອນ</option>
-                                <option value="ລາຍງານເປັນ 3 ເດືອນ">3) ລາຍງານເປັນ 3 ເດືອນ</option>
-                                <option value="ລາຍງານ 6 ເດືອນ">4) ລາຍງານ 6 ເດືອນ</option>
-                                <option value="ລາຍງານ 9 ເດືອນ">5) ລາຍງານ 9 ເດືອນ</option>
-                                <option value="ລາຍງານ 12 ເດືອນ">6) ລາຍງານ 12 ເດືອນ</option>
+                                <option value="ອາທິດທີ... ປີ 2026">1) ລາຍງານເປັນອາທິດ</option>
+                                <option value="ເດືອນ... ປີ 2026">2) ລາຍງານເປັນເດືອນ</option>
+                                <option value="3 ເດືອນ ປີ 2026">3) ລາຍງານເປັນ 3 ເດືອນ</option>
+                                <option value="6 ເດືອນ ປີ 2026">4) ລາຍງານ 6 ເດືອນ</option>
+                                <option value="9 ເດືອນ ປີ 2026">5) ລາຍງານ 9 ເດືອນ</option>
+                                <option value="12 ເດືອນ ປີ 2026">6) ລາຍງານ 12 ເດືອນ</option>
                             </select>
                         </div>
                         <button type="button" class="print-btn" onclick="window.print()">🖨️ ພິມ / ບັນທຶກເປັນ PDF</button>
                     </div>
 
-                    <div id="report-period-title" style="font-weight: bold; margin-bottom: 15px; color: #b5651d;">ປະເພດ: ລາຍງານເປັນອາທິດ</div>
-                    
-                    <p style="margin-bottom: 15px; line-height: 1.6;"><strong>ຮຽນ:</strong> ທ່ານ ຫົວໜ້າພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ</p>
-                    <p style="margin-bottom: 20px; line-height: 1.6;">ອີງຕາມການຈັດຕັ້ງປະຕິບັດວຽກງານຕົວຈິງຂອງບັນດາຂະແໜງການ, ທາງລະບົບໄດ້ສັງລວມຜົນການປະຕິບັດງານ ແລະ ໄຟລ໌ເອກະສານທີ່ໄດ້ບັນທຶກໄວ້ດັ່ງລຸ່ມນີ້:</p>
+                    <p style="margin-bottom: 15px;"><strong>ຮຽນ:</strong> ທ່ານ ຫົວໜ້າພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ</p>
+                    <p style="margin-bottom: 20px;"><strong>ຈາກ:</strong> ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ (ຜູ້ລາຍງານ)</p>
+
+                    <div class="report-section-title">I. ພາກສະຫຼຸບຫຍໍ້ (Executive Summary)</div>
+                    <p style="margin-bottom: 15px; text-align: justify;">
+                        ໃນໄລຍະ <span id="report-period-label" style="font-weight: bold; color: #b5651d;">ອາທິດທີ... ປີ 2026</span> ຜ່ານມາ, ທຸກຂະແໜງການໄດຸ້ມໃສ່ຊີ້ນຳ-ນຳພາ ແລະ ຈັດຕັ້ງປະຕິບັດບັນດາວຽກງານຈຸດສຸມຕາມແຜນຍຸດທະສາດຂອງຂະແໜງການ ໂດຍຕິດພັນກັບການນຳໃຊ້ຂໍ້ມູນຕົວຈິງ ແລະ ເອກະສານຜົນງານທີ່ໄດ້ອັບໂຫຼດເຂົ້າລະບົບຕິດຕາມ ເຊິ່ງສາມາດຍາດໄດ້ຜົນງານພົ້ນເດັ່ນດັ່ງລຸ່ມນີ້:
+                    </p>
+                    <ul style="margin-bottom: 20px; padding-left: 20px;">
+                        <li><strong>ອັດຕາຄວາມຄືບໜ້າໂດຍລວມ:</strong> ປະຕິບັດໄດ້ ຕາມແຜນການທີ່ກຳນົດ.</li>
+                        <li><strong>ຈຸດເດັ່ນໃນໄລຍະນີ້:</strong> ບັນດາຫົວໜ່ວຍງານໄດ້ເອົາໃຈໃສ່ຕິດຕາມ ແລະ ບັນທຶກຜົນງານລົງໃນລະບົບຢ່າງເປັນລະບົບ.</li>
+                    </ul>
+
+                    <div class="report-section-title">II. ຜົນການຈັດຕັ້ງປະຕິບັດວຽກງານຕົວຈິງ (Performance Details)</div>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 10px;">*(ດຶງຂໍ້ມູນຈາກການປ້ອນຕົວຈິງ ແລະ ໄຟລ໌ທີ່ອັບໂຫຼດໃນລະບົບ)*</p>
 
                     <table class="strategy-table">
                         <thead>
                             <tr>
-                                <th style="width: 15%;">ໜ່ວຍງານ / ຂະແໜງ</th>
-                                <th style="width: 35%;">ແຜນຍຸດທະສາດ & ວຽກຈຸດສຸມ</th>
-                                <th style="width: 35%;">ຜົນການຈັດຕັ້ງປະຕິບັດຕົວຈິງ</th>
-                                <th style="width: 15%;">ໄຟລ໌ແນບ</th>
+                                <th style="width: 15%;">ແຜນຍຸດທະສາດ</th>
+                                <th style="width: 30%;">ວຽກງານຈຸດສຸມ</th>
+                                <th style="width: 40%;">ຜົນການຈັດຕັ້ງປະຕິບັດຕົວຈິງ & ເນື້ອໃນສັງລວມ</th>
+                                <th style="width: 15%;">ເອກະສານອ້າງອີງ</th>
                             </tr>
                         </thead>
                         <tbody id="report-table-body">
-                            <!-- ຂໍ້ມູນຈະຖືກໂຫຼດໃส່ທີ່ນີ້ -->
+                            <!-- ຂໍ້ມູນຈະຖືກໂຫຼດໃສ່ທີ່ນີ້ -->
                         </tbody>
                     </table>
+
+                    <div class="report-section-title">III. ດ້ານວຽກງານທີ່ຕັ້ງໜ້າ ແລະ ຂໍ້ສະດວກ (Advantages)</div>
+                    <ul style="margin-bottom: 20px; padding-left: 20px;">
+                        <li><strong>ການຊີ້ນຳ-ນຳພາ:</strong> ໄດ້ຮັບຄວາມເອົາໃຈໃສ່ຊີ້ນຳຢ່າງໃກ້ຊິດຈາກຄະນະພະແນກ.</li>
+                        <li><strong>ການມີສ່ວນຮ່ວມ:</strong> ພະນັກງານ-ລັດຖະກອນພາຍໃນຂະແໜງ ແລະ ທ້ອງຖິ່ນ ໄດ້ເປັນເຈົ້າການຈັດຕັ້ງປະຕິບັດ.</li>
+                        <li><strong>ເຄື່ອງມືຕິດຕາມ:</strong> ການນຳໃຊ້ລະບົບອັບໂຫຼດໄຟລ໌ ແລະ ບັນທຶກຜ່ານເວັບໄຊ ເຮັດໃຫ້ການເກັບກຳຂໍ້ມູນວ່ອງໄວ ແລະ ເປັນລະບົບຂຶ້ນ.</li>
+                    </ul>
+
+                    <div class="report-section-title">IV. ຂໍ້ຄົງຄ້າງ, ສິ່ງທ້າທາຍ ແລະ ວິທີແກ້ໄຂ (Challenges & Solutions)</div>
+                    <p><strong>1. ຂໍ້ຄົງຄ້າງ ແລະ ສິ່ງທ້າທາຍ:</strong></p>
+                    <ul style="margin-bottom: 10px; padding-left: 20px;">
+                        <li>ງົບປະມານ ແລະ ເວລາໃນການລົງຕິດຕາມຕົວຈິງບາງພື້ນທີ່ຍັງຈຳກັດ.</li>
+                        <li>ການສົ່ງລາຍງານ ແລະ ໄຟລ໌ຂໍ້ມູນຂອງບາງຫົວໜ່ວຍຍັງຊັກຊ້າກຳນົດເວລາ.</li>
+                    </ul>
+                    <p><strong>2. ທິດທາງແກ້ໄຂໃນໄລຍະຕໍ່ໄປ:</strong></p>
+                    <ul style="margin-bottom: 20px; padding-left: 20px;">
+                        <li>ເພີ່ມທະວີການຕິດຕາມ, ຊຸກຍູ້ ແລະ ກວດສອບຜ່ານລະບົບອອນລາຍໃຫ້ເປັນປະຈຳ.</li>
+                        <li>ສືບຕໍ່ປະສານສົມທົບກັບພາກສ່ວນກ່ຽວຂ້ອງ ເພື່ອແກ້ໄຂບັນຫາຕິດຂັດຢ່າງຮ່ວມມື.</li>
+                    </ul>
+
+                    <div class="report-section-title">V. ທິດທາງແຜນການຈຸດສຸມ ໄລຍະຕໍ່ໄປ (Future Plan)</div>
+                    <ul style="margin-bottom: 30px; padding-left: 20px;">
+                        <li>ສືບຕໍ່ຊຸກຍູ້ວຽກງານທີ່ຍັງຄ້າງຄາ ໃຫ້ບັນລຸຕາມຕົວຊີ້ບອກຂອງແຜນການປະຈຳໄລຍະຕໍ່ໄປ.</li>
+                        <li>ກຽມຄວາມພ້ອມສຳລັບການປະເມີນຜົນ ແລະ ສ້າງບົດລາຍງານສະຫຼຸບຂັ້ນສູງຕໍ່ໄປ.</li>
+                    </ul>
 
                     <div style="margin-top: 40px; display: flex; justify-content: flex-end;">
                         <div style="text-align: center;">
                             <p><strong>ວັນທີ:</strong> ............/............/2026</p>
-                            <p style="margin-top: 5px;"><strong>ຜູ້ລາຍງານ</strong></p>
+                            <p style="margin-top: 5px; font-weight: bold;">ຜູ້ລາຍງານ</p>
+                            <p style="font-size: 12px; color: #64748b;">(ເຊັນ ແລະ ປະທັບຕາ)</p>
                             <br><br><br>
                             <p>..................................................</p>
                         </div>
@@ -779,7 +821,7 @@
 
         function updateReportTitle() {
             const val = document.getElementById('report-type').value;
-            document.getElementById('report-period-title').innerText = `ປະເພດ: ${val}`;
+            document.getElementById('report-period-label').innerText = val;
         }
 
         function loadReportData() {
@@ -791,6 +833,8 @@
                 let strats = strategiesData[unit] || [];
                 strats.forEach((item, index) => {
                     let focusItems = item.focus.split(/<br>\s*(?=\d+\.)/);
+                    let rowSpan = focusItems.length;
+
                     focusItems.forEach((fItem, fIndex) => {
                         let uniqueKey = `${unit}_${index}_${fIndex}`;
                         let savedText = localStorage.getItem(`text_${uniqueKey}`) || '';
@@ -800,7 +844,7 @@
                             hasData = true;
                             tbody.innerHTML += `
                                 <tr>
-                                    <td><strong>${unit}</strong></td>
+                                    ${fIndex === 0 ? `<td rowspan="${rowSpan}"><strong>${unit}</strong><br><span style="font-size:11px; color:#b5651d;">${item.strat}</span></td>` : ''}
                                     <td>${fItem.trim()}</td>
                                     <td>${savedText || '<span style="color:#94a3b8; font-style:italic;">(ບໍ່ມີການພິມເນື້ອໃນ)</span>'}</td>
                                     <td>${savedFile ? `📄 ${savedFile}` : '<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>'}</td>
@@ -812,7 +856,7 @@
             });
 
             if (!hasData) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #666; font-style: italic;">ຍັງບໍ່ມີຂໍ້ມູນການຈັດຕັ້ງປະຕິບັດ ຫຼື ໄຟລ໌ຖືກບັນທຶກໃນລະບົບ</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #666; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນການຈັດຕັ້ງປະຕິບັດ ຫຼື ໄຟລ໌ຖືກບັນທຶກໃນລະບົບ (ກະລຸນາປ້ອນຂໍ້ມູນຜົນການປະຕິບັດກ່ອນ)</td></tr>`;
             }
         }
 
