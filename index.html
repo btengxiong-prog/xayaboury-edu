@@ -99,6 +99,35 @@
             font-size: 11px;
             width: 100%;
         }
+        .file-info-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #e2e8f0;
+            padding: 4px 6px;
+            border-radius: 3px;
+            margin-top: 4px;
+            font-size: 11px;
+            color: #0f172a;
+        }
+        .file-info-display span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 80%;
+        }
+        .remove-file-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        .remove-file-btn:hover {
+            background: #dc2626;
+        }
     </style>
 </head>
 <body>
@@ -381,7 +410,8 @@
                                     <textarea class="actual-input" placeholder="ປ້ອນຜົນການຈັດຕັ້ງປະຕິບັດ..."></textarea>
                                     <div class="file-upload-section">
                                         <label>📎 ອັບໂຫຼດໄຟລ໌ຜົນງານ (PDF, Word, Excel):</label>
-                                        <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx">
+                                        <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileChange(this)">
+                                        <div class="file-display-area"></div>
                                     </div>
                                 </div>
                             </td>
@@ -452,7 +482,8 @@
                                         <textarea class="actual-input" placeholder="ປ້ອນຜົນການຈັດຕັ້ງປະຕິບັດ..."></textarea>
                                         <div class="file-upload-section">
                                             <label>📎 ອັບໂຫຼດໄຟລ໌ຜົນງານ (PDF, Word, Excel):</label>
-                                            <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx">
+                                            <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileChange(this)">
+                                            <div class="file-display-area"></div>
                                         </div>
                                     </div>
                                 </td>
@@ -490,6 +521,30 @@
                     </tbody>
                 </table>
             `;
+        }
+
+        // ฟັງຊັນຈັດການສະແດງຊື່ໄຟລ໌, ລົບໄຟລ໌ ແລະ ອັບໃໝ່
+        function handleFileChange(input) {
+            const displayArea = input.parentElement.querySelector('.file-display-area');
+            displayArea.innerHTML = '';
+
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-info-display';
+                fileItem.innerHTML = `
+                    <span>📄 ${fileName}</span>
+                    <button type="button" class="remove-file-btn" onclick="removeFile(this)">ລົບ</button>
+                `;
+                displayArea.appendChild(fileItem);
+            }
+        }
+
+        function removeFile(btn) {
+            const section = btn.closest('.file-upload-section');
+            const fileInput = section.querySelector('input[type="file"]');
+            fileInput.value = ''; // ລົບຄ່າໄຟລ໌ໃນ input
+            section.querySelector('.file-display-area').innerHTML = ''; // ລົບການສະແດງຜົນຊື່ໄຟລ໌ອອກ
         }
 
         function initResize(e) {
