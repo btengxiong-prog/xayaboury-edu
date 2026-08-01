@@ -1,0 +1,90 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: 'Phetsarath OT', Tahoma, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f0f2f5;
+}
+
+/* ຕົບແຕ່ງເມນູລວງນອນດ້ານເທິງ */
+.top-toolbar {
+    height: 80px;
+    background: linear-gradient(to bottom, #fcfcfc, #d5e4f7);
+    border-bottom: 1px solid #99b8d8;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 15px;
+}
+.tool-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 12px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #000;
+}
+.tool-item:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+    border-color: #b8d0eb;
+}
+.tool-item .icon {
+    font-size: 24px;
+    margin-bottom: 3px;
+}
+.tool-item.logout {
+    margin-left: auto;
+}
+
+/* ໂຄງສ້າງສ່ວນລຸ່ມ (ຊ້າຍ-ຂວາ) */
+.main-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ຕົບແຕ່ງເມນູລວງຕັ້ງດ້ານຊ້າຍ (TreeView) */
+.sidebar-tree {
+    width: 380px;
+    background: #ffffff;
+    border-right: 1px solid #ccc;
+    padding: 10px;
+    overflow-y: auto;
+    font-size: 13px;
+}
+.sidebar-tree ul {
+    list-style: none;
+    padding-left: 15px;
+}
+.sidebar-tree li {
+    margin: 4px 0;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.sidebar-tree li:hover {
+    color: #0056b3;
+}
+.folder {
+    font-weight: bold;
+    color: #b5651d;
+}
+
+/* ພື້ນທີ່ສະແດງເນື້ອຫາຂວາມື */
+.content-area {
+    flex: 1;
+    background: #ffffff;
+    padding: 30px;
+}
+.content-area h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
