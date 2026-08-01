@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ລະບົບຕິດຕາມ ແລະ ສະຫຼຸບລາຍງານ - ພຶສກ ໄຊຍະບູລີ</title>
+    <title>ລະບົບຕິດຕາມ ແລະ ສະຫຼຸບລາຍງານ - ພສກ ໄຊຍະບູລີ</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- 1. ເມນູລວງນອນດ້ານເທິງ (Quick Access Toolbar - ປ່ຽນຫົວຂໍ້ໃໝ່) -->
+    <!-- 1. ເມນູລວງນອນດ້ານເທິງ -->
     <div class="top-toolbar">
         <div class="tool-item">
             <span class="icon">🔍</span>
@@ -42,7 +42,7 @@
 
     <!-- 2. ສ່ວນເນື້ອຫາ ແລະ ເມນູລວງຕັ້ງດ້ານຊ້າຍ -->
     <div class="main-container">
-        <!-- ເມນູລວງຕັ້ງ (TreeView) -->
+        <!-- ເມນູລວງຕັ້ງ (TreeView ທີ່ປັບໃຫ້ມີແຖບເລື່ອນ ແລະ ປັບຂະໜາດໄດ້) -->
         <div class="sidebar-tree">
             <ul>
                 <li class="folder">📁 ພາກສ່ວນຕ່າງໆ
@@ -65,13 +65,15 @@
                                 <li>🏫 ສູນສຶກສານິເທດ ແຂວງໄຊຍະບູລີ</li>
                                 <li>🏫 ສູນການສຶກສານອກໂຮງຮຽນ</li>
                                 <li>🏫 ຫ້ອງການກຳມະທິການສຶກສາສິງແຂວງ</li>
-                                <li>🏫 ຫົວໜ້າ ແລະ ຮອງ ຫ້ອງການ</li>
                             </ul>
                         </li>
                     </ul>
                 </li>
             </ul>
         </div>
+
+        <!-- ເສັ້ນຂັ້ນກາງທີ່ສາມາດລາກປັບຂະໜາດ (Resize Handle) -->
+        <div class="resizer"></div>
 
         <!-- ພື້ນທີ່ສະແດງຜົນຂວາມື -->
         <div class="content-area">

@@ -9,9 +9,10 @@ body {
     flex-direction: column;
     height: 100vh;
     background-color: #f0f2f5;
+    overflow: hidden;
 }
 
-/* ຕົບແຕ່ງເມນູລວງນອນດ້ານເທິງ */
+/* ເມນູລວງນອນດ້ານເທິງ */
 .top-toolbar {
     height: 80px;
     background: linear-gradient(to bottom, #fcfcfc, #d5e4f7);
@@ -20,6 +21,7 @@ body {
     align-items: center;
     padding: 0 10px;
     gap: 15px;
+    flex-shrink: 0;
 }
 .tool-item {
     display: flex;
@@ -50,25 +52,30 @@ body {
     display: flex;
     flex: 1;
     overflow: hidden;
+    position: relative;
 }
 
-/* ຕົບແຕ່ງເມນູລວງຕັ້ງດ້ານຊ້າຍ (TreeView) */
+/* ຕົບແຕ່ງເມນູລວງຕັ້ງດ້ານຊ້າຍ (ໃຫ້ສາມາດຂະຫຍາຍຄວາມກว้างໄດ້ ແລະ ມີ Scrollbar ທັງຕັ້ງ-ນອນ) */
 .sidebar-tree {
     width: 380px;
+    min-width: 200px;
+    max-width: 600px;
     background: #ffffff;
     border-right: 1px solid #ccc;
     padding: 10px;
-    overflow-y: auto;
+    overflow: auto; /* ໃຫ້ມີທັງ Scrollbar ຕັ້ງ ແລະ ນອນ ເພື່ອເຫັນຂໍ້ຄວາມຄົບ */
+    resize: horizontal; /* อนุญาตให้ผู้ใช้ลากปรับความกว้างซ้าย-ขวาได้ */
     font-size: 13px;
+    flex-shrink: 0;
 }
 .sidebar-tree ul {
     list-style: none;
     padding-left: 15px;
+    white-space: nowrap; /* ປ້ອງກັນບໍ່ໃຫ້ຂໍ້ຄວາມຕົກແຖວ ໃຫ້ຍືດອອກທາງຂ້າງ */
 }
 .sidebar-tree li {
     margin: 4px 0;
     cursor: pointer;
-    white-space: nowrap;
 }
 .sidebar-tree li:hover {
     color: #0056b3;
@@ -78,11 +85,24 @@ body {
     color: #b5651d;
 }
 
+/* ເສັ້ນຂັ້ນກາງແດງ/ເທົາ */
+.resizer {
+    width: 5px;
+    background: #d0d0d0;
+    cursor: col-resize;
+    border-left: 1px solid #b0b0b0;
+    border-right: 1px solid #b0b0b0;
+}
+.resizer:hover {
+    background: #ff4d4d; /* เปลี่ยนเป็นสีแดงពេលເອົາເມົ້າໄປຊີ້ */
+}
+
 /* ພື້ນທີ່ສະແດງເນື້ອຫາຂວາມື */
 .content-area {
     flex: 1;
     background: #ffffff;
     padding: 30px;
+    overflow-y: auto;
 }
 .content-area h2 {
     color: #333;
