@@ -6,12 +6,14 @@
     <title>ລະບົບຕິດຕາມ ແລະ ສະຫຼຸບລາຍງານ - ພສກ ໄຊຍະບູລີ</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* ຕັ້ງຄ່າຕາຕະລາງໃຫ້ສາມາດປັບຂະໜາດຄໍລຳ (Resizable Table) ໄດ້ */
         .strategy-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
             margin-bottom: 25px;
             background-color: #fff;
+            table-layout: fixed; /* ບັງຄັບໃຫ້ໃຊ້ຄວາມກວ້າງຕາມທີ່ກຳນົດ */
         }
         .strategy-table th, .strategy-table td {
             border: 1px solid #ddd;
@@ -19,12 +21,28 @@
             vertical-align: top;
             font-size: 13px;
             word-break: break-word;
+            overflow: hidden;
+            position: relative;
         }
         .strategy-table th {
             background-color: #f1f1f1;
             color: #333;
             text-align: left;
             font-weight: bold;
+        }
+        /* ເສັ້ນຂັ້ນກາງລະຫວ່າງ 2 ຄໍລຳ ທີ່ສາມາດລາກປັບຂະໜາດໄດ້ */
+        .col-resizer {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: transparent;
+            cursor: col-resize;
+            z-index: 10;
+        }
+        .col-resizer:hover, .col-resizer.resizing {
+            background-color: #ff4d4d; /* ປ່ຽນເປັນສີແດງເວລາເອົາເມົ້າໄປຊີ້ ຫຼື ກຳລັງລາກ */
         }
     </style>
 </head>
@@ -152,7 +170,6 @@
             "ຫ້ອງການກຳມະທິການສຶກສາສິງແຂວງ"
         ];
 
-        // ฐานข้อมูลແຜນຍຸດທະສາດ ແລະ ວຽກງານຈຸດສຸມ ຕາມຂໍ້ມູນທີ່ທ່ານໃຫ້ມາ[cite: 1]
         const strategiesData = {
             "ຂະແໜງ ສາມັນສຶກສາ": [
                 { strat: "ຍຸດທະສາດ 01: ຫຼຸດຜ່ອນຄ່າໃຊ້ຈ່າຍຂອງຄອບຄົວໃນການເຂົ້າຮຽນຊັ້ນປະຖົມສຶກສາຢ່າງເທົ່າທຽມ ເພື່ອສົ່ງເສີມການເຂົ້າຮຽນ ແລະ ຫຼຸດຜ່ອນການປະລະ.", focus: "1. ຂະຫຍາຍການສະໜອງເບ້ຍລ້ຽງໃຫ້ນັກຮຽນທຸກຍາກ ແລະ ດ້ອຍໂອກາດທີ່ເປັນກຸ່ມເປົ້າໝາຍ (ໃນເຂດຫ່າງໄກ, ພິການ ແລະ ທຸກຍາກ).<br>2. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ກົນໄກໃນການຄັດເລືອກກຸ່ມເປົ້າໝາຍທີ່ຈະໄດ້ຮັບເບ້ຍລ້ຽງ ແລະ ການຈັດຕັ້ງປະຕິບັດ ລວມທັງການຕິດຕາມ ແລະ ການປະເມີນ ທີ່ສົ່ງຜົນຕໍ່ການເຂົ້າຮຽນ.<br>3. ຈັດຕັ້ງປະຕິບັດນິຕິກຳທີ່ລົບລ້າງຄ່າຮຽນ ຫຼື ຄ່າປະກອບສ່ວນຕ່າງໆຂອງພໍ່ແມ່ (ຍົກເວັ້ນກໍລະນີສະໝັກໃຈໃນການປະກອບສ່ວນ).<br>4. ສືບຕໍ່ສະໜອງອາຫານທ່ຽງໃຫ້ນັກຮຽນ ໃນໂຮງຮຽນເປົ້າໝາຍ ແລະ ປະເມີນຜົນຂອງແຜນງານການສະໜອງອາຫານທ່ຽງ ລວມທັງທີ່ກ່ຽວຂ້ອງກັບຄວາມຄຸ້ມຄ່າກັບການລົງທຶນ." },
@@ -218,11 +235,11 @@
             
             contentDisplay.innerHTML = `
                 <h3 style="color: #b5651d; margin-bottom: 15px;">🏫 ${unitName}</h3>
-                <table class="strategy-table">
+                <table class="strategy-table" id="myTable">
                     <thead>
                         <tr>
-                            <th>ແຜນຍຸດທະສາດ</th>
-                            <th>ວຽກງານຈຸດສຸມ (ຄໍລຳຖັດໄປ)</th>
+                            <th style="width: 50%;">ແຜນຍຸດທະສາດ <div class="col-resizer" onmousedown="initResize(event)"></div></th>
+                            <th style="width: 50%;">ວຽກງານຈຸດສຸມ (ຄໍລຳຖັດໄປ)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -259,8 +276,8 @@
                         <table class="strategy-table">
                             <thead>
                                 <tr>
-                                    <th>ແຜນຍຸດທະສາດ</th>
-                                    <th>ວຽກງານຈຸດສຸມ (ຄໍລຳຖັດໄປ)</th>
+                                    <th style="width: 50%;">ແຜນຍຸດທະສາດ <div class="col-resizer" onmousedown="initResize(event)"></div></th>
+                                    <th style="width: 50%;">ວຽກງານຈຸດສຸມ (ຄໍລຳຖັດໄປ)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -272,6 +289,39 @@
             });
 
             contentDisplay.innerHTML = htmlContent;
+        }
+
+        // ฟังก์ชันสำหรับลากปรับความกว้างระหว่างคอลัมน์
+        function initResize(e) {
+            const th = e.target.parentElement;
+            const table = th.closest('table');
+            const startX = e.clientX;
+            const startWidth = th.offsetWidth;
+            const nextTh = th.nextElementSibling;
+            const startNextWidth = nextTh ? nextTh.offsetWidth : 0;
+            const tableWidth = table.offsetWidth;
+
+            e.target.classList.add('resizing');
+
+            function onMouseMove(e) {
+                const dx = e.clientX - startX;
+                const newThWidth = startWidth + dx;
+                if (newThWidth > 50 && newThWidth < tableWidth - 50) {
+                    th.style.width = newThWidth + 'px';
+                    if (nextTh) {
+                        nextTh.style.width = (startNextWidth - dx) + 'px';
+                    }
+                }
+            }
+
+            function onMouseUp(e) {
+                e.target.classList.remove('resizing');
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
         }
 
         function handleLogout() {
