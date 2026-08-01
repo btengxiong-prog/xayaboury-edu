@@ -5,14 +5,82 @@
 }
 body {
     font-family: 'Phetsarath OT', Tahoma, sans-serif;
-    display: flex;
-    flex-direction: column;
     height: 100vh;
     background-color: #f0f2f5;
     overflow: hidden;
 }
 
-/* ເມນູລວງນອນດ້ານເທິງ */
+/* ດີໄຊໜ້າ Login */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+}
+.login-box {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    width: 380px;
+    text-align: center;
+}
+.login-box h2 {
+    margin-bottom: 5px;
+    color: #333;
+}
+.login-box p {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 25px;
+}
+.form-group {
+    text-align: left;
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: #444;
+    font-weight: bold;
+}
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+.login-btn {
+    width: 100%;
+    padding: 11px;
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.login-btn:hover {
+    background-color: #004085;
+}
+.error-msg {
+    color: red;
+    font-size: 12px;
+    margin-top: 15px;
+}
+
+/* ໂຄງສ້າງ Dashboard ຫຼັກ */
+.main-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
 .top-toolbar {
     height: 80px;
     background: linear-gradient(to bottom, #fcfcfc, #d5e4f7);
@@ -47,7 +115,6 @@ body {
     margin-left: auto;
 }
 
-/* ໂຄງສ້າງສ່ວນລຸ່ມ (ຊ້າຍ-ຂວາ) */
 .main-container {
     display: flex;
     flex: 1;
@@ -55,7 +122,6 @@ body {
     position: relative;
 }
 
-/* ຕົບແຕ່ງເມນູລວງຕັ້ງດ້ານຊ້າຍ (ໃຫ້ສາມາດຂະຫຍາຍຄວາມກว้างໄດ້ ແລະ ມີ Scrollbar ທັງຕັ້ງ-ນອນ) */
 .sidebar-tree {
     width: 380px;
     min-width: 200px;
@@ -63,15 +129,15 @@ body {
     background: #ffffff;
     border-right: 1px solid #ccc;
     padding: 10px;
-    overflow: auto; /* ໃຫ້ມີທັງ Scrollbar ຕັ້ງ ແລະ ນອນ ເພື່ອເຫັນຂໍ້ຄວາມຄົບ */
-    resize: horizontal; /* อนุญาตให้ผู้ใช้ลากปรับความกว้างซ้าย-ขวาได้ */
+    overflow: auto;
+    resize: horizontal;
     font-size: 13px;
     flex-shrink: 0;
 }
 .sidebar-tree ul {
     list-style: none;
     padding-left: 15px;
-    white-space: nowrap; /* ປ້ອງກັນບໍ່ໃຫ້ຂໍ້ຄວາມຕົກແຖວ ໃຫ້ຍືດອອກທາງຂ້າງ */
+    white-space: nowrap;
 }
 .sidebar-tree li {
     margin: 4px 0;
@@ -85,7 +151,6 @@ body {
     color: #b5651d;
 }
 
-/* ເສັ້ນຂັ້ນກາງແດງ/ເທົາ */
 .resizer {
     width: 5px;
     background: #d0d0d0;
@@ -94,10 +159,9 @@ body {
     border-right: 1px solid #b0b0b0;
 }
 .resizer:hover {
-    background: #ff4d4d; /* เปลี่ยนเป็นสีแดงពេលເອົາເມົ້າໄປຊີ້ */
+    background: #ff4d4d;
 }
 
-/* ພື້ນທີ່ສະແດງເນື້ອຫາຂວາມື */
 .content-area {
     flex: 1;
     background: #ffffff;

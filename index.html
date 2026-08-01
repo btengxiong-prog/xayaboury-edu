@@ -8,79 +8,148 @@
 </head>
 <body>
 
-    <!-- 1. ເມນູລວງນອນດ້ານເທິງ -->
-    <div class="top-toolbar">
-        <div class="tool-item">
-            <span class="icon">🔍</span>
-            <span>ຊອກຂະແໜງການ</span>
-        </div>
-        <div class="tool-item">
-            <span class="icon">📊</span>
-            <span>ຍຸດທະສາດ</span>
-        </div>
-        <div class="tool-item">
-            <span class="icon">🎯</span>
-            <span>ວຽກງານຈຸດສຸມ</span>
-        </div>
-        <div class="tool-item">
-            <span class="icon">📝</span>
-            <span>ປ້ອນແຜນຍຸດທະສາດ</span>
-        </div>
-        <div class="tool-item">
-            <span class="icon">📋</span>
-            <span>ປ້ອນວຽກງານຈຸດສຸມ</span>
-        </div>
-        <div class="tool-item">
-            <span class="icon">🖨️</span>
-            <span>ລາຍງານ</span>
-        </div>
-        <div class="tool-item logout">
-            <span class="icon">🔴</span>
-            <span>Log off</span>
+    <!-- 1. ໜ້າຈໍ Login (ສະແດງຂຶ້ນມາກ່ອນ) -->
+    <div id="login-screen" class="login-container">
+        <div class="login-box">
+            <h2>ເຂົ້າສູ່ລະບົບ</h2>
+            <p>ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ</p>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Username (ຊື່ຜູ້ໃຊ້):</label>
+                    <input type="text" id="username" required placeholder="ປ້ອນ Username ຕົວຢ່າງ: EDUXYBL01">
+                </div>
+                <div class="form-group">
+                    <label>Password (ລະຫັດຜ່ານ):</label>
+                    <input type="password" id="password" required placeholder="ປ້ອນລະຫັດຜ່ານ">
+                </div>
+                <button type="submit" class="login-btn">ເຂົ້າສູ່ລະບົບ</button>
+                <div id="error-msg" class="error-msg"></div>
+            </form>
         </div>
     </div>
 
-    <!-- 2. ສ່ວນເນື້ອຫາ ແລະ ເມນູລວງຕັ້ງດ້ານຊ້າຍ -->
-    <div class="main-container">
-        <!-- ເມນູລວງຕັ້ງ (TreeView ທີ່ປັບໃຫ້ມີແຖບເລື່ອນ ແລະ ປັບຂະໜາດໄດ້) -->
-        <div class="sidebar-tree">
-            <ul>
-                <li class="folder">📁 ພາກສ່ວນຕ່າງໆ
-                    <ul>
-                        <li class="folder open">📂 ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ
-                            <ul>
-                                <li>🏫 ຂະແໜງ ກວດກາ, ປະເມີນຜົນ ແລະ ປະກັນຄຸນນະພາບ</li>
-                                <li>🏫 ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ</li>
-                                <li>🏫 ຂະແໜງ ຈັດຕັ້ງ ແລະ ພະນັກງານ</li>
-                                <li>🏫 ຂະແໜງ ການສຶກສາກ່ອນໄວຮຽນ</li>
-                                <li>🏫 ຂະແໜງ ການສຶກສານອກໂຮງຮຽນ ແລະ ຝຶກອົບຮົມວິຊາຊີບຂັ້ນພື້ນຖານ</li>
-                                <li>🏫 ຂະແໜງ ພັດທະນາຄູ</li>
-                                <li>🏫 ຂະແໜງ ສະຖິຕິ, ແຜນການ ແລະ ຮ່ວມມືກັບຕ່າງປະເທດ</li>
-                                <li>🏫 ຂະແໜງ ສາມັນສຶກສາ</li>
-                                <li>🏫 ຂະແໜງ ວິທະຍາສາດ, ອາຊີວະສຶກສາ ແລະ ການສຶກສາຊັ້ນສູງ</li>
-                                <li>🏫 ຂະແໜງ ກິລາ-ກາຍະກຳ ແລະ ສິລະປະສຶກສາ</li>
-                                <li>🏫 ສູນໄອຊີທີ ແຂວງໄຊຍະບູລີ</li>
-                                <li>🏫 ສູນພັດທະນາເດັກ</li>
-                                <li>🏫 ສູນພັດທະນາຄູ</li>
-                                <li>🏫 ສູນສຶກສານິເທດ ແຂວງໄຊຍະບູລີ</li>
-                                <li>🏫 ສູນການສຶກສານອກໂຮງຮຽນ</li>
-                                <li>🏫 ຫ້ອງການກຳມະທິການສຶກສາສິງແຂວງ</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+    <!-- 2. ໜ້າຈໍຫຼັກ (Dashboard) - ເຊື່ອງໄວ້ກ่อน ຈົນກວ່າຈະ Login สำเร็จ -->
+    <div id="main-screen" class="main-wrapper" style="display: none;">
+        
+        <!-- ເມນູລວງນອນດ້ານເທິງ -->
+        <div class="top-toolbar">
+            <div class="tool-item">
+                <span class="icon">🔍</span>
+                <span>ຊອກຂະແໜງການ</span>
+            </div>
+            <div class="tool-item">
+                <span class="icon">📊</span>
+                <span>ຍຸດທະສາດ</span>
+            </div>
+            <div class="tool-item">
+                <span class="icon">🎯</span>
+                <span>ວຽກງານຈຸດສຸມ</span>
+            </div>
+            <div class="tool-item">
+                <span class="icon">📝</span>
+                <span>ປ້ອນແຜນຍຸດທະສາດ</span>
+            </div>
+            <div class="tool-item">
+                <span class="icon">📋</span>
+                <span>ປ້ອນວຽກງານຈຸດສຸມ</span>
+            </div>
+            <div class="tool-item">
+                <span class="icon">🖨️</span>
+                <span>ລາຍງານ</span>
+            </div>
+            <div class="tool-item logout" onclick="handleLogout()">
+                <span class="icon">🔴</span>
+                <span>Log off</span>
+            </div>
         </div>
 
-        <!-- ເສັ້ນຂັ້ນກາງທີ່ສາມາດລາກປັບຂະໜາດ (Resize Handle) -->
-        <div class="resizer"></div>
+        <!-- ສ່ວນເນື້ອຫາ ແລະ ເມນູລວງຕັ້ງດ້ານຊ້າຍ -->
+        <div class="main-container">
+            <div class="sidebar-tree">
+                <ul>
+                    <li class="folder">📁 ພາກສ່ວນຕ່າງໆ
+                        <ul>
+                            <li class="folder open">📂 ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ
+                                <ul>
+                                    <li>🏫 ຂະແໜງ ກວດກາ, ປະເມີນຜົນ ແລະ ປະກັນຄຸນນະພາບ</li>
+                                    <li>🏫 ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ</li>
+                                    <li>🏫 ຂະແໜງ ຈັດຕັ້ງ ແລະ ພະນັກງານ</li>
+                                    <li>🏫 ຂະແໜງ ການສຶກສາກ່ອນໄວຮຽນ</li>
+                                    <li>🏫 ຂະແໜງ ການສຶກສານອກໂຮງຮຽນ ແລະ ຝຶກອົບຮົມວິຊາຊີບຂັ້ນພື້ນຖານ</li>
+                                    <li>🏫 ຂະແໜງ ພັດທະນາຄູ</li>
+                                    <li>🏫 ຂະແໜງ ສະຖິຕິ, ແຜນການ ແລະ ຮ່ວມມືກັບຕ່າງປະເທດ</li>
+                                    <li>🏫 ຂະແໜງ ສາມັນສຶກສາ</li>
+                                    <li>🏫 ຂະແໜງ ວິທະຍາສາດ, ອາຊີວະສຶກສາ ແລະ ການສຶກສາຊັ້ນສູງ</li>
+                                    <li>🏫 ຂະແໜງ ກິລາ-ກາຍະກຳ ແລະ ສິລະປະສຶກສາ</li>
+                                    <li>🏫 ສູນໄອຊີທີ ແຂວງໄຊຍະບູລີ</li>
+                                    <li>🏫 ສູນພັດທະນາເດັກ</li>
+                                    <li>🏫 ສູນພັດທະນາຄູ</li>
+                                    <li>🏫 ສູນສຶກສານິເທດ ແຂວງໄຊຍະບູລີ</li>
+                                    <li>🏫 ສູນການສຶກສານອກໂຮງຮຽນ</li>
+                                    <li>🏫 ຫ້ອງການກຳມະທິການສຶກສາສິງແຂວງ</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
 
-        <!-- ພື້ນທີ່ສະແດງຜົນຂວາມື -->
-        <div class="content-area">
-            <h2>ລະບົບຕິດຕາມ ແລະ ສະຫຼຸບລາຍງານການຈັດຕັ້ງປະຕິບັດວຽກງານ</h2>
-            <p>ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ. ກະລຸນາເລືອກເມນູທາງດ້ານຊ້າຍ ຫຼື ປຸ່ມລັດດ້ານເທິງເພື່ອເລີ່ມຕົ້ນການເຮັດວຽກ.</p>
+            <div class="resizer"></div>
+
+            <div class="content-area">
+                <h2>ລະບົບຕິດຕາມ ແລະ ສະຫຼຸບລາຍງານການຈັດຕັ້ງປະຕິບັດວຽກງານ</h2>
+                <p id="welcome-user">ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ. ກະລຸນາເລືອກເມນູທາງດ້ານຊ້າຍ ຫຼື ປຸ່ມລັດດ້ານເທິງເພື່ອເລີ່ມຕົ້ນການເຮັດວຽກ.</p>
+            </div>
         </div>
+
     </div>
 
+    <!-- JavaScript ສຳລັບກວດສອບ Username ແລະ Password -->
+    <script>
+        // ຖານຂໍ້ມູນ User ທີ່ທ່ານກຳນົດ
+        const users = {
+            "EDUXYBL01": { pass: "123456", name: "ຂະແໜງ ກວດກາ, ປະເມີນຜົນ ແລະ ປະກັນຄຸນນະພາບ" },
+            "EDUXYBL02": { pass: "123456", name: "ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ" },
+            "EDUXYBL03": { pass: "123456", name: "ຂະແໜງ ຈັດຕັ້ງ ແລະ ພະນັກງານ" },
+            "EDUXYBL04": { pass: "123456", name: "ຂະແໜງ ການສຶກສາກ່ອນໄວຮຽນ" },
+            "EDUXYBL05": { pass: "123456", name: "ຂະແໜງ ການສຶກສານອກໂຮງຮຽນ ແລະ ຝຶກອົບຮົມວິຊາຊີບຂັ້ນພື້ນຖານ" },
+            "EDUXYBL06": { pass: "123456", name: "ຂະແໜງ ພັດທະນາຄູ" },
+            "EDUXYBL07": { pass: "123456", name: "ຂະແໜງ ສະຖິຕິ, ແຜນການ ແລະ ຮ່ວມມືກັບຕ່າງປະເທດ" },
+            "EDUXYBL08": { pass: "123456", name: "ຂະແໜງ ສາມັນສຶກສາ" },
+            "EDUXYBL09": { pass: "123456", name: "ຂະແໜງ ວິທະຍາສາດ, ອາຊີວະສຶກສາ ແລະ ການສຶກສາຊັ້ນສູງ" },
+            "EDUXYBL10": { pass: "123456", name: "ຂະແໜງ ກິລາ-ກາຍະກຳ ແລະ ສິລະປະສຶກສາ" },
+            "EDUXYBL11": { pass: "123456", name: "ສູນໄອຊີທີ ແຂວງໄຊຍະບູລີ" },
+            "EDUXYBL12": { pass: "123456", name: "ສູນພັດທະນາເດັກ" },
+            "EDUXYBL13": { pass: "123456", name: "ສູນພັດທະນາຄູ" },
+            "EDUXYBL14": { pass: "123456", name: "ສູນສຶກສານິເທດ ແຂວງໄຊຍະບູລີ" },
+            "EDUXYBL15": { pass: "123456", name: "ສູນການສຶກສານອກໂຮງຮຽນ" },
+            "EDUXYBL16": { pass: "123456", name: "ຫ້ອງການກຳມະທິການສຶກສາສິງແຂວງ" }
+        };
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            const errDiv = document.getElementById('error-msg');
+
+            if (users[u] && users[u].pass === p) {
+                // Login สำเร็จ
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-screen').style.display = 'flex';
+                document.getElementById('welcome-user').innerText = "ຍິນດີຕ້ອນຮັບ: " + users[u].name;
+            } else {
+                // Login ບໍ່ຜ່ານ
+                errDiv.innerText = "Username ຫຼື Password ບໍ່ຖືກຕ້ອງ ກະລຸນາລອງใหม่อีกครั้ง!";
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('error-msg').innerText = '';
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+        }
+    </script>
 </body>
 </html>
