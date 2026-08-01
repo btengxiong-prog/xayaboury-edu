@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <!-- 1. ໜ້າຈໍ Login (ສະແດງຂຶ້ນມາກ່ອນ) -->
+    <!-- 1. ໜ້າຈໍ Login -->
     <div id="login-screen" class="login-container">
         <div class="login-box">
             <h2>ເຂົ້າສູ່ລະບົບ</h2>
@@ -16,7 +16,7 @@
             <form id="login-form" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label>Username (ຊື່ຜູ້ໃຊ້):</label>
-                    <input type="text" id="username" required placeholder="ປ້ອນ Username ຕົວຢ່າງ: EDUXYBL01">
+                    <input type="text" id="username" required placeholder="ປ້ອນ Username ຕົວຢ່າງ: EDUXYBL">
                 </div>
                 <div class="form-group">
                     <label>Password (ລະຫັດຜ່ານ):</label>
@@ -28,7 +28,7 @@
         </div>
     </div>
 
-    <!-- 2. ໜ້າຈໍຫຼັກ (Dashboard) - ເຊື່ອງໄວ້ກ่อน ຈົນກວ່າຈະ Login สำเร็จ -->
+    <!-- 2. ໜ້າຈໍຫຼັກ (Dashboard) -->
     <div id="main-screen" class="main-wrapper" style="display: none;">
         
         <!-- ເມນູລວງນອນດ້ານເທິງ -->
@@ -104,10 +104,10 @@
 
     </div>
 
-    <!-- JavaScript ສຳລັບກວດສອບ Username ແລະ Password -->
+    <!-- JavaScript -->
     <script>
-        // ຖານຂໍ້ມູນ User ທີ່ທ່ານກຳນົດ
         const users = {
+            "EDUXYBL":   { pass: "123456", name: "ຜູ້ບໍລິຫານລະບົບ (ADMIN)" },
             "EDUXYBL01": { pass: "123456", name: "ຂະແໜງ ກວດກາ, ປະເມີນຜົນ ແລະ ປະກັນຄຸນນະພາບ" },
             "EDUXYBL02": { pass: "123456", name: "ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ" },
             "EDUXYBL03": { pass: "123456", name: "ຂະແໜງ ຈັດຕັ້ງ ແລະ ພະນັກງານ" },
@@ -133,12 +133,10 @@
             const errDiv = document.getElementById('error-msg');
 
             if (users[u] && users[u].pass === p) {
-                // Login สำเร็จ
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-screen').style.display = 'flex';
                 document.getElementById('welcome-user').innerText = "ຍິນດີຕ້ອນຮັບ: " + users[u].name;
             } else {
-                // Login ບໍ່ຜ່ານ
                 errDiv.innerText = "Username ຫຼື Password ບໍ່ຖືກຕ້ອງ ກະລຸນາລອງใหม่อีกครั้ง!";
             }
         }
