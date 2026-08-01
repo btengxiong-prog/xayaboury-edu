@@ -387,7 +387,11 @@
 </head>
 <body onclick="closeAllDropdowns(event)">
 
-    <!-- Modal ສຳລັບສະແດງຮູບພາບຕົວຈິງ -->
+    <!-- Hidden File Inputs ສຳລັບtrigger ເປີດປ່ອງຢ້ຽມເລືອກໄຟລ໌ທັນທີ -->
+    <input type="file" id="hidden-file-general" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleHiddenFileChange(event, 'import_general', 'ວຽກທົ່ວໄປ')">
+    <input type="file" id="hidden-file-strategy" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleHiddenFileChange(event, 'import_strategy', 'ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ')">
+
+    <!-- Modal ສຳລັບສະແດງຮູບພາບຂະໜາດໃຫຍ່ -->
     <div id="image-modal" class="image-modal-overlay" onclick="closeImageModal()">
         <div class="image-modal-content" onclick="event.stopPropagation()">
             <img id="modal-img-tag" src="" alt="Preview">
@@ -439,8 +443,8 @@
                     <span>ນຳເຂົ້າແຜນ ▾</span>
                 </div>
                 <div id="import-dropdown-menu" class="dropdown-menu">
-                    <div onclick="showImportPage('general', 'ວຽກທົ່ວໄປ')">📁 ວຽກທົ່ວໄປ</div>
-                    <div onclick="showImportPage('strategy', 'ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ')">📊 ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</div>
+                    <div onclick="triggerImport('general')">📁 ວຽກທົ່ວໄປ</div>
+                    <div onclick="triggerImport('strategy')">📊 ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</div>
                 </div>
             </div>
 
@@ -866,11 +870,19 @@
             }
         }
 
-        // ຟັງຊັນສຳລັບການນຳເຂົ້າໄຟລ໌ແຜນ
-        function handleImportFileChange(input, key) {
-            const displayArea = document.getElementById(key + '_display');
-            displayArea.innerHTML = '';
+        // ຟັງຊັນສຳລັບທຣິກເປີດໜ້າຕ່າງເລືອກໄຟລ໌
+        function triggerImport(type) {
+            closeAllDropdowns();
+            if (type === 'general') {
+                document.getElementById('hidden-file-general').click();
+            } else if (type === 'strategy') {
+                document.getElementById('hidden-file-strategy').click();
+            }
+        }
 
+        // ຟັງຊັນຮັບໄຟລ໌ທີ່ອັບໂຫຼດແລ້ວບັນທຶກລົງ LocalStorage ພ້ອມສະແດງໜ້າຈໍຈັດການໄຟລ໌ແຜນ
+        function handleHiddenFileChange(event, key, titleName) {
+            const input = event.target;
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 const fileName = file.name;
@@ -880,23 +892,35 @@
                     const fileDataUrl = e.target.result;
                     localStorage.setItem(`plan_file_${key}`, fileName);
                     localStorage.setItem(`plan_fileObj_${key}`, fileDataUrl);
-                    renderImportFile(key, fileName, fileDataUrl, file.type.startsWith('image/'));
-                    showCustomAlert('ນຳເຂົ້າ ແລະ ບັນທຶກໄຟລ໌ແຜນຮັບຮອງສຳເລັດແລ້ວ!');
+                    
+                    showImportManagerPage(key, titleName, fileName, fileDataUrl, file.type.startsWith('image/'));
+                    showCustomAlert('ນຳເຂົ້າ ແລະ ບັນທຶກໄຟລ໌ແຜນສຳເລັດແລ້ວ!');
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function renderImportFile(key, fileName, fileDataUrl, isImage) {
-            const displayArea = document.getElementById(key + '_display');
-            if(!displayArea) return;
+        function showImportManagerPage(key, titleName, fileName, fileDataUrl, isImage) {
+            const contentDisplay = document.getElementById('content-display');
             let fileIcon = isImage ? '🖼️' : '📄';
-            displayArea.innerHTML = `
-                <div class="file-info-display" style="max-width: 500px; margin: 0 auto; padding: 12px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; background: #e2e8f0; border-radius: 6px;">
-                    <span onclick="${isImage ? `previewPlanImage('${key}')` : `downloadPlanFile('${key}')`}" title="${isImage ? 'ກົດເພື່ອເບິ່ງຮູບ' : 'ກົດເພື່ອດາວໂຫຼດໄຟລ໌'}" style="cursor:pointer; color: #2563eb; text-decoration: underline; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        ${fileIcon} ${fileName} (ຄລິກເພື່ອເບິ່ງ/ດາວໂຫຼດ)
-                    </span>
-                    <button type="button" class="remove-file-btn" style="padding: 6px 12px; font-size: 12px; background: #ef4444; border-radius: 4px;" onclick="removeImportFile('${key}')">ລົບໄຟລ໌</button>
+            contentDisplay.innerHTML = `
+                <div class="report-container">
+                    <h2 style="color: #0f172a; margin-bottom: 10px;">ນຳເຂົ້າແຜນ: ${titleName}</h2>
+                    <p style="color: #64748b; margin-bottom: 20px;">ໄຟລ໌ແຜນงานທີ່ໄດ້ຮັບຮອງ ແລະ ນຳເຂົ້າໃນລະບົບແລ້ວ:</p>
+                    <div style="padding: 20px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center;">
+                        <div class="file-info-display" style="max-width: 500px; margin: 0 auto; padding: 12px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; background: #e2e8f0; border-radius: 6px;">
+                            <span onclick="${isImage ? `previewPlanImage('${key}')` : `downloadPlanFile('${key}')`}" title="${isImage ? 'ກົດເພື່ອເບິ່ງຮູບ' : 'ກົດເພື່ອດາວໂຫຼດໄຟລ໌'}" style="cursor:pointer; color: #2563eb; text-decoration: underline; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                ${fileIcon} ${fileName} (ຄລິກເພື່ອເບິ່ງ/ດາວໂຫຼດ)
+                            </span>
+                            <button type="button" class="remove-file-btn" style="padding: 6px 12px; font-size: 12px; background: #ef4444; border-radius: 4px;" onclick="removeImportFile('${key}', '${titleName}')">ລົບໄຟລ໌</button>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <label style="cursor:pointer; display:inline-block; padding:8px 16px; background:#2563eb; color:white; border-radius:4px; font-weight:bold; font-size:13px;">
+                            🔄 ປ່ຽນໄຟລ໌ແຜນໃໝ່
+                            <input type="file" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleHiddenFileChange(event, '${key}', '${titleName}')">
+                        </label>
+                    </div>
                 </div>
             `;
         }
@@ -922,61 +946,14 @@
             }
         }
 
-        function removeImportFile(key) {
+        function removeImportFile(key, titleName) {
             localStorage.removeItem(`plan_file_${key}`);
             localStorage.removeItem(`plan_fileObj_${key}`);
-            const displayArea = document.getElementById(key + '_display');
-            if(displayArea) displayArea.innerHTML = '';
-            showCustomAlert('ລົບໄຟລ໌ແຜນຮັບຮອງສຳເລັດແລ້ວ!');
-        }
-
-        // 1) ຟັງຊັນສະແດງໜ້າ "ນຳເຂົ້າແຜນ -> ວຽກທົ່ວໄປ"
-        function showImportGeneral() {
-            closeAllDropdowns();
-            const contentDisplay = document.getElementById('content-display');
-            contentDisplay.innerHTML = `
-                <div class="report-container">
-                    <h2 style="color: #0f172a; margin-bottom: 10px;">ນຳເຂົ້າແຜນ: ວຽກທົ່ວໄປ</h2>
-                    <p style="color: #64748b; margin-bottom: 20px;">ກະລຸນາອັບໂຫຼດໄຟລ໌ແຜນວຽກທົ່ວໄປທີ່ໄດ້ຮັບຮອງແລ້ວ (ຮອງຮັບ PDF, Word, Excel ແລະ ໄຟລ໌ຮູບທຸກຊະນິດ)</p>
-                    <div class="file-upload-section" style="padding: 30px; text-align: center; border: 2px dashed #cbd5e1; font-size: 14px; background: #f8fafc;">
-                        <label style="cursor:pointer; display:inline-block; padding:10px 20px; background:#2563eb; color:white; border-radius:4px; font-weight:bold;">
-                            📥 ອັບໂຫຼດໄຟລ໌ແຜນວຽກທົ່ວໄປ
-                            <input type="file" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleImportFileChange(this, 'import_general')">
-                        </label>
-                        <div id="import_general_display" style="margin-top: 20px;"></div>
-                    </div>
-                </div>
-            `;
-            
-            let savedFile = localStorage.getItem('plan_file_import_general');
-            let savedFileObj = localStorage.getItem('plan_fileObj_import_general');
-            if(savedFile && savedFileObj) {
-                renderImportFile('import_general', savedFile, savedFileObj, savedFileObj.startsWith('data:image/'));
-            }
-        }
-
-        // 2) ຟັງຊັນສະແດງໜ້າ "ນຳເຂົ້າແຜນ -> ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ"
-        function showImportStrategy() {
-            closeAllDropdowns();
-            const contentDisplay = document.getElementById('content-display');
-            contentDisplay.innerHTML = `
-                <div class="report-container">
-                    <h2 style="color: #0f172a; margin-bottom: 10px;">ນຳເຂົ້າແຜນ: ຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</h2>
-                    <p style="color: #64748b; margin-bottom: 20px;">ກະລຸນາອັບໂຫຼດໄຟລ໌ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມທີ່ໄດ້ຮັບຮອງແລ້ວ (ຮອງຮັບ PDF, Word, Excel ແລະ ໄຟລ໌ຮູບທຸກຊະນິດ)</p>
-                    <div class="file-upload-section" style="padding: 30px; text-align: center; border: 2px dashed #cbd5e1; font-size: 14px; background: #f8fafc;">
-                        <label style="cursor:pointer; display:inline-block; padding:10px 20px; background:#10b981; color:white; border-radius:4px; font-weight:bold;">
-                            📥 ອັບໂຫຼດໄຟລ໌ແຜນຍຸດທະສາດ
-                            <input type="file" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleImportFileChange(this, 'import_strategy')">
-                        </label>
-                        <div id="import_strategy_display" style="margin-top: 20px;"></div>
-                    </div>
-                </div>
-            `;
-            
-            let savedFile = localStorage.getItem('plan_file_import_strategy');
-            let savedFileObj = localStorage.getItem('plan_fileObj_import_strategy');
-            if(savedFile && savedFileObj) {
-                renderImportFile('import_strategy', savedFile, savedFileObj, savedFileObj.startsWith('data:image/'));
+            showCustomAlert('ລົບໄຟລ໌ແຜນສຳເລັດແລ້ວ!');
+            if(key === 'import_general') {
+                showImportManagerPage(key, titleName, 'ຍັງບໍ່ມີໄຟລ໌', '', false);
+            } else {
+                showImportManagerPage(key, titleName, 'ຍັງບໍ່ມີໄຟລ໌', '', false);
             }
         }
 
@@ -987,7 +964,7 @@
             contentDisplay.innerHTML = `
                 <div class="report-container" id="printable-report">
                     <div style="text-align: center; font-weight: bold; margin-bottom: 5px;">ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ</div>
-                    <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">ສັນຕິພາບ ເອກະລາດ ປະຊາທິປະໄຕ ເອກະພາບ ວັດຖະນະຖາວອນ</div>
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">ສັນຕິພາບ ເອກະລາດ ປະຊາທິປະໄຕ ເອກະພາບ ວັດທະນະຖາວອນ</div>
                     <hr style="border: 0; border-top: 1px solid #cbd5e1; width: 180px; margin: 10px auto 20px auto;">
                     
                     <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-weight: bold;">
@@ -1287,16 +1264,6 @@
         // ຟັງຊັນບັນທຶກຂໍ້ຄວາມອັດຕະໂນມັດລົງ LocalStorage
         function saveText(key, textarea) {
             localStorage.setItem(`text_${key}`, textarea.value);
-        }
-
-        // ຟັງຊັນລົບໄຟລ໌ອອກ
-        function removeFile(btn, key) {
-            localStorage.removeItem(`file_${key}`);
-            localStorage.removeItem(`fileObj_${key}`);
-            const section = btn.closest('.file-upload-section');
-            const fileInput = section.querySelector('input[type="file"]');
-            fileInput.value = '';
-            section.querySelector('.file-display-area').innerHTML = '';
         }
 
         function initResize(e) {
