@@ -128,6 +128,26 @@
         .remove-file-btn:hover {
             background: #dc2626;
         }
+        
+        /* ປຸ່ມບັນທຶກຂໍ້ມູນ */
+        .action-bar {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .save-btn {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .save-btn:hover {
+            background-color: #059669;
+        }
     </style>
 </head>
 <body>
@@ -307,7 +327,7 @@
                 { strat: "ຍຸດທະສາດ 08: ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ວຽກງານການສ້າງແຜນ, ການຄຸ້ມຄອງ ແລະ ການນໍາພາ ຂອງໂຮງຮຽນປະຖົມ", focus: "32. ປະຕິບັດນິຕິກຳໃນການບໍລິຫານຄຸ້ມຄອງໂຮງຮຽນ ແລະ ການສຶກສາຮຽນຮ່ວມ.<br>33. ຈັດຕັ້ງປະຕິບັດການຄຸ້ມຄອງທີ່ອີງໃສ່ໂຮງຮຽນເປັນຫຼັກ (SBM) ແລະ ປະເມີນຜົນ.<br>34. ຈັດຕັ້ງປະຕິບັດ ມຄພ (FQS) ເພື່ອປັບປຸງການສ້າງແຜນ ແລະ ພັດທະນາໂຮງຮຽນ.<br>35. ພັດທະນາວິຊາຊີບແບບຕໍ່ເນື່ອງໃຫ້ແກ່ຜູ້ອຳນວຍການໂຮງຮຽນ (SBM ແລະ ມຄພ).<br>36. ປະຕິບັດນິຕິກຳ ແລະ ລະບົບການຄັດເລືອກ ແລະ ແຕ່ງຕັ້ງຜູ້ອຳນວຍການ (ຍົກສູງເພດຍິງ).<br>37. ສະໜອງອຸປະກອນ ICT ພື້ນຖານໃຫ້ແກ່ໂຮງຮຽນປະຖົມ ສຳລັບການຄຸ້ມຄອງ.<br>38. ສ້າງຄວາມເຂັ້ມແຂງໃນວຽກງານການຄຸ້ມຄອງຄວາມສ່ຽງຕໍ່ໄພພິບັດ ແລະ ການປ່ຽນແປງດິນຟ້າອາກາດ.<br>39. ສ້າງລະບົບຕິດຕາມນັກຮຽນທີ່ມີຄວາມສ່ຽງທີ່ຈະອອກໂຮງຮຽນ.<br>40. ສົ່ງເສີມການສ້າງຕັ້ງໂຮງຮຽນຕົວແບບ, ກຸ່ມໂຮງຮຽນຕົວແບບ, ໂຮງຮຽນສີຂຽວ ແລະ ອາຫານທ່ຽງ.<br>41. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ຜູ້ບໍລິຫານໂຮງຮຽນໃນການຈັດຕັ້ງປະຕິບັດໂຄງການອາຫານທ່ຽງ." },
                 { strat: "ຍຸດທະສາດ 09: ການສະໜອງ ແລະ ຈັດສັນຊັບພະຍາກອນດ້ານງົບປະມານ ແລະ ບຸກຄະລາກອນຢ່າງພຽງພໍ", focus: "42. ຕິດຕາມ ແລະ ປະເມີນຜົນໄດ້ຮັບ ການສະໜອງເງິນບໍລິຫານສະຖານການສຶກສາ ແລະ ອາຫານທ່ຽງ.<br>43. ທົບທວນ ແລະ ປັບປຸງລະບົບການຈັດສັນຄູ ເພື່ອແຈກຢາຍຄູຢ່າງພຽງພໍ ແລະ ເທົ່າທຽມ." },
                 { strat: "ຍຸດທະສາດ 10: ໂຄສະນາປຸກລະດົມ ແລະ ສົ່ງເສີມການມີສ່ວນຮ່ວມຂອງຊຸມຊົນ", focus: "44. ໂຄສະນາປຸກລະດົມ ແລະ ຈັດກິດຈະກຳສົ່ງເສີມການເຂົ້າຮຽນ ເພື່ອໃຫ້ເຫັນຄວາມສຳຄັນ.<br>45. ຍົກບົດບາດ ແລະ ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ຄະນະພັດທະນາການສຶກສາຂັ້ນບ້ານ (ຄພສບ).<br>46. ຊຸກຍູ້ການມີສ່ວນຮ່ວມຂອງຊຸມຊົນ ແລະ ພໍ່ແມ່ໃນການພົບປະ ແລະ ເຂົ້າຮ່ວມກິດຈະກຳ." },
-                { strat: "ຍຸດທະສາດ 01 (ມ.ຕົ້ນ): ຫຼຸດຜ່ອນຄ່າໃຊ້ຈ່າຍຂອງຄອບຄົວໃນການເຂົ້າຮຽນຊັ້ນ ມ.ຕົ້ນ ຢ່າງເທົ່າທຽມ", focus: "1. ຂະຫຍາຍການສະໜອງເບ້ຍລ້ຽງໃຫ້ນັກຮຽນທຸກຍາກ ແລະ ດ້ອຍໂອກາດຊັ້ນ ມ.ຕົ້ນ.<br>2. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ກົນໄກໃນການຄັດເລືອກກຸ່ມເປົ້າໝາຍທີ່ຈະໄດ້ຮັບເບ້ຍລ້ຽງ ແລະ ຕິດຕາມປະເມີນຜົນ.<br>3. ຈັດຕັ້ງປະຕິບັດນິຕິກຳທີ່ລົບລ້າງຄ່າຮຽນ ຫຼື ຄ່າປະກອບສ່ວນຕ່າງໆ.<br>4. ທົບທວນຄວາມເປັນໄປໄດ້ໃນການຫຼຸດຜ່ອນຄ່າໃຊ້ຈ່າຍຄົວເຮືອນ (ຄ່າຊຸດນັກຮຽນ)." },
+                { strat: "ຍຸດທະສາດ 01 (ມ.ຕົ້ນ): ຫຼຸດຜ່ອນຄ່າໃຊ້ຈ່າຍຂອງຄອບຄົວໃນການເຂົ້າຮຽນຊັ້ນ ມ.ຕົ້ນ ຢ່າງເທົ່າທຽມ", focus: "1. ຂະຫຍາຍການສະໜອງເບ້ຍລ້ຽງໃຫ້ນັກຮຽນທຸກຍາກ ແລະ ດ້ອຍໂອກາດຊັ້ນ ມ.ຕົ້ນ.<br>2. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ກົນໄກໃນການຄັດເລືອກກຸ່ມເປົ້າໝາຍທີ່ຈະໄດ້ຮັບເບ້ຍລ້ຽງ ແລະ ຕິດຕາມປະເມີນຜົນ.<br>3. ສ້າງ ແລະ ຈັດຕັ້ງປະຕິບັດນິຕິກຳທີ່ລົບລ້າງຄ່າຮຽນ ຫຼື ຄ່າປະກອບສ່ວນຕ່າງໆ.<br>4. ທົບທວນຄວາມເປັນໄປໄດ້ໃນການຫຼຸດຜ່ອນຄ່າໃຊ້ຈ່າຍຄົວເຮືອນ (ຄ່າຊຸດນັກຮຽນ)." },
                 { strat: "ຍຸດທະສາດ 02 (ມ.ຕົ້ນ): ທົບທວນ ນິຕິກໍາ ກ່ຽວກັບການຊຸກຍູ້, ສົ່ງເສີມການເຂົ້າຮຽນຈົບ ປ.5 ຕໍ່ ມ.ຕົ້ນ", focus: "5. ສ້າງ ແລະ ປັບປຸງນິຕິກຳກ່ຽວກັບການຄຸ້ມຄອງໂຮງຮຽນ ລວມທັງການສຶກສາຮຽນຮ່ວມ.<br>6. ຄົ້ນຄວ້າຄວາມເປັນໄປໄດ້ໃນການຂະຫຍາຍການສະໜອງອາຫານທ່ຽງໃນຊັ້ນ ມ.ຕົ້ນ.<br>7. ສະໜອງສິ່ງອຳນວຍຄວາມສະດວກໃນການເຂົ້າຮຽນ ລວມທັງການສຶກສາຮຽນຮ່ວມ." },
                 { strat: "ຍຸດທະສາດ 03 (ມ.ຕົ້ນ): ສົ່ງເສີມການມີສ່ວນຮ່ວມຂອງ ສະມາຄົມພໍ່ແມ່ນັກຮຽນ ແລະ ຊຸມຊົນ", focus: "8. ສ້າງ, ປັບປຸງ ແລະ ເຜີຍແຜ່ນິຕິກຳກ່ຽວກັບການມີສ່ວນຮ່ວມຂອງຊຸມຊົນ ແລະ ສັງຄົມ.<br>9. ສ້າງຄວາມເຂັ້ມແຂງໃຫ້ແກ່ສະມາຄົມພໍ່ແມ່ນັກຮຽນ, ຄພສບ ແລະ ຊຸມຊົນ.<br>10. ປຸກລະດົມຂົນຂວາຍຊຸມຊົນໃຫ້ຊຸກຍູ້ສົ່ງເສີມລູກຫຼານໃຫ້ຮຽນຈົບຊັ້ນມັດທະຍົມສຶກສາຕອນຕົ້ນ.<br>11. ຕິດຕາມ, ຊຸກຍູ້, ຊ່ວຍເຫຼືອການປະຕິບັດໜ້າທີ່ຂອງສະມາຄົມພໍ່ແມ່ນັກຮຽນ ແລະ ຊຸມຊົນ." },
                 { strat: "ຍຸດທະສາດ 03 (ມ.ຕົ້ນ - ສືບຕໍ່): ສົ່ງເສີມສະພາບແວດລ້ອມພາຍໃນໂຮງຮຽນທີ່ປອດໄພ", focus: "12. ສະໜອງ ແລະ ປັບປຸງພື້ນຖານໂຄ່ງລ່າງ (ໄຟຟ້າ, ນ້ຳສະອາດ, ຫ້ອງນ້ຳແຍກຍິງ-ຊາຍ).<br>13. ສະໜອງອຸປະກອນການຮຽນການສອນ ແລະ ອຸປະກອນຊ່ວຍເຫຼືອສຳລັບນັກຮຽນພິການ.<br>14. ສ້າງ, ປັບປຸງ ແລະ ເຜີຍແຜ່ນິຕິກຳກ່ຽວກັບວຽກງານສົ່ງເສີມສຸຂະພາບໃນໂຮງຮຽນ.<br>15. ສົ່ງເສີມທັກສະ, ຄວາມຮູ້ກ່ຽວກັບເພດສຶກສາ, ບົດບາດຍິງ-ຊາຍ, ລະເບີດບໍ່ທັນແຕກ, ສິ່ງເສບຕິດ.<br>16. ສ້າງຄວາມເຂັ້ມແຂງປະສານສາທາລະນະສຸກຂັ້ນທ້ອງຖິ່ນ ເພື່ອສຸຂະພາບ ແລະ ໂພຊະນາການ.<br>17. ສົ່ງເສີມກິດຈະກຳນອກຫຼັກສູດ (ສະໂມສອນເດັກຍິງ, ກິລາ, ສິລະປະ, ວິທະຍາສາດ)." },
@@ -399,6 +419,10 @@
                     totalFocus += rowSpan;
 
                     focusItems.forEach((fItem, fIndex) => {
+                        let uniqueKey = `${unitName}_${index}_${fIndex}`;
+                        let savedText = localStorage.getItem(`text_${uniqueKey}`) || '';
+                        let savedFile = localStorage.getItem(`file_${uniqueKey}`) || '';
+
                         tableRows += `<tr>`;
                         if (fIndex === 0) {
                             tableRows += `<td rowspan="${rowSpan}" style="width: 35%;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}</td>`;
@@ -407,11 +431,13 @@
                             <td style="width: 35%;">${fItem.trim()}</td>
                             <td style="width: 30%;">
                                 <div class="actual-input-wrapper">
-                                    <textarea class="actual-input" placeholder="ປ້ອນຜົນການຈັດຕັ້ງປະຕິບັດ..."></textarea>
+                                    <textarea class="actual-input" placeholder="ປ້ອນຜົນການຈັດຕັ້ງປະຕິບັດ..." oninput="saveText('${uniqueKey}', this)">${savedText}</textarea>
                                     <div class="file-upload-section">
                                         <label>📎 ອັບໂຫຼດໄຟລ໌ຜົນງານ (PDF, Word, Excel):</label>
-                                        <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileChange(this)">
-                                        <div class="file-display-area"></div>
+                                        <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileChange(this, '${uniqueKey}')">
+                                        <div class="file-display-area">
+                                            ${savedFile ? `<div class="file-info-display"><span>📄 ${savedFile}</span><button type="button" class="remove-file-btn" onclick="removeFile(this, '${uniqueKey}')">ລົບ</button></div>` : ''}
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -432,6 +458,9 @@
             }
             
             contentDisplay.innerHTML = `
+                <div class="action-bar">
+                    <button type="button" class="save-btn" onclick="alert('ບັນທຶກຂໍ້ມູນລົງໃນໜ່ວຍຄວາມຈຳສຳເລັດແລ້ວ!')">💾 ບັນທຶກຂໍ້ມູນທັງໝົດ</button>
+                </div>
                 <h3 style="color: #b5651d; margin-bottom: 15px;">🏫 ${unitName}</h3>
                 <table class="strategy-table">
                     <thead>
@@ -471,6 +500,10 @@
                         totalFocus += rowSpan;
 
                         focusItems.forEach((fItem, fIndex) => {
+                            let uniqueKey = `${unit}_${index}_${fIndex}`;
+                            let savedText = localStorage.getItem(`text_${uniqueKey}`) || '';
+                            let savedFile = localStorage.getItem(`file_${uniqueKey}`) || '';
+
                             tableRows += `<tr>`;
                             if (fIndex === 0) {
                                 tableRows += `<td rowspan="${rowSpan}" style="width: 35%;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}</td>`;
@@ -479,11 +512,13 @@
                                 <td style="width: 35%;">${fItem.trim()}</td>
                                 <td style="width: 30%;">
                                     <div class="actual-input-wrapper">
-                                        <textarea class="actual-input" placeholder="ປ້ອນຜົນການຈັດຕັ້ງປະຕິບັດ..."></textarea>
+                                        <textarea class="actual-input" placeholder="ປ້ອນຜົນການຈັດຕັ້ງປະຕິບັດ..." oninput="saveText('${uniqueKey}', this)">${savedText}</textarea>
                                         <div class="file-upload-section">
                                             <label>📎 ອັບໂຫຼດໄຟລ໌ຜົນງານ (PDF, Word, Excel):</label>
-                                            <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileChange(this)">
-                                            <div class="file-display-area"></div>
+                                            <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileChange(this, '${uniqueKey}')">
+                                            <div class="file-display-area">
+                                                ${savedFile ? `<div class="file-info-display"><span>📄 ${savedFile}</span><button type="button" class="remove-file-btn" onclick="removeFile(this, '${uniqueKey}')">ລົບ</button></div>` : ''}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -507,6 +542,9 @@
             `;
 
             contentDisplay.innerHTML = `
+                <div class="action-bar">
+                    <button type="button" class="save-btn" onclick="alert('ບັນທຶກຂໍ້ມູນລົງໃນໜ່ວຍຄວາມຈຳສຳເລັດແລ້ວ!')">💾 ບັນທຶກຂໍ້ມູນທັງໝົດ</button>
+                </div>
                 <h2 style="margin-bottom: 15px;">ແຜນຍຸດທະສາດ ແລະ ວຽກງານຈຸດສຸມທັງໝົດ</h2>
                 <table class="strategy-table">
                     <thead>
@@ -523,28 +561,37 @@
             `;
         }
 
-        // ฟັງຊັນຈັດການສະແດງຊື່ໄຟລ໌, ລົບໄຟລ໌ ແລະ ອັບໃໝ່
-        function handleFileChange(input) {
+        // ຟັງຊັນບັນທຶກຂໍ້ຄວາມອັດຕະໂນມັດລົງ LocalStorage
+        function saveText(key, textarea) {
+            localStorage.setItem(`text_${key}`, textarea.value);
+        }
+
+        // ຟັງຊັນຈັດການສະແດງຊື່ໄຟລ໌ ແລະ บันทึกຊື່ລົງ LocalStorage
+        function handleFileChange(input, key) {
             const displayArea = input.parentElement.querySelector('.file-display-area');
             displayArea.innerHTML = '';
 
             if (input.files && input.files[0]) {
                 const fileName = input.files[0].name;
+                localStorage.setItem(`file_${key}`, fileName);
+
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-info-display';
                 fileItem.innerHTML = `
                     <span>📄 ${fileName}</span>
-                    <button type="button" class="remove-file-btn" onclick="removeFile(this)">ລົບ</button>
+                    <button type="button" class="remove-file-btn" onclick="removeFile(this, '${key}')">ລົບ</button>
                 `;
                 displayArea.appendChild(fileItem);
             }
         }
 
-        function removeFile(btn) {
+        // ຟັງຊັນລົບໄຟລ໌ອອກ
+        function removeFile(btn, key) {
+            localStorage.removeItem(`file_${key}`);
             const section = btn.closest('.file-upload-section');
             const fileInput = section.querySelector('input[type="file"]');
-            fileInput.value = ''; // ລົບຄ່າໄຟລ໌ໃນ input
-            section.querySelector('.file-display-area').innerHTML = ''; // ລົບການສະແດງຜົນຊື່ໄຟລ໌ອອກ
+            fileInput.value = '';
+            section.querySelector('.file-display-area').innerHTML = '';
         }
 
         function initResize(e) {
