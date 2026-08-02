@@ -249,40 +249,40 @@
             max-width: 900px; margin: 0 auto; font-family: 'Phetsarath OT', 'Saysana', sans-serif; color: #1e293b; line-height: 1.6;
         }
 
-        /* 🌟 CSS ສຳລັບຈັດ Top Toolbar ໃຫ້ໄອຄອນຢູ່ຊ້າຍ ແລະ ຂໍ້ຄວາມຢູ່ຂວາແບບແນວນອນທັງໝົດ 100% */
+        /* 🌟 CSS ສຳລັບຈັດ Top Toolbar ໃຫ້ໄອຄອນຢູ່ເທິງ ແລະ ຂໍ້ຄວາມຢູ່ລຸ່ມສະເໝີກັນທັງໝົດ */
         .top-toolbar {
             display: flex;
             align-items: center;
             background: linear-gradient(to bottom, #f8fafc, #e2e8f0);
-            padding: 6px 12px;
+            padding: 8px 15px;
             border-bottom: 1px solid #cbd5e1;
-            gap: 10px;
+            gap: 15px;
             flex-wrap: wrap;
         }
         .top-toolbar .tool-item {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            padding: 6px 10px;
+            padding: 6px 12px;
             border-radius: 6px;
             transition: background 0.2s;
-            font-size: 13px;
+            text-align: center;
+            font-size: 12px;
             color: #1e293b;
             font-family: 'Phetsarath OT', 'Saysana', sans-serif;
-            gap: 6px;
-            white-space: nowrap; /* ປ້ອງກັນບໍ່ໃຫ້ຂໍ້ຄວາມຕັດບັນທັດລົງລຸ່ມ */
+            min-width: 70px;
         }
         .top-toolbar .tool-item:hover {
             background-color: rgba(37, 99, 235, 0.1);
         }
         .top-toolbar .tool-item .icon {
-            font-size: 20px;
-            margin-bottom: 0;
+            font-size: 22px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
-            flex-shrink: 0;
+            justify-content: center;
         }
         .top-toolbar .dropdown-container {
             display: flex;
@@ -379,7 +379,7 @@
     <div id="main-screen" class="main-wrapper" style="display: none;">
         
         <div class="top-toolbar">
-            <!-- 1. ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ -->
+            <!-- 1. ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ມາໄວ້ຊ້າຍສຸດ) -->
             <div class="tool-item admin-only-btn" onclick="showAddStrategyForm()">
                 <span class="icon">📝</span>
                 <span>ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</span>
