@@ -31,7 +31,21 @@
             text-align: left;
             font-weight: bold;
         }
+        .unit-header-row td {
+            background-color: #faf3e0;
+            font-weight: bold;
+            color: #b5651d;
+            font-size: 14px;
+        }
+        .total-summary-row td {
+            background-color: #eef2f7;
+            font-weight: bold;
+            color: #1a365d;
+            font-size: 14px;
+            border-top: 2px solid #b5651d;
+        }
         
+        /* Input ສະໄຕລ໌ສຳລັບແກ້ໄຂໃນຕາຕະລາງ */
         .table-inline-input {
             width: 100%;
             padding: 6px 8px;
@@ -123,7 +137,6 @@
             border-radius: 4px;
         }
 
-        /* ຕົບແຕ່ງກ່ອງບົດສັງລວມຫຍໍ້ */
         .summary-badge {
             background: #eef2f7;
             border-left: 4px solid #b5651d;
@@ -321,14 +334,18 @@
                 </div>
             </div>
 
+            <!-- ປຸ່ມ ຍຸດທະສາດ -->
             <div class="tool-item" onclick="showStrategySummaryTable()">
                 <span class="icon">📊</span>
                 <span>ຍຸດທະສາດ</span>
             </div>
-            <div class="tool-item" onclick="showAllStrategies()">
+            
+            <!-- ປຸ່ມ ວຽກງານຈຸດສຸມ (ອັບເດດໃໝ່ - ເຮັດງານຄືກັນກັບ ຍຸດທະສາດ) -->
+            <div class="tool-item" onclick="showFocusWorkSummaryTable()">
                 <span class="icon">🎯</span>
                 <span>ວຽກງານຈຸດສຸມ</span>
             </div>
+
             <div class="tool-item" onclick="showAllStrategies()">
                 <span class="icon">📝</span>
                 <span>ປ້ອນແຜນຍຸດທະສາດ</span>
@@ -406,11 +423,9 @@
         function createTextSummary(htmlContent, maxLength = 600) {
             if (!htmlContent) return '';
             
-            // ແປງ HTML ເປັນ Plain Text ບໍລິສຸດ
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
             
-            // ເກັບຮັກສາຫົວຂໍ້ (h1, h2, h3, p) ທີ່ສຳຄັນ
             let paragraphs = tempDiv.querySelectorAll('p, h1, h2, h3, li');
             let summaryText = '';
 
@@ -418,7 +433,7 @@
                 let count = 0;
                 paragraphs.forEach(p => {
                     let txt = p.innerText.trim();
-                    if (txt.length > 10 && count < 8) { // ຄັດເອົາປະໂຫຍກສຳຄັນ
+                    if (txt.length > 10 && count < 8) {
                         summaryText += '• ' + txt + '<br><br>';
                         count++;
                     }
@@ -664,7 +679,14 @@
             });
         }
 
+        /* ----------------------------------------------------
+           1. ຟັງຊັນປຸ່ມ "ຍຸດທະສາດ" ແລະ "ວຽກງານຈຸດສຸມ"
+        ---------------------------------------------------- */
         function showStrategySummaryTable() {
+            showDocListTable('strategy');
+        }
+
+        function showFocusWorkSummaryTable() {
             showDocListTable('strategy');
         }
 
@@ -756,7 +778,7 @@
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນ ຄັດເອົາເນື້ອໃນມາຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ
+           2. ຟັງຊັນ ຄັດເອົາເນື້ອໃນມາຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ
         ---------------------------------------------------- */
         function openFilePreviewModal(id, type) {
             getAllDocsFromIDB(type, function(docsList) {
@@ -787,7 +809,6 @@
                             mammoth.convertToHtml({ arrayBuffer: bytes.buffer })
                                 .then(function(result) {
                                     if (result.value && result.value.trim().length > 0) {
-                                        // ເອີ້ນໃຊ້ຟັງຊັນ ຄັດເອົາສະເພາະເນື້ອໃນສຳຄັນມາຫຍໍ້
                                         let summarizedText = createTextSummary(result.value);
 
                                         previewBody.innerHTML = `
