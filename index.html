@@ -568,7 +568,7 @@
         }
 
         /* ----------------------------------------------------
-           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ ພ້ອມ Checkbox Toggle
+           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ
         ---------------------------------------------------- */
         function showStrategy(unitName) {
             const contentDisplay = document.getElementById('content-display');
@@ -733,6 +733,9 @@
             showAddStrategyForm(unitName, index);
         }
 
+        /* ----------------------------------------------------
+           ຟັງຊັນ ບັນທຶກແຜນຍຸດທະສາດ (ເພີ່ມລະບົບກວດສອບ ແລະ ປ້ອງກັນຂໍ້ມູນຊ້ຳກັນ)
+        ---------------------------------------------------- */
         function saveStrategyEntryData() {
             if (currentUser && currentUser.type !== 'admin') {
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດເພີ່ມ/ດັດແກ້ແຜນຍຸດທະສາດ!', false);
@@ -756,7 +759,23 @@
                 stratsData[selectedUnit] = [];
             }
 
-            if (editIndex !== '' && editIndex !== null && editIndex !== undefined) {
+            let isEdit = (editIndex !== '' && editIndex !== null && editIndex !== undefined);
+
+            // 🔍 ລະບົບກວດສອບຂໍ້ມູນຊ້ຳກັນ (Prevent Duplicate Plan)
+            let isDuplicate = stratsData[selectedUnit].some((item, idx) => {
+                // ຖ້າເປັນການດັດແກ້, ໃຫ້ຂ້າມການກວດສອບຕົວມັນເອງ
+                if (isEdit && idx === parseInt(editIndex)) return false;
+                
+                // ເປรียບທຽບເນື້ອໃນແຜນຍຸດທະສາດ (ຕັດຍ່ານຫວ່າງອອກ)
+                return item.strat.trim().toLowerCase() === stratTitle.toLowerCase();
+            });
+
+            if (isDuplicate) {
+                showCustomAlert('⚠️ ແຜນຍຸດທະສາດນີ້ມີຢູ່ໃນຂະແໜງການດັ່ງກ່າວແລ້ວ! ບໍ່ສາມາດປ້ອນຊ້ຳກັນໄດ້.', false);
+                return;
+            }
+
+            if (isEdit) {
                 let idx = parseInt(editIndex);
                 if (stratsData[selectedUnit] && stratsData[selectedUnit][idx]) {
                     stratsData[selectedUnit][idx].strat = stratTitle;
@@ -775,7 +794,7 @@
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນ ລົບແຜນຍຸດທະສາດ ພ້ອມ Custom Confirm Dialog ("ຕົກລົງ" ແລະ "ຍົກເລີກ")
+           ຟັງຊັນ ລົບແຜນຍຸດທະສາດ ພ້ອມ Custom Confirm Dialog
         ---------------------------------------------------- */
         function deleteStrategyEntry(unitName, index) {
             if (currentUser && currentUser.type !== 'admin') {
@@ -795,7 +814,7 @@
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນ Toggle Checkbox: ກົດ 1 ບາດ ຕິກ, ກົດບາດທີ 2 ຍົກເລີກ
+           ຟັງຊັນ Toggle Checkbox
         ---------------------------------------------------- */
         function toggleStatusCheck(event, key, targetStatus, unitName) {
             event.preventDefault();
