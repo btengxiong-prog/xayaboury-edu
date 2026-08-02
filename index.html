@@ -19,7 +19,7 @@
         .strategy-table th, .strategy-table td {
             border: 1px solid #cbd5e1;
             padding: 10px;
-            vertical-align: top !important; /* ຈັດຂໍ້ຄວາມໃຫ້ຊິກເຂົ້າຈຳຂອບເທິງສຸດ */
+            vertical-align: top !important;
             font-size: 13px;
             word-break: break-word;
             overflow: hidden;
@@ -367,7 +367,7 @@
                 </div>
                 <div class="form-group">
                     <label>Password (ລະຫັດຜ່ານ):</label>
-                    <input type="password" id="password" required placeholder="ປ້ອນລະຫັດຜ່ານ">
+                    <input type="password" id="password" required placeholder="ລະຫັດຜ່ານ">
                 </div>
                 <button type="submit" class="login-btn">ເຂົ້າສູ່ລະບົບ</button>
                 <div id="error-msg" class="error-msg"></div>
@@ -412,10 +412,10 @@
                 <span>ຍຸດທະສາດ/ວຽກຈຸດສຸມ</span>
             </div>
 
-            <!-- 5. ປ້ອນວຽກງານຈຸດສຸມ -->
-            <div class="tool-item admin-only-btn" onclick="showPlaceholderFocusWork()">
+            <!-- 5. ຈັດຕັ້ງປະຕິບັດ (ອັບໂຫຼດບົດສະຫຼຸບ, ລາຍງານ word, excel, pdf, ຮູບ) -->
+            <div class="tool-item admin-only-btn" onclick="openImportModal('general')">
                 <span class="icon">📋</span>
-                <span>ປ້ອນວຽກງານຈຸດສຸມ</span>
+                <span>ຈັດຕັ້ງປະຕິບັດ</span>
             </div>
             
             <!-- 6. ລາຍງານ ▾ -->
@@ -530,14 +530,6 @@
             const req = store.getAll();
             req.onsuccess = () => callback(req.result);
             req.onerror = () => callback([]);
-        }
-
-        function deleteDocFromIDB(type, id, callback) {
-            const tx = db.transaction([getStoreName(type)], "readwrite");
-            const store = tx.objectStore(getStoreName(type));
-            const req = store.delete(id);
-            req.onsuccess = () => callback(true);
-            req.onerror = () => callback(false);
         }
 
         const users = {
@@ -1052,10 +1044,6 @@
             }
         }
 
-        function showPlaceholderFocusWork() {
-            showCustomAlert('ℹ️ ປຸ່ມນີ້ເກັບໄວ້ສຳລັບການຂະຫຍາຍຟັງຊັນອື່ນໆ ໃນອະນາຄົດ');
-        }
-
         function toggleDropdown(event, menuId) {
             event.stopPropagation();
             closeAllDropdowns(menuId);
@@ -1079,7 +1067,7 @@
             currentImportType = type;
             tempFileData = null;
             
-            document.getElementById('doc-modal-title').innerText = (type === 'general') ? '📁 ນຳເຂົ້າແຜນວຽກທົ່ວໄປ' : '📊 ນຳເຂົ້າແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ';
+            document.getElementById('doc-modal-title').innerText = (type === 'general') ? '📁 ຈັດຕັ້ງປະຕິບັດ (ອັບໂຫຼດບົດສະຫຼຸບ/ລາຍງານ)' : '📊 ນຳເຂົ້າແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ';
             document.getElementById('modal-doc-content').value = '';
             document.getElementById('modal-doc-no').value = '';
             document.getElementById('modal-doc-date').value = new Date().toISOString().split('T')[0];
@@ -1158,7 +1146,7 @@
             addDocToIDB(currentImportType, newDoc, function(success) {
                 if (success) {
                     closeDocModal();
-                    showCustomAlert('✅ ບັນທຶກ ແລະ ນຳເຂົ້າເອກະສານສຳເລັດແລ້ວ!');
+                    showCustomAlert('✅ ບັນທຶກ ແລະ ອັບໂຫຼດເອກະສານສຳເລັດແລ້ວ!');
                     showDocListTable(currentImportType);
                 } else {
                     showCustomAlert('❌ ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກຂໍ້ມູນ!', false);
@@ -1212,7 +1200,7 @@
                         `;
                     });
                 } else {
-                    rowsHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານທີ່ນຳເຂົ້າໃນລະບົບ (ກະລຸນາກົດເມນູ "ນຳເຂົ້າແຜນ..." ເພື່ອເພີ່ມເອກະສານ)</td></tr>`;
+                    rowsHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານທີ່ນຳເຂົ້າໃນລະບົບ (ກະລຸນາກົດເມນູ "ຈັດຕັ້ງປະຕິບັດ" ຫຼື "ນຳເຂົ້າແຜນ" ເພື່ອເພີ່ມເອກະສານ)</td></tr>`;
                 }
 
                 contentDisplay.innerHTML = `
@@ -1221,10 +1209,10 @@
                             <h2 style="color: #b5651d; margin: 0;">📋 ${titleName} ${currentUser && currentUser.type !== 'admin' ? `<span style="font-size:14px; color:#475569;">(${currentUser.name})</span>` : ''}</h2>
                             <div style="display: flex; gap: 10px;">
                                 <button type="button" class="save-btn" style="background:#10b981;" onclick="showCustomAlert('💾 ບັນທຶກການປ່ຽນແປງຂໍ້ມູນທັງໝົດແລ້ວ!')">💾 ບັນທຶກການປ່ຽນແປງ</button>
-                                <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າເອກະສານໃໝ່</button>
+                                <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ຈັດຕັ້ງປະຕິບັດ (ເພີ່ມເອກະສານ)</button>
                             </div>
                         </div>
-                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້າຕາຕະລາງນີ້ເຮັດໜ້າທີ່ສັງລວມຫຍໍ້ ແລະ ຈັດເກັບເນື້ອໃນແຜນທີ່ໄດ້ຈາກການນຳເຂົ້າ ເພື່ອງ່າຍຕໍ່ການກວດສອບຢ່າງກະທັດຮັດ (ບໍ່ສາມາດລົບຂໍ້ມູນໄດ້).</p>
+                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້າຕາຕະລາງນີ້ເຮັດໜ້າທີ່ສັງລວມຫຍໍ້ ແລະ ຈັດເກັບບົດລາຍງານ, ບົດສະຫຼຸບ (Word, Excel, PDF, ຮູບ) ເພື່ອງ່າຍຕໍ່ການກວດສອບຢ່າງກະທັດຮັດ (ບໍ່ສາມາດລົບຂໍ້ມູນໄດ້).</p>
 
                         <table class="strategy-table" style="width: 100%;">
                             <thead>
