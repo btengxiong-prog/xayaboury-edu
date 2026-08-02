@@ -17,7 +17,7 @@
         .strategy-table th, .strategy-table td {
             border: 1px solid #cbd5e1;
             padding: 8px 10px;
-            vertical-align: top;
+            vertical-align: middle;
             font-size: 13px;
             word-break: break-word;
             overflow: hidden;
@@ -42,20 +42,27 @@
             font-size: 14px;
             border-top: 2px solid #b5651d;
         }
-        .col-resizer {
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            width: 6px;
-            background: transparent;
-            cursor: col-resize;
-            z-index: 10;
-        }
-        .col-resizer:hover, .col-resizer.resizing {
-            background-color: #ff4d4d;
-        }
         
+        /* Input ສະໄຕລ໌ສຳລັບແກ້ໄຂໃນຕາຕະລາງ */
+        .table-inline-input {
+            width: 100%;
+            padding: 6px 8px;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            background-color: #fff;
+            color: #1e293b;
+            transition: all 0.2s;
+        }
+        .table-inline-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background-color: #f0f9ff;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
         .actual-input-wrapper {
             display: flex;
             flex-direction: column;
@@ -94,40 +101,13 @@
             margin-bottom: 3px;
             color: #1e293b;
         }
-        .file-upload-section input[type="file"] {
-            font-size: 11px;
-            width: 100%;
-        }
-        .file-info-display {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #e2e8f0;
-            padding: 4px 6px;
-            border-radius: 3px;
-            margin-top: 4px;
-            font-size: 11px;
-            color: #0f172a;
-        }
-        .file-info-display span {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 70%;
-            cursor: pointer;
-            color: #2563eb;
-            text-decoration: underline;
-        }
-        .file-info-display span:hover {
-            color: #1d4ed8;
-        }
         .remove-file-btn {
             background: #ef4444;
             color: white;
             border: none;
             border-radius: 3px;
-            padding: 2px 6px;
-            font-size: 10px;
+            padding: 4px 8px;
+            font-size: 11px;
             cursor: pointer;
         }
         .remove-file-btn:hover {
@@ -254,10 +234,6 @@
             cursor: pointer;
             transition: all 0.2s;
             box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
-        }
-        .custom-alert-btn:hover {
-            background: #059669;
-            transform: translateY(-1px);
         }
 
         .input-modal-box {
@@ -525,13 +501,8 @@
     </div>
 
     <script>
-        /* ----------------------------------------------------
-           ຟັງຊັນแปลงວັນທີເປັນ dd/mm/yyyy (ຕົວຢ່າງ: 01/08/2026)
-        ---------------------------------------------------- */
         function formatDateDDMMYYYY(dateString) {
             if (!dateString || dateString === '-') return '-';
-            
-            // ຖ້າເປັນ string ຈາກ input date (yyyy-mm-dd)
             const parts = dateString.split('-');
             if (parts.length === 3) {
                 const year = parts[0];
@@ -539,8 +510,6 @@
                 const day = parts[2].padStart(2, '0');
                 return `${day}/${month}/${year}`;
             }
-
-            // ຖ້າເປັນ Date object
             const d = new Date(dateString);
             if (!isNaN(d.getTime())) {
                 const day = String(d.getDate()).padStart(2, '0');
@@ -548,11 +517,10 @@
                 const year = d.getFullYear();
                 return `${day}/${month}/${year}`;
             }
-
             return dateString;
         }
 
-        /* IndexedDB Database */
+        /* IndexedDB Database Functions */
         let db;
         const dbRequest = indexedDB.open("EduDocumentDB", 1);
 
@@ -582,6 +550,14 @@
             req.onerror = (e) => callback(false);
         }
 
+        function updateDocInIDB(type, docData, callback) {
+            const tx = db.transaction([getStoreName(type)], "readwrite");
+            const store = tx.objectStore(getStoreName(type));
+            const req = store.put(docData);
+            req.onsuccess = () => callback && callback(true);
+            req.onerror = (e) => callback && callback(false);
+        }
+
         function getAllDocsFromIDB(type, callback) {
             if (!db) {
                 setTimeout(() => getAllDocsFromIDB(type, callback), 200);
@@ -607,9 +583,7 @@
             "EDUXYBL01": { pass: "123456", name: "ຂະແໜງ ກວດກາ, ປະເມີນຜົນ ແລະ ປະກັນຄຸນນະພາບ", type: "user" }
         };
 
-        const allUnits = [
-            "ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ"
-        ];
+        const allUnits = ["ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ"];
 
         const strategiesData = {
             "ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ": [
@@ -715,8 +689,6 @@
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const year = now.getFullYear();
             const timeStr = now.toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit' });
-            
-            // ຟໍແມັດວັນທີບັນທຶກເອກະສານ ເປັນ dd/mm/yyyy hh:mm
             const recordDate = `${day}/${month}/${year} ${timeStr}`;
 
             const newDoc = {
@@ -743,6 +715,9 @@
             });
         }
 
+        /* ----------------------------------------------------
+           ຟັງຊັນ ສະແດງຕາຕະລາງ ແລະ ແກ້ໄຂຂໍ້ມູນໂດຍຕົ່ງ (Inline Editable)
+        ---------------------------------------------------- */
         function showDocListTable(type) {
             closeAllDropdowns();
             const titleName = (type === 'general') ? 'ຂໍ້ມູນວຽກທົ່ວໄປ' : 'ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ';
@@ -758,15 +733,18 @@
                             `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເອກະສານ">${fileIcon} ${doc.fileName}</span>` : 
                             `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
 
-                        // ແປງວັນທີເອກະສານໃຫ້ເປັນ dd/mm/yyyy (ເຊັ່ນ: 01/08/2026)
-                        let formattedDocDate = formatDateDDMMYYYY(doc.docDate);
-
                         rowsHTML += `
                             <tr>
                                 <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
-                                <td>${doc.content}</td>
-                                <td style="text-align: center;">${doc.docNo}</td>
-                                <td style="text-align: center;">${formattedDocDate}</td>
+                                <td>
+                                    <input type="text" class="table-inline-input" value="${doc.content}" onchange="updateDocField(${doc.id}, '${type}', 'content', this.value)" placeholder="ເນື້ອໃນເອກະສານ...">
+                                </td>
+                                <td>
+                                    <input type="text" class="table-inline-input" style="text-align: center;" value="${doc.docNo !== '-' ? doc.docNo : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docNo', this.value)" placeholder="ເລກທີເອກະສານ...">
+                                </td>
+                                <td>
+                                    <input type="date" class="table-inline-input" style="text-align: center;" value="${doc.docDate !== '-' ? doc.docDate : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docDate', this.value)">
+                                </td>
                                 <td style="text-align: center;">${fileLink}</td>
                                 <td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td>
                                 <td style="text-align: center;">
@@ -783,7 +761,10 @@
                     <div class="report-container" style="max-width: 100%;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #b5651d; padding-bottom: 10px;">
                             <h2 style="color: #b5651d; margin: 0;">📋 ${titleName}</h2>
-                            <button type="button" class="save-btn" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າເອກະສານໃໝ່</button>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="button" class="save-btn" style="background:#10b981;" onclick="showCustomAlert('💾 ບັນທຶກການປ່ຽນແປງຂໍ້ມູນທັງໝົດແລ້ວ!')">💾 ບັນທຶກການປ່ຽນແປງ</button>
+                                <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າເອກະສານໃໝ່</button>
+                            </div>
                         </div>
 
                         <table class="strategy-table" style="width: 100%;">
@@ -804,6 +785,19 @@
                         </table>
                     </div>
                 `;
+            });
+        }
+
+        /* ຟັງຊັນ ອັບເດດຂໍ້ມູນເອກະສານອັດຕະໂນມັດ ເມື່ອມີການພິມແກ້ໄຂໃນຕາຕະລາງ */
+        function updateDocField(id, type, field, value) {
+            getAllDocsFromIDB(type, function(docsList) {
+                const doc = docsList.find(d => d.id == id);
+                if (doc) {
+                    doc[field] = value.trim() || '-';
+                    updateDocInIDB(type, doc, function(success) {
+                        console.log(`ອັບເດດ ${field} ສຳເລັດແລ້ວ!`);
+                    });
+                }
             });
         }
 
