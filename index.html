@@ -39,8 +39,15 @@
             font-size: 15px;
             font-weight: bold;
             border-left: 4px solid #b5651d;
-            margin-top: 20px;
+            margin-top: 25px;
             margin-bottom: 5px;
+        }
+
+        .unit-summary-row td {
+            background-color: #f8fafc !important;
+            font-weight: bold !important;
+            color: #1e293b !important;
+            border-top: 2px solid #cbd5e1 !important;
         }
 
         .total-summary-footer {
@@ -586,14 +593,13 @@
         }
 
         /* ----------------------------------------------------
-           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ (ແຍກຕາມຂະແໜງ / ສະແດງທັງໝົດຕໍ່ກັນ)
+           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ (ພ້ອມແຖບສະຫຼຸບແຍກປະຈຳຂະແໜງ)
         ---------------------------------------------------- */
         function showStrategy(unitName) {
             const contentDisplay = document.getElementById('content-display');
             let stratsData = getMergedStrategiesData();
             let isAdmin = (currentUser && currentUser.type === 'admin');
 
-            // ຖ້າເລືອກ "ALL" ສະແດງທຸກຂະແໜງການຕໍ່ກັນລົງໄປ
             let targetUnits = (unitName === 'ALL') ? allUnits : [unitName];
 
             let totalStratCount = 0;
@@ -607,14 +613,22 @@
                 let strats = stratsData[unit] || [];
                 let tableRows = '';
 
+                let unitStratCount = 0;
+                let unitFocusCount = 0;
+                let unitNotDoneCount = 0;
+                let unitDoneCount = 0;
+
                 if (strats.length > 0) {
                     strats.forEach((item, index) => {
+                        unitStratCount++;
                         totalStratCount++;
+
                         let focusItems = item.focus ? item.focus.split(/<br>\s*(?=\d+\.)/) : ['-'];
                         let rowSpan = focusItems.length;
 
                         focusItems.forEach((fItem, fIndex) => {
                             if (fItem.trim() !== '-' && fItem.trim() !== '') {
+                                unitFocusCount++;
                                 totalFocusCount++;
                             }
 
@@ -622,8 +636,8 @@
                             let savedStatus = localStorage.getItem(`status_${uniqueKey}`) || '';
                             let savedProof = JSON.parse(localStorage.getItem(`proof_${uniqueKey}`)) || null;
 
-                            if (savedStatus === 'none') totalNotDoneCount++;
-                            if (savedStatus === 'done') totalDoneCount++;
+                            if (savedStatus === 'none') { unitNotDoneCount++; totalNotDoneCount++; }
+                            if (savedStatus === 'done') { unitDoneCount++; totalDoneCount++; }
 
                             tableRows += `<tr>`;
                             if (fIndex === 0) {
@@ -684,6 +698,18 @@
 
                 let actionHeader = isAdmin ? `<th style="width: 15%; text-align: center;">ຈັດການ</th>` : '';
 
+                // 📌 ແຖບສະຫຼຸບລວມແຍກປະຈຳຂະແໜງການ (ຢູ່ກົ້ນຕາຕະລາງຂອງຂະແໜງການ)
+                let unitSummaryRow = `
+                    <tr class="unit-summary-row">
+                        <td style="color:#b5651d;">📊 ສະຫຼຸບລວມປະຈຳຂະແໜງ: ${unitStratCount} ແຜນຍຸດທະສາດ</td>
+                        <td style="color:#1e293b;">📋 ${unitFocusCount} ວຽກງານຈຸດສຸມ</td>
+                        <td colspan="${isAdmin ? 2 : 1}">
+                            <span style="color:#ef4444; margin-right:12px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${unitNotDoneCount} ຂໍ້</span>
+                            <span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${unitDoneCount} ຂໍ້</span>
+                        </td>
+                    </tr>
+                `;
+
                 htmlContent += `
                     <div class="unit-section-title">🏫 ${unit}</div>
                     <table class="strategy-table">
@@ -695,16 +721,18 @@
                                 ${actionHeader}
                             </tr>
                         </thead>
-                        <tbody>${tableRows}</tbody>
+                        <tbody>
+                            ${tableRows}
+                            ${unitSummaryRow}
+                        </tbody>
                     </table>
                 `;
             });
 
-            // ແຖບສະຫຼຸບລວມຢູ່ລຸ່ມສຸດ (Summary Footer)
-            let summaryColSpan = isAdmin ? 4 : 3;
+            // ແຖບສະຫຼຸບລວມຍອດທັງໝົດທຸກຂະແໜງຢູ່ລຸ່ມສຸດ (Total Summary Footer)
             let totalSummaryFooter = `
-                <div style="margin-top:30px; border-top:3px solid #b5651d; padding-top:10px;">
-                    <h3 style="color:#b5651d; margin-bottom:10px;">📊 ບົດສະຫຼຸບສັງລວມລວມທັງໝົດ:</h3>
+                <div style="margin-top:35px; border-top:3px solid #b5651d; padding-top:10px;">
+                    <h3 style="color:#b5651d; margin-bottom:10px;">📊 ບົດສະຫຼຸບສັງລວມລວມທັງໝົດ (ທຸກຂະແໜງການ):</h3>
                     <table class="strategy-table" style="background:#f8fafc;">
                         <thead>
                             <tr class="total-summary-footer">
@@ -730,7 +758,6 @@
             contentDisplay.innerHTML = htmlContent + totalSummaryFooter;
         }
 
-        // ກົດທີ່ "📁 ພາກສ່ວນຕ່າງໆ" ຫຼື "📂 ພະແນກສຶກສາທິການ..." ໃຫ້ສະແດງທຸກຂະແໜງການຕໍ່ກັນ
         function showAllStrategies() {
             showStrategy("ALL");
         }
@@ -803,9 +830,6 @@
             showAddStrategyForm(unitName, index);
         }
 
-        /* ----------------------------------------------------
-           ຟັງຊັນບັນທຶກແຜນ - ກວດສອບຂໍ້ມູນຊ້ຳກັນ
-        ---------------------------------------------------- */
         function saveStrategyEntryData() {
             if (currentUser && currentUser.type !== 'admin') {
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດເພີ່ມ/ດັດແກ້ແຜນຍຸດທະສາດ!', false);
@@ -830,7 +854,6 @@
 
             let formattedFocus = stratFocus.replace(/\n/g, '<br>');
 
-            // 🔍 ເຊັກການປ້ອນຂໍ້ມູນຊ້ຳກັນ (Duplicate Check)
             let isDuplicate = stratsData[selectedUnit].some((item, idx) => {
                 if (editIndex !== '' && editIndex !== null && editIndex !== undefined && parseInt(editIndex) === idx) {
                     return false;
@@ -861,9 +884,6 @@
             showStrategy(selectedUnit);
         }
 
-        /* ----------------------------------------------------
-           ຟັງຊັນ ລົບແຜນຍຸດທະສາດ ພ້ອມ Custom Confirm Dialog ("ຕົກລົງ" ແລະ "ຍົກເລີກ")
-        ---------------------------------------------------- */
         function deleteStrategyEntry(unitName, index) {
             if (currentUser && currentUser.type !== 'admin') {
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດລົບແຜນຍຸດທະສາດ!', false);
@@ -881,9 +901,6 @@
             });
         }
 
-        /* ----------------------------------------------------
-           ຟັງຊັນ Toggle Checkbox: ກົດ 1 ບາດ ຕິກ, ກົດບາດທີ 2 ຍົກເລີກ
-        ---------------------------------------------------- */
         function toggleStatusCheck(event, key, targetStatus, unitName) {
             event.preventDefault();
             let currentStatus = localStorage.getItem(`status_${key}`) || '';
