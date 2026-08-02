@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ລະບົບຕິດຕາມ ແລະ ສະຫຼຸບລາຍງານ - ພສກ ໄຊຍະບູລີ</title>
     <link rel="stylesheet" href="style.css">
-    <!-- ນຳໃຊ້ Mammoth.js ສຳລັບ Parse ເປີດອ່ານໄຟລ໌ Word (.docx) ເທິງ Browser ໂດຍຕົ່ງ -->
+    <!-- Mammoth.js ສຳລັບ Parse ໄຟລ໌ Word (.docx) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
         .strategy-table {
@@ -31,21 +31,7 @@
             text-align: left;
             font-weight: bold;
         }
-        .unit-header-row td {
-            background-color: #faf3e0;
-            font-weight: bold;
-            color: #b5651d;
-            font-size: 14px;
-        }
-        .total-summary-row td {
-            background-color: #eef2f7;
-            font-weight: bold;
-            color: #1a365d;
-            font-size: 14px;
-            border-top: 2px solid #b5651d;
-        }
         
-        /* Input ສະໄຕລ໌ສຳລັບແກ້ໄຂໃນຕາຕະລາງ */
         .table-inline-input {
             width: 100%;
             padding: 6px 8px;
@@ -65,44 +51,6 @@
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
-        .actual-input-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .actual-input {
-            width: 100%;
-            min-height: 50px;
-            box-sizing: border-box;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            padding: 8px;
-            font-family: inherit;
-            font-size: 13px;
-            resize: vertical;
-            background-color: #f8fafc;
-            color: #333;
-        }
-        .actual-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            background-color: #fff;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-        }
-        .file-upload-section {
-            background-color: #f1f5f9;
-            border: 1px dashed #cbd5e1;
-            padding: 6px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            color: #475569;
-        }
-        .file-upload-section label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 3px;
-            color: #1e293b;
-        }
         .remove-file-btn {
             background: #ef4444;
             color: white;
@@ -134,8 +82,8 @@
             padding: 20px;
             border-radius: 8px;
             width: 95%;
-            max-width: 1050px;
-            max-height: 94vh;
+            max-width: 900px;
+            max-height: 92vh;
             text-align: center;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
             position: relative;
@@ -146,12 +94,12 @@
 
         .preview-container {
             width: 100%;
-            height: 73vh;
+            height: 68vh;
             overflow-y: auto;
             margin-bottom: 15px;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
-            padding: 30px;
+            padding: 25px;
             background: #ffffff;
             text-align: left;
             box-sizing: border-box;
@@ -162,7 +110,7 @@
         }
         .preview-container img {
             max-width: 100%;
-            max-height: 65vh;
+            max-height: 60vh;
             border-radius: 4px;
             object-fit: contain;
             display: block;
@@ -175,11 +123,27 @@
             border-radius: 4px;
         }
 
-        .action-bar {
+        /* ຕົບແຕ່ງກ່ອງບົດສັງລວມຫຍໍ້ */
+        .summary-badge {
+            background: #eef2f7;
+            border-left: 4px solid #b5651d;
+            padding: 10px 15px;
+            font-weight: bold;
+            color: #b5651d;
             margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
+            border-radius: 0 6px 6px 0;
+            font-size: 14px;
         }
+        .summary-box-content {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 15px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+
         .save-btn {
             background-color: #10b981;
             color: white;
@@ -215,38 +179,15 @@
             padding: 24px;
             width: 320px;
             text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             border: 1px solid #e2e8f0;
         }
-        .custom-alert-icon {
-            font-size: 44px;
-            margin-bottom: 10px;
-            line-height: 1;
-        }
-        .custom-alert-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #0f172a;
-            margin-bottom: 6px;
-        }
-        .custom-alert-msg {
-            font-size: 13px;
-            color: #475569;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
+        .custom-alert-icon { font-size: 44px; margin-bottom: 10px; line-height: 1; }
+        .custom-alert-title { font-size: 16px; font-weight: bold; color: #0f172a; margin-bottom: 6px; }
+        .custom-alert-msg { font-size: 13px; color: #475569; margin-bottom: 20px; line-height: 1.5; }
         .custom-alert-btn {
-            background: #10b981;
-            color: white;
-            border: none;
-            padding: 9px 28px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+            background: #10b981; color: white; border: none; padding: 9px 28px;
+            border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;
         }
 
         .input-modal-box {
@@ -259,105 +200,27 @@
             border: 1px solid #cbd5e1;
             text-align: left;
         }
-        .input-modal-box h3 {
-            margin-top: 0;
-            color: #0f172a;
-            font-size: 16px;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-        .form-field {
-            margin-bottom: 12px;
-        }
-        .form-field label {
-            display: block;
-            font-size: 12px;
-            font-weight: bold;
-            color: #334155;
-            margin-bottom: 4px;
-        }
+        .form-field { margin-bottom: 12px; }
+        .form-field label { display: block; font-size: 12px; font-weight: bold; color: #334155; margin-bottom: 4px; }
         .form-field input[type="text"], .form-field input[type="date"], .form-field textarea {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            font-size: 13px;
-            font-family: inherit;
+            width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; font-family: inherit;
         }
-        .modal-btn-group {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .btn-cancel {
-            background: #94a3b8;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+        .modal-btn-group { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .btn-cancel { background: #94a3b8; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
-        .dropdown-container {
-            position: relative;
-            display: inline-block;
-        }
+        .dropdown-container { position: relative; display: inline-block; }
         .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: #ffffff;
-            min-width: 280px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            z-index: 1000;
-            padding: 6px 0;
-            text-align: left;
+            display: none; position: absolute; top: 100%; left: 0; background-color: #ffffff;
+            min-width: 280px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border: 1px solid #cbd5e1;
+            border-radius: 6px; z-index: 1000; padding: 6px 0; text-align: left;
         }
-        .dropdown-menu div {
-            color: #1e293b;
-            padding: 10px 16px;
-            text-decoration: none;
-            display: block;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: normal;
-        }
-        .dropdown-menu div:hover {
-            background-color: #f1f5f9;
-            color: #2563eb;
-        }
-        .dropdown-divider {
-            height: 1px;
-            background-color: #e2e8f0;
-            margin: 4px 0;
-        }
+        .dropdown-menu div { color: #1e293b; padding: 10px 16px; font-size: 13px; cursor: pointer; }
+        .dropdown-menu div:hover { background-color: #f1f5f9; color: #2563eb; }
+        .dropdown-divider { height: 1px; background-color: #e2e8f0; margin: 4px 0; }
 
         .report-container {
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            max-width: 900px;
-            margin: 0 auto;
-            font-family: 'Phetsarath OT', 'Saysana', sans-serif;
-            color: #1e293b;
-            line-height: 1.6;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes popUp {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            max-width: 900px; margin: 0 auto; font-family: 'Phetsarath OT', 'Saysana', sans-serif; color: #1e293b; line-height: 1.6;
         }
     </style>
 </head>
@@ -366,12 +229,12 @@
     <!-- Hidden File Inputs -->
     <input type="file" id="hidden-file-input" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileSelected(event)">
 
-    <!-- Modal Preview ເປີດອ່ານເອກະສານ / ສັງລວມເນື້ອໃນໂດຍຫຍໍ້ -->
+    <!-- Modal Preview ສະແດງເນື້ອໃນໂດຍຫຍໍ້ -->
     <div id="file-preview-modal" class="image-modal-overlay" onclick="closeFilePreviewModal()">
         <div class="image-modal-content" onclick="event.stopPropagation()">
-            <h3 id="preview-file-title" style="margin-top:0; color:#0f172a; font-size:15px; margin-bottom:12px;">🔍 ສັງລວມເນື້ອໃນເອກະສານ</h3>
+            <h3 id="preview-file-title" style="margin-top:0; color:#0f172a; font-size:15px; margin-bottom:12px;">🔍 ເນື້ອໃນໂດຍຫຍໍ້ຂອງເອກະສານ</h3>
             <div id="preview-body" class="preview-container">
-                <!-- ສ່ວນສະແດງເນື້ອໃນໂດຍຫຍໍ້ / ເອກະສານ -->
+                <!-- ສະແດງບົດສັງລວມຫຍໍ້ທີ່ນີ້ -->
             </div>
             <div style="display: flex; gap: 10px;">
                 <button type="button" id="download-btn-modal" class="save-btn" style="background:#2563eb;">📥 ດາວໂຫຼດໄຟລ໌</button>
@@ -458,7 +321,6 @@
                 </div>
             </div>
 
-            <!-- ປຸ່ມ ຍຸດທະສາດ ຢູ່ແຖບດ້ານເທິງ (ອັບເດດໃໝ່) -->
             <div class="tool-item" onclick="showStrategySummaryTable()">
                 <span class="icon">📊</span>
                 <span>ຍຸດທະສາດ</span>
@@ -536,6 +398,43 @@
                 return `${day}/${month}/${year}`;
             }
             return dateString;
+        }
+
+        /* ----------------------------------------------------
+           ຟັງຊັນສັງລວມເນື້ອໃນໃຫ້ສັ້ນ (Text Summarizer Logic)
+        ---------------------------------------------------- */
+        function createTextSummary(htmlContent, maxLength = 600) {
+            if (!htmlContent) return '';
+            
+            // ແປງ HTML ເປັນ Plain Text ບໍລິສຸດ
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            
+            // ເກັບຮັກສາຫົວຂໍ້ (h1, h2, h3, p) ທີ່ສຳຄັນ
+            let paragraphs = tempDiv.querySelectorAll('p, h1, h2, h3, li');
+            let summaryText = '';
+
+            if (paragraphs.length > 0) {
+                let count = 0;
+                paragraphs.forEach(p => {
+                    let txt = p.innerText.trim();
+                    if (txt.length > 10 && count < 8) { // ຄັດເອົາປະໂຫຍກສຳຄັນ
+                        summaryText += '• ' + txt + '<br><br>';
+                        count++;
+                    }
+                });
+            }
+
+            if (!summaryText || summaryText.length < 20) {
+                let rawText = tempDiv.innerText.replace(/\s+/g, ' ').trim();
+                if (rawText.length > maxLength) {
+                    summaryText = rawText.substring(0, maxLength) + '...';
+                } else {
+                    summaryText = rawText;
+                }
+            }
+
+            return summaryText;
         }
 
         /* IndexedDB Database Functions */
@@ -765,9 +664,6 @@
             });
         }
 
-        /* ----------------------------------------------------
-           1. ຟັງຊັນ ສະແດງສັງລວມເອກະສານແຜນຍຸດທະສາດ (ເມື່ອກົດປຸ່ມ "ຍຸດທະສາດ" ຢູ່ແຖບດ້ານເທິງ)
-        ---------------------------------------------------- */
         function showStrategySummaryTable() {
             showDocListTable('strategy');
         }
@@ -860,7 +756,7 @@
         }
 
         /* ----------------------------------------------------
-           2. ຟັງຊັນ ເມື່ອກົດເອກະສານອ້າງອີງ -> ສະແດງເນື້ອໃນສັງລວມໂດຍຫຍໍ້
+           ຟັງຊັນ ຄັດເອົາເນື້ອໃນມາຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ
         ---------------------------------------------------- */
         function openFilePreviewModal(id, type) {
             getAllDocsFromIDB(type, function(docsList) {
@@ -868,9 +764,9 @@
                 if (doc && doc.fileDataUrl) {
                     const previewBody = document.getElementById('preview-body');
                     const downloadBtn = document.getElementById('download-btn-modal');
-                    document.getElementById('preview-file-title').innerText = "🔍 ສັງລວມເນື້ອໃນເອກະສານ: " + doc.fileName;
+                    document.getElementById('preview-file-title').innerText = "🔍 ເນື້ອໃນສັງລວມຫຍໍ້: " + doc.fileName;
 
-                    previewBody.innerHTML = '<p style="text-align:center; color:#64748b; font-weight:bold; margin-top:30px;">⏳ ກຳລັງໂຫຼດ ແລະ ສັງລວມເນື້ອໃນເອກະສານ...</p>';
+                    previewBody.innerHTML = '<p style="text-align:center; color:#64748b; font-weight:bold; margin-top:30px;">⏳ ກຳລັງຄັດເອົາເນື້ອໃນມາສັງລວມຫຍໍ້...</p>';
 
                     if (doc.isImage) {
                         previewBody.innerHTML = `<img src="${doc.fileDataUrl}" alt="Preview">`;
@@ -879,7 +775,6 @@
                         previewBody.innerHTML = `<iframe src="${doc.fileDataUrl}"></iframe>`;
                     } 
                     else {
-                        // ສັງລວມເນື້ອໃນຫຍໍ້ຢ່າງຄົບຖ້ວນ
                         try {
                             const base64Data = doc.fileDataUrl.split(',')[1];
                             const binaryString = window.atob(base64Data);
@@ -892,19 +787,22 @@
                             mammoth.convertToHtml({ arrayBuffer: bytes.buffer })
                                 .then(function(result) {
                                     if (result.value && result.value.trim().length > 0) {
+                                        // ເອີ້ນໃຊ້ຟັງຊັນ ຄັດເອົາສະເພາະເນື້ອໃນສຳຄັນມາຫຍໍ້
+                                        let summarizedText = createTextSummary(result.value);
+
                                         previewBody.innerHTML = `
                                             <div style="width:100%; font-family:'Phetsarath OT', 'Saysana', sans-serif;">
-                                                <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:15px 20px; margin-bottom:20px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-                                                    <h3 style="margin:0 0 10px 0; color:#b5651d;">📄 ຂໍ້ມູນສັງລວມເອກະສານ</h3>
-                                                    <p style="margin:4px 0; font-size:14px; color:#334155;"><strong>📝 ເນື້ອໃນເອກະສານ:</strong> ${doc.content}</p>
-                                                    <p style="margin:4px 0; font-size:14px; color:#334155;"><strong>🔢 ເລກທີເອກະສານ:</strong> ${doc.docNo}</p>
-                                                    <p style="margin:4px 0; font-size:14px; color:#334155;"><strong>📅 ວັນ/ເດືອນ/ປີ ເອກະສານ:</strong> ${formatDateDDMMYYYY(doc.docDate)}</p>
-                                                    <p style="margin:4px 0; font-size:14px; color:#334155;"><strong>🏢 ພາກສ່ວນອັບໂຫຼດ:</strong> ${doc.ownerName || 'ADMIN'}</p>
-                                                    <p style="margin:4px 0; font-size:14px; color:#334155;"><strong>🕒 ວັນທີບັນທຶກ:</strong> ${doc.recordDate}</p>
+                                                <div class="summary-badge">
+                                                    📌 ບົດສັງລວມເນື້ອໃນເອກະສານໂດຍຫຍໍ້ (ຄັດເລືອກຈາກໄຟລ໌)
                                                 </div>
-                                                <div style="border-top:2px dashed #cbd5e1; padding-top:15px; color:#0f172a; line-height:1.8;">
-                                                    <h4 style="color:#0f172a; margin-top:0;">📖 ເນື້ອໃນໂດຍຫຍໍ້ຈາກໄຟລ໌ເອກະສານ:</h4>
-                                                    ${result.value}
+                                                <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:12px 18px; margin-bottom:15px; font-size:13px; color:#334155;">
+                                                    <p style="margin:3px 0;"><strong>📝 ເນື້ອໃນ/ຊື່ເອກະສານ:</strong> ${doc.content}</p>
+                                                    <p style="margin:3px 0;"><strong>🔢 ເລກທີເອກະສານ:</strong> ${doc.docNo} | <strong>📅 ວັນທີ:</strong> ${formatDateDDMMYYYY(doc.docDate)}</p>
+                                                    <p style="margin:3px 0;"><strong>🏢 ຂະແໜງການ:</strong> ${doc.ownerName || 'ADMIN'}</p>
+                                                </div>
+                                                <div class="summary-box-content">
+                                                    <h4 style="margin-top:0; color:#0f172a; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">📖 ປະໂຫຍກ ແລະ ຫົວຂໍ້ບູລິມະສິດສຳຄັນ:</h4>
+                                                    ${summarizedText}
                                                 </div>
                                             </div>
                                         `;
@@ -920,7 +818,6 @@
                         }
                     }
 
-                    // ປຸ່ມດາວໂຫຼດສີນ້ຳເງິນ
                     downloadBtn.onclick = function() {
                         const a = document.createElement('a');
                         a.href = doc.fileDataUrl;
