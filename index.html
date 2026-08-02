@@ -45,7 +45,6 @@
             border-top: 2px solid #b5651d;
         }
         
-        /* Input ສະໄຕລ໌ສຳລັບແກ້ໄຂໃນຕາຕະລາງ */
         .table-inline-input {
             width: 100%;
             padding: 6px 8px;
@@ -215,7 +214,7 @@
         }
         .form-field { margin-bottom: 12px; }
         .form-field label { display: block; font-size: 12px; font-weight: bold; color: #334155; margin-bottom: 4px; }
-        .form-field input[type="text"], .form-field input[type="date"], .form-field textarea {
+        .form-field input[type="text"], .form-field input[type="date"], .form-field textarea, .form-field select {
             width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; font-family: inherit;
         }
         .modal-btn-group { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
@@ -246,9 +245,7 @@
     <div id="file-preview-modal" class="image-modal-overlay" onclick="closeFilePreviewModal()">
         <div class="image-modal-content" onclick="event.stopPropagation()">
             <h3 id="preview-file-title" style="margin-top:0; color:#0f172a; font-size:15px; margin-bottom:12px;">🔍 ເນື້ອໃນໂດຍຫຍໍ້ຂອງເອກະສານ</h3>
-            <div id="preview-body" class="preview-container">
-                <!-- ສະແດງບົດສັງລວມຫຍໍ້ທີ່ນີ້ -->
-            </div>
+            <div id="preview-body" class="preview-container"></div>
             <div style="display: flex; gap: 10px;">
                 <button type="button" id="download-btn-modal" class="save-btn" style="background:#2563eb;">📥 ດາວໂຫຼດໄຟລ໌</button>
                 <button type="button" class="remove-file-btn" style="padding: 8px 16px; font-size:13px;" onclick="closeFilePreviewModal()">ປິດ</button>
@@ -334,23 +331,22 @@
                 </div>
             </div>
 
-            <!-- ປຸ່ມ ຍຸດທະສາດ -->
             <div class="tool-item" onclick="showStrategySummaryTable()">
                 <span class="icon">📊</span>
                 <span>ຍຸດທະສາດ</span>
             </div>
             
-            <!-- ປຸ່ມ ວຽກງານຈຸດສຸມ (ອັບເດດໃໝ່ - ເຮັດງານຄືກັນກັບ ຍຸດທະສາດ) -->
             <div class="tool-item" onclick="showFocusWorkSummaryTable()">
                 <span class="icon">🎯</span>
                 <span>ວຽກງານຈຸດສຸມ</span>
             </div>
 
-            <div class="tool-item" onclick="showAllStrategies()">
+            <!-- ປຸ່ມ ປ້ອນແຜນຍຸດທະສາດ (ອັບເດດໃໝ່) -->
+            <div class="tool-item" onclick="showAddStrategyForm()">
                 <span class="icon">📝</span>
                 <span>ປ້ອນແຜນຍຸດທະສາດ</span>
             </div>
-            <div class="tool-item" onclick="showAllStrategies()">
+            <div class="tool-item" onclick="showAddStrategyForm()">
                 <span class="icon">📋</span>
                 <span>ປ້ອນວຽກງານຈຸດສຸມ</span>
             </div>
@@ -417,12 +413,8 @@
             return dateString;
         }
 
-        /* ----------------------------------------------------
-           ຟັງຊັນສັງລວມເນື້ອໃນໃຫ້ສັ້ນ (Text Summarizer Logic)
-        ---------------------------------------------------- */
         function createTextSummary(htmlContent, maxLength = 600) {
             if (!htmlContent) return '';
-            
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
             
@@ -513,16 +505,60 @@
         const users = {
             "EDUXYBL":   { pass: "123456", name: "ຜູ້ບໍລິຫານລະບົບ (ADMIN)", type: "admin" },
             "EDUXYBL01": { pass: "123456", name: "ຂະແໜງ ກວດກາ, ປະເມີນຜົນ ແລະ ປະກັນຄຸນນະພາບ", type: "user" },
-            "EDUXYBL02": { pass: "123456", name: "ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ", type: "user" }
+            "EDUXYBL02": { pass: "123456", name: "ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ", type: "user" },
+            "EDUXYBL03": { pass: "123456", name: "ຂະແໜງ ຈັດຕັ້ງ ແລະ ພະນັກງານ", type: "user" },
+            "EDUXYBL04": { pass: "123456", name: "ຂະແໜງ ການສຶກສາກ່ອນໄວຮຽນ", type: "user" },
+            "EDUXYBL05": { pass: "123456", name: "ຂະແໜງ ການສຶກສານອກໂຮງຮຽນ ແລະ ຝຶກອົບຮົມວິຊາຊີບຂັ້ນພື້ນຖານ", type: "user" },
+            "EDUXYBL06": { pass: "123456", name: "ຂະແໜງ ພັດທະນາຄູ", type: "user" },
+            "EDUXYBL07": { pass: "123456", name: "ຂະແໜງ ສະຖິຕິ, ແຜນການ ແລະ ຮ່ວມມືກັບຕ່າງປະເທດ", type: "user" },
+            "EDUXYBL08": { pass: "123456", name: "ຂະແໜງ ສາມັນສຶກສາ", type: "user" },
+            "EDUXYBL09": { pass: "123456", name: "ຂະແໜງ ວິທະຍາສາດ, ອາຊີວະສຶກສາ ແລະ ການສຶກສາຊັ້ນສູງ", type: "user" },
+            "EDUXYBL10": { pass: "123456", name: "ຂະແໜງ ກິລາ-ກາຍະກຳ ແລະ ສິລະປະສຶກສາ", type: "user" },
+            "EDUXYBL11": { pass: "123456", name: "ສູນໄອຊີທີ ແຂວງໄຊຍະບູລີ", type: "user" },
+            "EDUXYBL12": { pass: "123456", name: "ສູນພັດທະນາເດັກ", type: "user" },
+            "EDUXYBL13": { pass: "123456", name: "ສູນພັດທະນາຄູ", type: "user" },
+            "EDUXYBL14": { pass: "123456", name: "ສູນສຶກສານິເທດ ແຂວງໄຊຍະບູລີ", type: "user" },
+            "EDUXYBL15": { pass: "123456", name: "ສູນການສຶກສານອກໂຮງຮຽນ", type: "user" },
+            "EDUXYBL16": { pass: "123456", name: "ຫ້ອງການກຳມະທິການສຶກສາສິງແຂວງ", type: "user" }
         };
 
-        const allUnits = ["ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ"];
+        const allUnits = [
+            "ຂະແໜງ ກວດກາ, ປະເມີນຜົນ ແລະ ປະກັນຄຸນນະພາບ",
+            "ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ",
+            "ຂະແໜງ ຈັດຕັ້ງ ແລະ ພະນັກງານ",
+            "ຂະແໜງ ການສຶກສາກ່ອນໄວຮຽນ",
+            "ຂະແໜງ ການສຶກສານອກໂຮງຮຽນ ແລະ ຝຶກອົບຮົມວິຊາຊີບຂັ້ນພື້ນຖານ",
+            "ຂະແໜງ ພັດທະນາຄູ",
+            "ຂະແໜງ ສະຖິຕິ, ແຜນການ ແລະ ຮ່ວມມືກັບຕ່າງປະເທດ",
+            "ຂະແໜງ ສາມັນສຶກສາ",
+            "ຂະແໜງ ວິທະຍາສາດ, ອາຊີວະສຶກສາ ແລະ ການສຶກສາຊັ້ນສູງ",
+            "ຂະແໜງ ກິລາ-ກາຍະກຳ ແລະ ສິລະປະສຶກສາ",
+            "ສູນໄອຊີທີ ແຂວງໄຊຍະບູລີ",
+            "ສູນພັດທະນາເດັກ",
+            "ສູນພັດທະນາຄູ",
+            "ສູນສຶກສານິເທດ ແຂວງໄຊຍະບູລີ",
+            "ສູນການສຶກສານອກໂຮງຮຽນ",
+            "ຫ້ອງການກຳມະທິການສຶກສາສິງແຂວງ"
+        ];
 
-        const strategiesData = {
+        // ດຶງຂໍ້ມູນຍຸດທະສາດທີ່ເຄີຍເກັບໃນ LocalStorage ຫຼື ໃຊ້ຂໍ້ມູນເລີ່ມຕົ້ນ
+        let customStrategiesData = JSON.parse(localStorage.getItem("custom_strategies_data")) || {};
+
+        const defaultStrategiesData = {
             "ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ": [
                 { strat: "ຍຸດທະສາດ 01: ເພີ່ມການຈັດສັນງົບປະມານຂອງລັດ...", focus: "1. ຊຸກຍູ້ການເພີ່ມງົບປະມານ..." }
             ]
         };
+
+        // ໂຮມຂໍ້ມູນເລີ່ມຕົ້ນ ແລະ ຂໍ້ມູນທີ່ປ້ອນໃໝ່
+        function getMergedStrategiesData() {
+            let merged = JSON.parse(JSON.stringify(defaultStrategiesData));
+            for (let unit in customStrategiesData) {
+                if (!merged[unit]) merged[unit] = [];
+                merged[unit] = merged[unit].concat(customStrategiesData[unit]);
+            }
+            return merged;
+        }
 
         let currentImportType = '';
         let tempFileData = null;
@@ -562,11 +598,130 @@
 
         function showStrategy(unitName) {
             const contentDisplay = document.getElementById('content-display');
-            contentDisplay.innerHTML = `<h3>🏫 ${unitName}</h3><p>ເນື້ອໃນແຜນຍຸດທະສາດ...</p>`;
+            let stratsData = getMergedStrategiesData();
+            let strats = stratsData[unitName] || [];
+            let tableRows = '';
+
+            if (strats.length > 0) {
+                strats.forEach((item, index) => {
+                    let focusItems = item.focus ? item.focus.split(/<br>\s*(?=\d+\.)/) : ['-'];
+                    let rowSpan = focusItems.length;
+
+                    focusItems.forEach((fItem, fIndex) => {
+                        let uniqueKey = `${unitName}_${index}_${fIndex}`;
+                        let savedText = localStorage.getItem(`text_${uniqueKey}`) || '';
+
+                        tableRows += `<tr>`;
+                        if (fIndex === 0) {
+                            tableRows += `<td rowspan="${rowSpan}" style="width: 35%;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}</td>`;
+                        }
+                        tableRows += `
+                            <td style="width: 35%;">${fItem.trim()}</td>
+                            <td style="width: 30%;">
+                                <textarea class="actual-input" placeholder="ປ້ອນຜົນການຈັດຕັ້ງປະຕິບັດ..." oninput="saveText('${uniqueKey}', this)">${savedText}</textarea>
+                            </td>
+                        </tr>`;
+                    });
+                });
+            } else {
+                tableRows = `<tr><td colspan="3" style="text-align: center; color: #666;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດສຳລັບໜ່ວຍງານນີ້</td></tr>`;
+            }
+
+            contentDisplay.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="color: #b5651d; margin:0;">🏫 ${unitName}</h3>
+                    <button type="button" class="save-btn" style="background:#2563eb;" onclick="showAddStrategyForm('${unitName}')">📝 ປ້ອນແຜນຍຸດທະສາດໃໝ່</button>
+                </div>
+                <table class="strategy-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%;">ແຜນຍຸດທະສາດ</th>
+                            <th style="width: 35%;">ວຽກງານຈຸດສຸມ</th>
+                            <th style="width: 30%;">ປະຕິບັດຕົວຈິງ</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            `;
         }
 
         function showAllStrategies() {
             showStrategy("ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ");
+        }
+
+        /* ----------------------------------------------------
+           ຟັງຊັນ ປ້ອນແຜນຍຸດທະສາດໃໝ່ (ເພີ່ມເຕີມໃສ່ຂະແໜງການ)
+        ---------------------------------------------------- */
+        function showAddStrategyForm(defaultUnit = '') {
+            closeAllDropdowns();
+            const contentDisplay = document.getElementById('content-display');
+
+            let unitOptions = '';
+            allUnits.forEach(unit => {
+                let selected = (unit === defaultUnit || (currentUser && currentUser.type !== 'admin' && unit === currentUser.name)) ? 'selected' : '';
+                unitOptions += `<option value="${unit}" ${selected}>${unit}</option>`;
+            });
+
+            contentDisplay.innerHTML = `
+                <div class="report-container" style="max-width:700px; margin:0 auto; text-align:left;">
+                    <h2 style="color:#b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📝 ປ້ອນແຜນຍຸດທະສາດໃໝ່ / ວຽກງານຈຸດສຸມ</h2>
+                    <p style="font-size:13px; color:#64748b; margin-bottom:20px;">ກະລຸນາເລືອກຂະແໜງການ ແລະ ພິມ ຫຼື Copy ເນື້ອໃນແຜນມາວາງ (Paste) ໃສ່ບ່ອນນີ້:</p>
+                    
+                    <div class="form-field">
+                        <label style="font-size:13px;">🏢 ເລືອກຂະແໜງການ / ຫົວໜ່ວຍງານ:</label>
+                        <select id="new-strat-unit">
+                            ${unitOptions}
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label style="font-size:13px;">🎯 ເນື້ອໃນແຜນຍຸດທະສາດ (ພິມ ຫຼື Copy ມາວາງໃສ່):</label>
+                        <textarea id="new-strat-title" rows="4" placeholder="ຕົວຢ່າງ: ຍຸດທະສາດ 05: ສ້າງຄວາມເຂັ້ມແຂງໃນການຈັດຕັ້ງປະຕິບັດ..."></textarea>
+                    </div>
+
+                    <div class="form-field">
+                        <label style="font-size:13px;">📋 ວຽກງານຈຸດສຸມ (ພິມ ຫຼື Copy ມາວາງໃສ່):</label>
+                        <textarea id="new-strat-focus" rows="5" placeholder="ຕົວຢ່າງ: 1. ຝຶກອົບຮົມວິຊາຊີບ...&#10;2. ຕິດຕາມ ແລະ ປະເມີນຜົນ..."></textarea>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:25px;">
+                        <button type="button" class="btn-cancel" onclick="showAllStrategies()">ຍົກເລີກ</button>
+                        <button type="button" class="save-btn" onclick="saveNewStrategyEntry()">💾 ບັນທຶກແຜນຍຸດທະສາດ</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ບັນທຶກແຜນຍຸດທະສາດໃໝ່ລົງຖານຂໍ້ມູນຂະແໜງການ
+        function saveNewStrategyEntry() {
+            const selectedUnit = document.getElementById('new-strat-unit').value;
+            const stratTitle = document.getElementById('new-strat-title').value.trim();
+            const stratFocus = document.getElementById('new-strat-focus').value.trim();
+
+            if (!stratTitle) {
+                alert('ກະລຸນາປ້ອນເນື້ອໃນແຜນຍຸດທະສາດ!');
+                return;
+            }
+
+            // ຈັດຟໍແມັດຂໍ້ຄວາມທີ່ຂຶ້ນແຖວໃໝ່
+            let formattedFocus = stratFocus.replace(/\n/g, '<br>');
+
+            if (!customStrategiesData[selectedUnit]) {
+                customStrategiesData[selectedUnit] = [];
+            }
+
+            customStrategiesData[selectedUnit].push({
+                strat: stratTitle,
+                focus: formattedFocus || '-'
+            });
+
+            // ບັນທຶກລົງ LocalStorage
+            localStorage.setItem("custom_strategies_data", JSON.stringify(customStrategiesData));
+
+            showCustomAlert(`✅ ບັນທຶກແຜນຍຸດທະສາດໃໝ່ເຂົ້າໃນ "${selectedUnit}" ສຳເລັດແລ້ວ!`);
+            
+            // ນຳໄປສະແດງຜົນໃນຂະແໜງການນັ້ນທັນທີ
+            showStrategy(selectedUnit);
         }
 
         function toggleDropdown(event, menuId) {
@@ -679,9 +834,6 @@
             });
         }
 
-        /* ----------------------------------------------------
-           1. ຟັງຊັນປຸ່ມ "ຍຸດທະສາດ" ແລະ "ວຽກງານຈຸດສຸມ"
-        ---------------------------------------------------- */
         function showStrategySummaryTable() {
             showDocListTable('strategy');
         }
@@ -777,9 +929,6 @@
             });
         }
 
-        /* ----------------------------------------------------
-           2. ຟັງຊັນ ຄັດເອົາເນື້ອໃນມາຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ
-        ---------------------------------------------------- */
         function openFilePreviewModal(id, type) {
             getAllDocsFromIDB(type, function(docsList) {
                 const doc = docsList.find(d => d.id == id);
