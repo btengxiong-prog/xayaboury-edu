@@ -270,13 +270,16 @@
         </div>
     </div>
 
-    <!-- Custom Alert Popup -->
+    <!-- Custom Alert Popup (ມີທັງ Alert ແລະ Confirm) -->
     <div id="custom-alert" class="custom-alert-overlay">
         <div class="custom-alert-box">
             <div id="custom-alert-icon" class="custom-alert-icon">✅</div>
             <div class="custom-alert-title">ແຈ້ງເຕືອນລະບົບ</div>
             <div id="custom-alert-msg" class="custom-alert-msg">ບັນທຶກຂໍ້ມູນສຳເລັດແລ້ວ!</div>
-            <button type="button" class="custom-alert-btn" onclick="closeCustomAlert()">ຕົກລົງ</button>
+            <div style="display:flex; justify-content:center; gap:10px;">
+                <button type="button" id="custom-alert-btn-cancel" class="btn-cancel" style="display:none; padding:8px 20px; font-size:13px;" onclick="closeCustomAlert()">ຍົກເລີກ</button>
+                <button type="button" id="custom-alert-btn-ok" class="custom-alert-btn" onclick="closeCustomAlert()">ຕົກລົງ</button>
+            </div>
         </div>
     </div>
 
@@ -565,7 +568,7 @@
         }
 
         /* ----------------------------------------------------
-           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ
+           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ ພ້ອມ Checkbox Toggle
         ---------------------------------------------------- */
         function showStrategy(unitName) {
             const contentDisplay = document.getElementById('content-display');
@@ -771,19 +774,24 @@
             showStrategy(selectedUnit);
         }
 
+        /* ----------------------------------------------------
+           ຟັງຊັນ ລົບແຜນຍຸດທະສາດ ພ້ອມ Custom Confirm Dialog ("ຕົກລົງ" ແລະ "ຍົກເລີກ")
+        ---------------------------------------------------- */
         function deleteStrategyEntry(unitName, index) {
             if (currentUser && currentUser.type !== 'admin') {
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດລົບແຜນຍຸດທະສາດ!', false);
                 return;
             }
 
-            let stratsData = getMergedStrategiesData();
-            if (stratsData[unitName] && stratsData[unitName][index]) {
-                stratsData[unitName].splice(index, 1);
-                saveAllStrategiesDataStore(stratsData);
-                showCustomAlert('🗑️ ລົບແຜນຍຸດທະສາດเรียບຮ້ອຍແລ້ວ!');
-                showStrategy(unitName);
-            }
+            showCustomConfirm('🗑️ ທ່ານຕ້ອງການລົບແຜນຍຸດທະສາດຂໍ້ນີ້ແທ້ ຫຼື ບໍ່?', function() {
+                let stratsData = getMergedStrategiesData();
+                if (stratsData[unitName] && stratsData[unitName][index]) {
+                    stratsData[unitName].splice(index, 1);
+                    saveAllStrategiesDataStore(stratsData);
+                    showCustomAlert('🗑️ ລົບແຜນຍຸດທະສາດ ຮຽບຮ້ອຍແລ້ວ!');
+                    showStrategy(unitName);
+                }
+            });
         }
 
         /* ----------------------------------------------------
@@ -1174,7 +1182,7 @@
 
         function deleteDocEntry(id, type) {
             deleteDocFromIDB(type, id, function(success) {
-                showCustomAlert('ລົບເອກະສານเรียບຮ້ອຍແລ້ວ!');
+                showCustomAlert('ລົບເອກະສານ ຮຽບຮ້ອຍແລ້ວ!');
                 showDocListTable(type);
             });
         }
@@ -1189,9 +1197,44 @@
             document.getElementById('content-display').innerHTML = `<h2>📊 ບົດລາຍງານແຜນຍຸດທະສາດ</h2>`;
         }
 
+        /* ----------------------------------------------------
+           ຟັງຊັນ Custom Alert & Custom Confirm (ພາສາລາວ)
+        ---------------------------------------------------- */
         function showCustomAlert(msg, isSuccess = true) {
             document.getElementById('custom-alert-icon').innerText = isSuccess ? '✅' : '⚠️';
             document.getElementById('custom-alert-msg').innerText = msg;
+            
+            const btnCancel = document.getElementById('custom-alert-btn-cancel');
+            const btnOk = document.getElementById('custom-alert-btn-ok');
+
+            btnCancel.style.display = 'none';
+            btnOk.innerText = 'ຕົກລົງ';
+            btnOk.style.background = '#10b981';
+            btnOk.onclick = function() {
+                closeCustomAlert();
+            };
+
+            document.getElementById('custom-alert').style.display = 'flex';
+        }
+
+        function showCustomConfirm(msg, onConfirmCallback) {
+            document.getElementById('custom-alert-icon').innerText = '❓';
+            document.getElementById('custom-alert-msg').innerText = msg;
+
+            const btnCancel = document.getElementById('custom-alert-btn-cancel');
+            const btnOk = document.getElementById('custom-alert-btn-ok');
+
+            btnCancel.style.display = 'inline-block';
+            btnCancel.innerText = 'ຍົກເລີກ';
+            
+            btnOk.innerText = 'ຕົກລົງ';
+            btnOk.style.background = '#2563eb';
+
+            btnOk.onclick = function() {
+                closeCustomAlert();
+                if (onConfirmCallback) onConfirmCallback();
+            };
+
             document.getElementById('custom-alert').style.display = 'flex';
         }
 
