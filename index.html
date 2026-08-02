@@ -509,7 +509,7 @@
             const store = tx.objectStore(getStoreName(type));
             const req = store.delete(id);
             req.onsuccess = () => callback(true);
-            req.onerror = () => callback(false);
+            req.onerror = (e) => callback(false);
         }
 
         const users = {
@@ -551,21 +551,20 @@
             "ຫ້ອງການກຳມະທິການສຶກສາສິງແຂວງ"
         ];
 
-        let customStrategiesData = JSON.parse(localStorage.getItem("custom_strategies_data")) || {};
-
         const defaultStrategiesData = {
             "ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ": [
                 { strat: "ຍຸດທະສາດ 01: ເພີ່ມການຈັດສັນງົບປະມານຂອງລັດ...", focus: "1. ຊຸກຍູ້ການເພີ່ມງົບປະມານ..." }
             ]
         };
 
+        let customStrategiesData = JSON.parse(localStorage.getItem("custom_strategies_data")) || null;
+
         function getMergedStrategiesData() {
-            let merged = JSON.parse(JSON.stringify(defaultStrategiesData));
-            for (let unit in customStrategiesData) {
-                if (!merged[unit]) merged[unit] = [];
-                merged[unit] = merged[unit].concat(customStrategiesData[unit]);
+            if (customStrategiesData === null) {
+                customStrategiesData = JSON.parse(JSON.stringify(defaultStrategiesData));
+                localStorage.setItem("custom_strategies_data", JSON.stringify(customStrategiesData));
             }
-            return merged;
+            return customStrategiesData;
         }
 
         let currentImportType = '';
@@ -614,7 +613,7 @@
         }
 
         /* ----------------------------------------------------
-           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ ພ້ອມປຸ່ມ ດັດແກ້ (✏️) ແລະ ລົບ (🗑️) ສະເພາະ ADMIN
+           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ
         ---------------------------------------------------- */
         function showStrategy(unitName) {
             const contentDisplay = document.getElementById('content-display');
@@ -652,8 +651,6 @@
                                     <button type="button" class="remove-file-btn" onclick="deleteStrategyEntry('${unitName}', ${index})">🗑️ ລົບ</button>
                                 </td>
                             `;
-                        } else if (!isAdmin && fIndex === 0) {
-                            // ຖ້າບໍ່ແມ່ນ admin ບໍ່ສະແດງຄໍລຳຈັດການ
                         }
 
                         tableRows += `</tr>`;
@@ -696,7 +693,7 @@
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນ ປ້ອນ / ດັດແກ້ ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ສະເພາະ ADMIN)
+           ຟັງຊັນ ປ້ອນ / ດັດແກ້ ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ
         ---------------------------------------------------- */
         function showAddStrategyForm(defaultUnit = '', editIndex = null) {
             if (currentUser && currentUser.type !== 'admin') {
@@ -715,7 +712,7 @@
 
             let stratVal = '';
             let focusVal = '';
-            let isEdit = (editIndex !== null && editIndex !== undefined);
+            let isEdit = (editIndex !== null && editIndex !== undefined && editIndex !== '');
 
             if (isEdit) {
                 let stratsData = getMergedStrategiesData();
@@ -780,11 +777,10 @@
             }
 
             let formattedFocus = stratFocus.replace(/\n/g, '<br>');
-
             let stratsData = getMergedStrategiesData();
 
-            if (!customStrategiesData[selectedUnit]) {
-                customStrategiesData[selectedUnit] = [];
+            if (!stratsData[selectedUnit]) {
+                stratsData[selectedUnit] = [];
             }
 
             // ຖ້າເປັນການດັດແກ້
@@ -793,24 +789,24 @@
                 if (stratsData[selectedUnit] && stratsData[selectedUnit][idx]) {
                     stratsData[selectedUnit][idx].strat = stratTitle;
                     stratsData[selectedUnit][idx].focus = formattedFocus || '-';
-                    customStrategiesData[selectedUnit] = stratsData[selectedUnit];
                 }
             } else {
                 // ຖ້າເປັນການເພີ່ມໃໝ່
-                customStrategiesData[selectedUnit].push({
+                stratsData[selectedUnit].push({
                     strat: stratTitle,
                     focus: formattedFocus || '-',
                     isCustom: true
                 });
             }
 
+            customStrategiesData = stratsData;
             localStorage.setItem("custom_strategies_data", JSON.stringify(customStrategiesData));
             showCustomAlert(`✅ ບັນທຶກການປ່ຽນແປງແຜນຍຸດທະສາດ ເຂົ້າໃນ "${selectedUnit}" ສຳເລັດແລ້ວ!`);
             showStrategy(selectedUnit);
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນ ລົບແຜນຍຸດທະສາດ (ສະເພາະ ADMIN)
+           ຟັງຊັນ ລົບແຜນຍຸດທະສາດ (ລົບໄດ້ 100%)
         ---------------------------------------------------- */
         function deleteStrategyEntry(unitName, index) {
             if (currentUser && currentUser.type !== 'admin') {
@@ -820,9 +816,9 @@
 
             if (confirm('ທ່ານຕ້ອງການລົບແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມຂໍ້ນີ້ແທ້ ຫຼື ບໍ່?')) {
                 let stratsData = getMergedStrategiesData();
-                if (stratsData[unitName]) {
+                if (stratsData[unitName] && stratsData[unitName][index]) {
                     stratsData[unitName].splice(index, 1);
-                    customStrategiesData[unitName] = stratsData[unitName];
+                    customStrategiesData = stratsData;
                     localStorage.setItem("custom_strategies_data", JSON.stringify(customStrategiesData));
                     showCustomAlert('ລົບແຜນຍຸດທະສາດเรียບຮ້ອຍແລ້ວ!');
                     showStrategy(unitName);
