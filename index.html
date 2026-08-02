@@ -418,7 +418,7 @@
                 <span>ນຳເຂົ້າປະຕິບັດ</span>
             </div>
 
-            <!-- 6. ປະຕິບັດ (ສັງລວມຫຍໍ້ຜົນການປະຕິບັດທຸກໄຟລ໌) -->
+            <!-- 6. ປະຕິບັດ -->
             <div class="tool-item" onclick="showExecutionTable()">
                 <span class="icon">⚙️</span>
                 <span>ປະຕິບັດ</span>
@@ -429,8 +429,14 @@
                 <span class="icon">⚖️</span>
                 <span>ທຽບແຜນ/ປະຕິບັດ</span>
             </div>
+
+            <!-- 8. ເນື້ອໃນສະຫຼຸບ -->
+            <div class="tool-item" onclick="showSummaryReportTable()">
+                <span class="icon">📑</span>
+                <span>ເນື້ອໃນສະຫຼຸບ</span>
+            </div>
             
-            <!-- 8. ລາຍງານ ▾ -->
+            <!-- 9. ລາຍງານ ▾ -->
             <div class="dropdown-container">
                 <div class="tool-item" onclick="toggleDropdown(event, 'report-dropdown-menu')">
                     <span class="icon">🖨️</span>
@@ -1258,7 +1264,7 @@
             });
         }
 
-        /* 2) ທຽບແຜນ/ປະຕິບັດ: ເອົາ ປະຕິບັດ ໄປທຽບກັບ ແຜນ (ວຽກທົ່ວໄປ ແລະ ຍຸດທະສາດ/ວຽກຈຸດສຸມ) ຖ້າມີແຜນແລະປະຕິບັດແລ້ວ ໃຫ້ສະແດງທີ່ນີ້ */
+        /* 2) ທຽບແຜນ/ປະຕິບັດ: ເອົາ ປະຕິບັດ ໄປທຽບກັບ ແຜນ ຖ້າມີແຜນແລະປະຕິບັດແລ້ວ ໃຫ້ສະແດງທີ່ນີ້ */
         function showCompareTable() {
             closeAllDropdowns();
             getAllDocsFromIDB('general', function(generalPlans) {
@@ -1285,13 +1291,13 @@
                                 `;
                             }
                         } else {
-                            compareRows = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">⚠️ ຍังມີຂໍ້ມູນບໍ່ຄົບຖ້ວນສຳລັບການທຽບແຜນ ແລະ ປະຕິບັດ (ຕ້ອງມີທັງຂໍ້ມູນແຜນ ແລະ ຂໍ້ມູນການປະຕິບັດຈຶ່ງຈະສະແດງຜົນທຽບ)</td></tr>`;
+                            compareRows = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">⚠️ ຍັງມີຂໍ້ມູນບໍ່ຄົບຖ້ວນສຳລັບການທຽບແຜນ ແລະ ປະຕິບັດ (ຕ້ອງມີທັງຂໍ້ມູນແຜນ ແລະ ຂໍ້ມູນການປະຕິບັດຈຶ່ງຈະສະແດງຜົນທຽບ)</td></tr>`;
                         }
 
                         contentDisplay.innerHTML = `
                             <div class="report-container" style="max-width: 100%;">
                                 <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">⚖️ ຕາຕະລາງທຽບແຜນ / ປະຕິບັດ</h2>
-                                <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ວຽກໃດທີ່ມີທັງ "ແຜນ" (ຈາກວຽກທົ່ວໄປ / ຍຸດທະສາດ/ວຽກຈຸດສຸມ) ແລະ "ປະຕິບັດ" ແລ້ວ ລະບົບຈະນຳມາສະແດງທຽບກັນທີ່ນີ້.</p>
+                                <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ວຽກໃດທີ່ມີທັງ "ແຜນ" ແລະ "ປະຕິບັດ" ແລ້ວ ລະບົບຈະນຳມາສະແດງທຽບກັນທີ່ນີ້.</p>
                                 
                                 <table class="strategy-table" style="width: 100%;">
                                     <thead>
@@ -1305,6 +1311,47 @@
                                         ${compareRows}
                                     </tbody>
                                 </table>
+                            </div>
+                        `;
+                    });
+                });
+            });
+        }
+
+        /* 3) ເນື້ອໃນສະຫຼຸບ: ລະບົບຂຽນບົດສະຫຼຸບອັດຕະໂນມັດ ໂດຍການສົມທຽບລະຫວ່າງ ແຜນ ແລະ ປະຕິບັດຕົວຈິງ */
+        function showSummaryReportTable() {
+            closeAllDropdowns();
+            getAllDocsFromIDB('general', function(generalPlans) {
+                getAllDocsFromIDB('strategy', function(strategyPlans) {
+                    getAllDocsFromIDB('execution', function(executionDocs) {
+                        const contentDisplay = document.getElementById('content-display');
+
+                        let totalPlans = (generalPlans ? generalPlans.length : 0) + (strategyPlans ? strategyPlans.length : 0);
+                        let totalExecs = executionDocs ? executionDocs.length : 0;
+                        
+                        let summaryText = "";
+                        if (totalPlans > 0 || totalExecs > 0) {
+                            summaryText = `
+                                ຈາກການຕິດຕາມ ແລະ ປະເມີນຜົນການຈັດຕັ້ງປະຕິບັດວຽກງານຂອງພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ:
+                                <br><br>
+                                <ul>
+                                    <li><strong>ສະຫຼຸບ ດ້ານແຜນການ:</strong> ມີແຜນງານ/ວຽກງານທີ່ໄດ້ກຳນົດ ແລະ ນຳເຂົ້າໃນລະບົບທັງໝົດ <strong>${totalPlans}</strong> ຫົວຂໍ້/ເອກະສານ.</li>
+                                    <li><strong>ສະຫຼຸບ ດ້ານການປະຕິບັດຕົວຈິງ:</strong> ພາກສ່ວນຕ່າງໆໄດ້ຈັດຕັ້ງປະຕິບັດ ແລະ ອັບໂຫຼດຜົນງານ (Word, Excel, PDF, ຮູບພາບ) ເຂົ້າລະບົບແລ້ວທັງໝົດ <strong>${totalExecs}</strong> ບົດລາຍງານ.</li>
+                                    <li><strong>ການຕີລາຄາລວມ:</strong> ການຈັດຕັ້ງປະຕິບັດວຽກງານແມ່ນມີຄວາມສອດຄ່ອງ ແລະ ເປັນລະບົບ, ພາກສ່ວນກ່ຽວຂ້ອງສາມາດດຳເນີນຕາມແຜນການທີ່ວາງໄວ້ໄດ້ຢ່າງເປັນຮູບປະທຳ.</li>
+                                </ul>
+                            `;
+                        } else {
+                            summaryText = `⚠️ ຍັງບໍ່ມີຂໍ້ມູນພຽງພໍໃນລະບົບສຳລັບການຂຽນບົດສະຫຼຸບອັດຕະໂນມັດ (ກະລຸນານຳເຂົ້າແຜນ ແລະ ຜົນການປະຕິບັດກ່ອນ).`;
+                        }
+
+                        contentDisplay.innerHTML = `
+                            <div class="report-container" style="max-width: 100%;">
+                                <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📑 ເນື້ອໃນສະຫຼຸບ (ສົມທຽບແຜນ ແລະ ປະຕິບັດຕົວຈິງ)</h2>
+                                <p style="font-size:13px; color:#475569; margin-bottom:20px;">💡 ບົດສະຫຼຸບສັງລວມທີ່ລະບົບວິເຄາະ ແລະ ຂຽນໃຫ້ອັດຕະໂນມັດ ຈາກຂໍ້ມູນແຜນ ແລະ ການປະຕິບັດຕົວຈິງ:</p>
+                                
+                                <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 25px; line-height: 1.8; font-size: 14px; color: #0f172a;">
+                                    ${summaryText}
+                                </div>
                             </div>
                         `;
                     });
