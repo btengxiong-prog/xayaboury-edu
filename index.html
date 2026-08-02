@@ -45,6 +45,7 @@
             border-top: 2px solid #b5651d;
         }
         
+        /* Input ສະໄຕລ໌ສຳລັບແກ້ໄຂໃນຕາຕະລາງ */
         .table-inline-input {
             width: 100%;
             padding: 6px 8px;
@@ -341,7 +342,7 @@
                 <span>ວຽກງານຈຸດສຸມ</span>
             </div>
 
-            <!-- ປຸ່ມ ປ້ອນແຜນຍຸດທະສາດ (ອັບເດດໃໝ່) -->
+            <!-- ປຸ່ມ ປ້ອນແຜນຍຸດທະສາດ -->
             <div class="tool-item" onclick="showAddStrategyForm()">
                 <span class="icon">📝</span>
                 <span>ປ້ອນແຜນຍຸດທະສາດ</span>
@@ -541,7 +542,6 @@
             "ຫ້ອງການກຳມະທິການສຶກສາສິງແຂວງ"
         ];
 
-        // ດຶງຂໍ້ມູນຍຸດທະສາດທີ່ເຄີຍເກັບໃນ LocalStorage ຫຼື ໃຊ້ຂໍ້ມູນເລີ່ມຕົ້ນ
         let customStrategiesData = JSON.parse(localStorage.getItem("custom_strategies_data")) || {};
 
         const defaultStrategiesData = {
@@ -550,7 +550,6 @@
             ]
         };
 
-        // ໂຮມຂໍ້ມູນເລີ່ມຕົ້ນ ແລະ ຂໍ້ມູນທີ່ປ້ອນໃໝ່
         function getMergedStrategiesData() {
             let merged = JSON.parse(JSON.stringify(defaultStrategiesData));
             for (let unit in customStrategiesData) {
@@ -650,7 +649,7 @@
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນ ປ້ອນແຜນຍຸດທະສາດໃໝ່ (ເພີ່ມເຕີມໃສ່ຂະແໜງການ)
+           ຟັງຊັນ ປ້ອນແຜນຍຸດທະສາດໃໝ່ (ຕັດສ່ວນປ້ອນ ວຽກງານຈຸດສຸມ ອອກແລ້ວ)
         ---------------------------------------------------- */
         function showAddStrategyForm(defaultUnit = '') {
             closeAllDropdowns();
@@ -664,7 +663,7 @@
 
             contentDisplay.innerHTML = `
                 <div class="report-container" style="max-width:700px; margin:0 auto; text-align:left;">
-                    <h2 style="color:#b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📝 ປ້ອນແຜນຍຸດທະສາດໃໝ່ / ວຽກງານຈຸດສຸມ</h2>
+                    <h2 style="color:#b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📝 ປ້ອນແຜນຍຸດທະສາດໃໝ່</h2>
                     <p style="font-size:13px; color:#64748b; margin-bottom:20px;">ກະລຸນາເລືອກຂະແໜງການ ແລະ ພິມ ຫຼື Copy ເນື້ອໃນແຜນມາວາງ (Paste) ໃສ່ບ່ອນນີ້:</p>
                     
                     <div class="form-field">
@@ -676,12 +675,7 @@
 
                     <div class="form-field">
                         <label style="font-size:13px;">🎯 ເນື້ອໃນແຜນຍຸດທະສາດ (ພິມ ຫຼື Copy ມາວາງໃສ່):</label>
-                        <textarea id="new-strat-title" rows="4" placeholder="ຕົວຢ່າງ: ຍຸດທະສາດ 05: ສ້າງຄວາມເຂັ້ມແຂງໃນການຈັດຕັ້ງປະຕິບັດ..."></textarea>
-                    </div>
-
-                    <div class="form-field">
-                        <label style="font-size:13px;">📋 ວຽກງານຈຸດສຸມ (ພິມ ຫຼື Copy ມາວາງໃສ່):</label>
-                        <textarea id="new-strat-focus" rows="5" placeholder="ຕົວຢ່າງ: 1. ຝຶກອົບຮົມວິຊາຊີບ...&#10;2. ຕິດຕາມ ແລະ ປະເມີນຜົນ..."></textarea>
+                        <textarea id="new-strat-title" rows="6" placeholder="ຕົວຢ່າງ: ຍຸດທະສາດ 05: ສ້າງຄວາມເຂັ້ມແຂງໃນການຈັດຕັ້ງປະຕິບັດ..."></textarea>
                     </div>
 
                     <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:25px;">
@@ -692,19 +686,14 @@
             `;
         }
 
-        // ບັນທຶກແຜນຍຸດທະສາດໃໝ່ລົງຖານຂໍ້ມູນຂະແໜງການ
         function saveNewStrategyEntry() {
             const selectedUnit = document.getElementById('new-strat-unit').value;
             const stratTitle = document.getElementById('new-strat-title').value.trim();
-            const stratFocus = document.getElementById('new-strat-focus').value.trim();
 
             if (!stratTitle) {
                 alert('ກະລຸນາປ້ອນເນື້ອໃນແຜນຍຸດທະສາດ!');
                 return;
             }
-
-            // ຈັດຟໍແມັດຂໍ້ຄວາມທີ່ຂຶ້ນແຖວໃໝ່
-            let formattedFocus = stratFocus.replace(/\n/g, '<br>');
 
             if (!customStrategiesData[selectedUnit]) {
                 customStrategiesData[selectedUnit] = [];
@@ -712,15 +701,13 @@
 
             customStrategiesData[selectedUnit].push({
                 strat: stratTitle,
-                focus: formattedFocus || '-'
+                focus: '-'
             });
 
-            // ບັນທຶກລົງ LocalStorage
             localStorage.setItem("custom_strategies_data", JSON.stringify(customStrategiesData));
 
             showCustomAlert(`✅ ບັນທຶກແຜນຍຸດທະສາດໃໝ່ເຂົ້າໃນ "${selectedUnit}" ສຳເລັດແລ້ວ!`);
             
-            // ນຳໄປສະແດງຜົນໃນຂະແໜງການນັ້ນທັນທີ
             showStrategy(selectedUnit);
         }
 
