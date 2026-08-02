@@ -32,6 +32,24 @@
             font-weight: bold;
         }
         
+        .unit-section-title {
+            background-color: #faf3e0;
+            color: #b5651d;
+            padding: 8px 12px;
+            font-size: 15px;
+            font-weight: bold;
+            border-left: 4px solid #b5651d;
+            margin-top: 20px;
+            margin-bottom: 5px;
+        }
+
+        .total-summary-footer {
+            background-color: #f1f5f9;
+            font-weight: bold;
+            color: #0f172a;
+            border-top: 2px solid #b5651d !important;
+        }
+        
         .status-container {
             display: flex;
             flex-direction: column;
@@ -568,101 +586,153 @@
         }
 
         /* ----------------------------------------------------
-           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ ພ້ອມ Checkbox Toggle
+           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ (ແຍກຕາມຂະແໜງ / ສະແດງທັງໝົດຕໍ່ກັນ)
         ---------------------------------------------------- */
         function showStrategy(unitName) {
             const contentDisplay = document.getElementById('content-display');
             let stratsData = getMergedStrategiesData();
-            let strats = stratsData[unitName] || [];
-            let tableRows = '';
-
             let isAdmin = (currentUser && currentUser.type === 'admin');
 
-            if (strats.length > 0) {
-                strats.forEach((item, index) => {
-                    let focusItems = item.focus ? item.focus.split(/<br>\s*(?=\d+\.)/) : ['-'];
-                    let rowSpan = focusItems.length;
+            // ຖ້າເລືອກ "ALL" ສະແດງທຸກຂະແໜງການຕໍ່ກັນລົງໄປ
+            let targetUnits = (unitName === 'ALL') ? allUnits : [unitName];
 
-                    focusItems.forEach((fItem, fIndex) => {
-                        let uniqueKey = `${unitName}_${index}_${fIndex}`;
-                        let savedStatus = localStorage.getItem(`status_${uniqueKey}`) || '';
-                        let savedProof = JSON.parse(localStorage.getItem(`proof_${uniqueKey}`)) || null;
+            let totalStratCount = 0;
+            let totalFocusCount = 0;
+            let totalNotDoneCount = 0;
+            let totalDoneCount = 0;
 
-                        tableRows += `<tr>`;
-                        if (fIndex === 0) {
-                            tableRows += `<td rowspan="${rowSpan}" style="width: 30%; vertical-align: top !important;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}</td>`;
-                        }
-                        
-                        let proofHTML = '';
-                        if (savedStatus === 'done') {
-                            if (savedProof) {
-                                proofHTML = `
-                                    <div class="upload-proof-box">
-                                        <span style="color:#2563eb; cursor:pointer; text-decoration:underline; font-weight:bold;" onclick="previewProofFile('${uniqueKey}')">📄 ${savedProof.fileName}</span>
-                                        <button type="button" class="remove-file-btn" style="padding:2px 6px; font-size:10px; margin-left:6px;" onclick="removeProofFile('${uniqueKey}')">ລົບໄຟລ໌</button>
-                                    </div>
-                                `;
-                            } else {
-                                proofHTML = `
-                                    <div class="upload-proof-box">
-                                        <button type="button" class="save-btn" style="background:#2563eb; padding:4px 8px; font-size:11px;" onclick="triggerProofUpload('${uniqueKey}')">📎 ອັບໂຫຼດໄຟລ໌ສະຫຼຸບ (Word, Excel, PDF, ຮູບ)</button>
-                                    </div>
-                                `;
+            let htmlContent = '';
+
+            targetUnits.forEach(unit => {
+                let strats = stratsData[unit] || [];
+                let tableRows = '';
+
+                if (strats.length > 0) {
+                    strats.forEach((item, index) => {
+                        totalStratCount++;
+                        let focusItems = item.focus ? item.focus.split(/<br>\s*(?=\d+\.)/) : ['-'];
+                        let rowSpan = focusItems.length;
+
+                        focusItems.forEach((fItem, fIndex) => {
+                            if (fItem.trim() !== '-' && fItem.trim() !== '') {
+                                totalFocusCount++;
                             }
-                        }
 
-                        tableRows += `
-                            <td style="width: 30%; vertical-align: top !important;">${fItem.trim()}</td>
-                            <td style="width: 25%; vertical-align: top !important;">
-                                <div class="status-container">
-                                    <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'none', '${unitName}')">
-                                        <input type="checkbox" ${savedStatus === 'none' ? 'checked' : ''} style="pointer-events:none;">
-                                        ❌ ບໍ່ໄດ້ຈັດຕັ້ງ
-                                    </label>
-                                    <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'done', '${unitName}')">
-                                        <input type="checkbox" ${savedStatus === 'done' ? 'checked' : ''} style="pointer-events:none;">
-                                        ✅ ຈັດຕັ້ງ
-                                    </label>
-                                    ${proofHTML}
-                                </div>
-                            </td>
-                        `;
+                            let uniqueKey = `${unit}_${index}_${fIndex}`;
+                            let savedStatus = localStorage.getItem(`status_${uniqueKey}`) || '';
+                            let savedProof = JSON.parse(localStorage.getItem(`proof_${uniqueKey}`)) || null;
 
-                        if (fIndex === 0 && isAdmin) {
+                            if (savedStatus === 'none') totalNotDoneCount++;
+                            if (savedStatus === 'done') totalDoneCount++;
+
+                            tableRows += `<tr>`;
+                            if (fIndex === 0) {
+                                tableRows += `<td rowspan="${rowSpan}" style="width: 30%; vertical-align: top !important;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}</td>`;
+                            }
+                            
+                            let proofHTML = '';
+                            if (savedStatus === 'done') {
+                                if (savedProof) {
+                                    proofHTML = `
+                                        <div class="upload-proof-box">
+                                            <span style="color:#2563eb; cursor:pointer; text-decoration:underline; font-weight:bold;" onclick="previewProofFile('${uniqueKey}')">📄 ${savedProof.fileName}</span>
+                                            <button type="button" class="remove-file-btn" style="padding:2px 6px; font-size:10px; margin-left:6px;" onclick="removeProofFile('${uniqueKey}')">ລົບໄຟລ໌</button>
+                                        </div>
+                                    `;
+                                } else {
+                                    proofHTML = `
+                                        <div class="upload-proof-box">
+                                            <button type="button" class="save-btn" style="background:#2563eb; padding:4px 8px; font-size:11px;" onclick="triggerProofUpload('${uniqueKey}')">📎 ອັບໂຫຼດໄຟລ໌ສະຫຼຸບ (Word, Excel, PDF, ຮູບ)</button>
+                                        </div>
+                                    `;
+                                }
+                            }
+
                             tableRows += `
-                                <td rowspan="${rowSpan}" style="width: 15%; text-align: center; vertical-align: top !important;">
-                                    <button type="button" class="edit-btn-sm" onclick="editStrategyEntry('${unitName}', ${index})">✏️ ດັດແກ້</button>
-                                    <button type="button" class="remove-file-btn" onclick="deleteStrategyEntry('${unitName}', ${index})">🗑️ ລົບ</button>
+                                <td style="width: 30%; vertical-align: top !important;">${fItem.trim()}</td>
+                                <td style="width: 25%; vertical-align: top !important;">
+                                    <div class="status-container">
+                                        <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'none', '${unitName}')">
+                                            <input type="checkbox" ${savedStatus === 'none' ? 'checked' : ''} style="pointer-events:none;">
+                                            ❌ ບໍ່ໄດ້ຈັດຕັ້ງ
+                                        </label>
+                                        <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'done', '${unitName}')">
+                                            <input type="checkbox" ${savedStatus === 'done' ? 'checked' : ''} style="pointer-events:none;">
+                                            ✅ ຈັດຕັ້ງ
+                                        </label>
+                                        ${proofHTML}
+                                    </div>
                                 </td>
                             `;
-                        }
 
-                        tableRows += `</tr>`;
+                            if (fIndex === 0 && isAdmin) {
+                                tableRows += `
+                                    <td rowspan="${rowSpan}" style="width: 15%; text-align: center; vertical-align: top !important;">
+                                        <button type="button" class="edit-btn-sm" onclick="editStrategyEntry('${unit}', ${index})">✏️ ດັດແກ້</button>
+                                        <button type="button" class="remove-file-btn" onclick="deleteStrategyEntry('${unit}', ${index})">🗑️ ລົບ</button>
+                                    </td>
+                                `;
+                            }
+
+                            tableRows += `</tr>`;
+                        });
                     });
-                });
-            } else {
-                let colSpan = isAdmin ? 4 : 3;
-                tableRows = `<tr><td colspan="${colSpan}" style="text-align: center; color: #666; padding:20px;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດສຳລັບໜ່ວຍງານນີ້</td></tr>`;
-            }
+                } else {
+                    let colSpan = isAdmin ? 4 : 3;
+                    tableRows = `<tr><td colspan="${colSpan}" style="text-align: center; color: #666; padding:15px;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດສຳລັບໜ່ວຍງານນີ້</td></tr>`;
+                }
 
-            let actionHeader = isAdmin ? `<th style="width: 15%; text-align: center;">ຈັດການ</th>` : '';
+                let actionHeader = isAdmin ? `<th style="width: 15%; text-align: center;">ຈັດການ</th>` : '';
 
-            contentDisplay.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h3 style="color: #b5651d; margin:0;">🏫 ${unitName}</h3>
+                htmlContent += `
+                    <div class="unit-section-title">🏫 ${unit}</div>
+                    <table class="strategy-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">ແຜນຍຸດທະສາດ</th>
+                                <th style="width: 30%;">ວຽກງານຈຸດສຸມ</th>
+                                <th style="width: 25%;">ປະຕິບັດຕົວຈິງ</th>
+                                ${actionHeader}
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                `;
+            });
+
+            // ແຖບສະຫຼຸບລວມຢູ່ລຸ່ມສຸດ (Summary Footer)
+            let summaryColSpan = isAdmin ? 4 : 3;
+            let totalSummaryFooter = `
+                <div style="margin-top:30px; border-top:3px solid #b5651d; padding-top:10px;">
+                    <h3 style="color:#b5651d; margin-bottom:10px;">📊 ບົດສະຫຼຸບສັງລວມລວມທັງໝົດ:</h3>
+                    <table class="strategy-table" style="background:#f8fafc;">
+                        <thead>
+                            <tr class="total-summary-footer">
+                                <th style="width: 30%;">ລວມແຜນຍຸດທະສາດທັງໝົດ</th>
+                                <th style="width: 30%;">ລວມວຽກງານຈຸດສຸມທັງໝົດ</th>
+                                <th style="width: 40%; text-align: left;" colspan="${isAdmin ? 2 : 1}">ລວມຜົນການຈັດຕັ້ງປະຕິບັດຕົວຈິງ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="font-weight:bold; font-size:14px; color:#1e293b;">
+                                <td>📌 ${totalStratCount} ຂໍ້ / ແຜນ</td>
+                                <td>📋 ${totalFocusCount} ຂໍ້ / ວຽກ</td>
+                                <td colspan="${isAdmin ? 2 : 1}">
+                                    <span style="color:#ef4444; margin-right:15px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${totalNotDoneCount} ຂໍ້</span>
+                                    <span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${totalDoneCount} ຂໍ້</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <table class="strategy-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 30%;">ແຜນຍຸດທະສາດ</th>
-                            <th style="width: 30%;">ວຽກງານຈຸດສຸມ</th>
-                            <th style="width: 25%;">ປະຕິບັດຕົວຈິງ</th>
-                            ${actionHeader}
-                        </tr>
-                    </thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
             `;
+
+            contentDisplay.innerHTML = htmlContent + totalSummaryFooter;
+        }
+
+        // ກົດທີ່ "📁 ພາກສ່ວນຕ່າງໆ" ຫຼື "📂 ພະແນກສຶກສາທິການ..." ໃຫ້ສະແດງທຸກຂະແໜງການຕໍ່ກັນ
+        function showAllStrategies() {
+            showStrategy("ALL");
         }
 
         /* ----------------------------------------------------
@@ -734,7 +804,7 @@
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນບັນທຶກແຜນ - ເພີ່ມເງື່ອນໄຂ ກວດສອບຂໍ້ມູນຊ້ຳກັນ
+           ຟັງຊັນບັນທຶກແຜນ - ກວດສອບຂໍ້ມູນຊ້ຳກັນ
         ---------------------------------------------------- */
         function saveStrategyEntryData() {
             if (currentUser && currentUser.type !== 'admin') {
@@ -763,7 +833,7 @@
             // 🔍 ເຊັກການປ້ອນຂໍ້ມູນຊ້ຳກັນ (Duplicate Check)
             let isDuplicate = stratsData[selectedUnit].some((item, idx) => {
                 if (editIndex !== '' && editIndex !== null && editIndex !== undefined && parseInt(editIndex) === idx) {
-                    return false; // ຂ້າມຂໍ້ທີ່ກຳລັງດັດແກ້ຢູ່
+                    return false;
                 }
                 return item.strat.trim().toLowerCase() === stratTitle.toLowerCase();
             });
@@ -906,10 +976,6 @@
 
                 document.getElementById('file-preview-modal').style.display = 'flex';
             }
-        }
-
-        function showAllStrategies() {
-            showStrategy("ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ");
         }
 
         function showPlaceholderFocusWork() {
