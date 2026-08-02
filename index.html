@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ລະບົບຕິດຕາມ ແລະ ສະຫຼຸບລາຍງານ - ພສກ ໄຊຍະບູລີ</title>
     <link rel="stylesheet" href="style.css">
+    <!-- ນຳໃຊ້ Mammoth.js ສຳລັບ Parse ເປີດອ່ານໄຟລ໌ Word (.docx) ເທິງ Browser ໂດຍຕົ່ງ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
         .strategy-table {
             width: 100%;
@@ -120,7 +122,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 23, 42, 0.7);
+            background: rgba(15, 23, 42, 0.75);
             backdrop-filter: blur(4px);
             display: none;
             justify-content: center;
@@ -128,39 +130,40 @@
             z-index: 999999;
         }
         .image-modal-content {
-            background: white;
+            background: #f1f5f9;
             padding: 20px;
             border-radius: 8px;
-            width: 90%;
-            max-width: 900px;
-            max-height: 92vh;
+            width: 95%;
+            max-width: 1050px;
+            max-height: 94vh;
             text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+
+        /* ຕົບແຕ່ງກ່ອງສະແດງເນື້ອໃນເອກະສານ ເປັນໃບເຈ້ຍ A4 */
         .preview-container {
             width: 100%;
-            height: 65vh;
+            height: 73vh;
             overflow-y: auto;
             margin-bottom: 15px;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
-            padding: 20px;
+            padding: 30px;
             background: #ffffff;
             text-align: left;
             box-sizing: border-box;
-            line-height: 1.6;
-            color: #1e293b;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            line-height: 1.8;
+            color: #0f172a;
+            font-family: 'Phetsarath OT', 'Saysana', sans-serif;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
         }
         .preview-container img {
             max-width: 100%;
-            max-height: 60vh;
+            max-height: 65vh;
             border-radius: 4px;
             object-fit: contain;
             display: block;
@@ -171,6 +174,20 @@
             height: 100%;
             border: none;
             border-radius: 4px;
+        }
+        /* ຕົບແຕ່ງຕາຕະລາງ ແລະ ຂໍ້ຄວາມທີ່ຖືກດຶງມາຈາກ Word */
+        .preview-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .preview-container th, .preview-container td {
+            border: 1px solid #94a3b8;
+            padding: 8px 10px;
+        }
+        .preview-container p {
+            margin-bottom: 12px;
+            font-size: 15px;
         }
 
         .action-bar {
@@ -364,12 +381,12 @@
     <!-- Hidden File Inputs -->
     <input type="file" id="hidden-file-input" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileSelected(event)">
 
-    <!-- Modal Preview ເບິ່ງ/ເປີດເອກະສານກ່ອນດາວໂຫຼດ -->
+    <!-- Modal Preview ເປີດອ່ານເອກະສານທັງໝົດໃນລະບົບ -->
     <div id="file-preview-modal" class="image-modal-overlay" onclick="closeFilePreviewModal()">
         <div class="image-modal-content" onclick="event.stopPropagation()">
             <h3 id="preview-file-title" style="margin-top:0; color:#0f172a; font-size:15px; margin-bottom:12px;">🔍 ເປີດເບິ່ງເອກະສານ</h3>
             <div id="preview-body" class="preview-container">
-                <!-- ສ່ວນສະແດງເນື້ອໃນເອກະສານ / PDF / ຮູບພາບ -->
+                <!-- ສ່ວນສະແດງເນື້ອໃນເອກະສານຕົວຈິງ / PDF / ຮູບພາບ -->
             </div>
             <div style="display: flex; gap: 10px;">
                 <button type="button" id="download-btn-modal" class="save-btn" style="background:#2563eb;">📥 ດາວໂຫຼດໄຟລ໌</button>
@@ -680,7 +697,7 @@
                         fileType: file.type,
                         isImage: file.type.startsWith('image/'),
                         isPDF: file.type === 'application/pdf',
-                        isOffice: file.name.endsWith('.doc') || file.name.endsWith('.docx') || file.name.endsWith('.xls') || file.name.endsWith('.xlsx')
+                        isDocx: file.name.toLowerCase().endsWith('.docx')
                     };
                     document.getElementById('selected-filename-display').innerText = '📎 ' + file.name;
                 };
@@ -715,7 +732,7 @@
                 fileType: tempFileData ? tempFileData.fileType : '',
                 isImage: tempFileData ? tempFileData.isImage : false,
                 isPDF: tempFileData ? tempFileData.isPDF : false,
-                isOffice: tempFileData ? tempFileData.isOffice : false,
+                isDocx: tempFileData ? tempFileData.isDocx : false,
                 recordDate: recordDate
             };
 
@@ -813,7 +830,7 @@
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນ Preview ສະແດງບັດສະຫຼຸບເອກະສານທີ່ສວຍງາມ (ບໍ່ດາວໂຫຼດເອງ)
+           ຟັງຊັນ ເປີດສະແດງເນື້ອໃນເອກະສານຕົວຈິງທັງໝົດ (Document Viewer)
         ---------------------------------------------------- */
         function openFilePreviewModal(id, type) {
             getAllDocsFromIDB(type, function(docsList) {
@@ -823,7 +840,7 @@
                     const downloadBtn = document.getElementById('download-btn-modal');
                     document.getElementById('preview-file-title').innerText = "🔍 ເປີດເບິ່ງເອກະສານ: " + doc.fileName;
 
-                    previewBody.innerHTML = '';
+                    previewBody.innerHTML = '<p style="text-align:center; color:#64748b; font-weight:bold; margin-top:30px;">⏳ ກຳລັງໂຫຼດ ແລະ ແປງເນື້ອໃນເອກະສານ...</p>';
 
                     // 1. ສະແດງຮູບພາບ
                     if (doc.isImage) {
@@ -833,25 +850,48 @@
                     else if (doc.isPDF) {
                         previewBody.innerHTML = `<iframe src="${doc.fileDataUrl}"></iframe>`;
                     } 
-                    // 3. ສະແດງ Document Summary Card ສຳລັບ Word / Excel
+                    // 3. ແປງ ແລະ ສະແດງເນື້ອໃນໄຟລ໌ Word (.docx) ເປັນ HTML ເອກະສານ A4 ຕົວຈິງ
                     else {
-                        previewBody.innerHTML = `
-                            <div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#f8fafc; border-radius:8px; padding:20px; box-sizing:border-box;">
-                                <div style="font-size: 64px; margin-bottom: 10px;">📄</div>
-                                <h3 style="color: #0f172a; margin: 5px 0 15px 0; font-size: 18px; text-align:center;">${doc.fileName}</h3>
-                                
-                                <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:15px 20px; width:85%; text-align:left; box-shadow:0 1px 3px rgba(0,0,0,0.05); margin-bottom:15px;">
-                                    <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>📝 ເນື້ອໃນເອກະສານ:</strong> ${doc.content}</p>
-                                    <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>🔢 ເລກທີເອກະສານ:</strong> ${doc.docNo}</p>
-                                    <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>📅 ວັນ/ເດືອນ/ປີ ເອກະສານ:</strong> ${formatDateDDMMYYYY(doc.docDate)}</p>
-                                    <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>🕒 ວັນທີບັນທຶກເອກະສານ:</strong> ${doc.recordDate}</p>
-                                </div>
-                                <p style="font-size: 12px; color: #64748b; margin: 0;">(ເອກະສານປະເພດ Word/Excel ໄດ້ຮັບການບັນທຶກ ແລະ ກວດກາສຳເລັດແລ້ວ. ກົດປຸ່ມສີນ້ຳເງິນດ້ານລຸ່ມຖ້າຕ້ອງການດາວໂຫຼດໄຟລ໌ຕົ້ນສະບັບ)</p>
-                            </div>
-                        `;
+                        try {
+                            // ແປງ Data URL ເປັນ ArrayBuffer
+                            const base64Data = doc.fileDataUrl.split(',')[1];
+                            const binaryString = window.atob(base64Data);
+                            const len = binaryString.length;
+                            const bytes = new Uint8Array(len);
+                            for (let i = 0; i < len; i++) {
+                                bytes[i] = binaryString.charCodeAt(i);
+                            }
+
+                            // ໃຊ້ Mammoth.js Parse ເນື້ອໃນ Word (.docx) ທັງໝົດ
+                            mammoth.convertToHtml({ arrayBuffer: bytes.buffer })
+                                .then(function(result) {
+                                    if (result.value && result.value.trim().length > 0) {
+                                        previewBody.innerHTML = `
+                                            <div style="width:100%; font-family:'Phetsarath OT', 'Saysana', sans-serif;">
+                                                <div style="text-align:center; margin-bottom:20px; border-bottom:2px dashed #cbd5e1; padding-bottom:10px;">
+                                                    <h3 style="margin:0; color:#0f172a;">${doc.fileName}</h3>
+                                                    <p style="font-size:12px; color:#64748b; margin:5px 0 0 0;">ເລກທີ: ${doc.docNo} | ວັນທີເອກະສານ: ${formatDateDDMMYYYY(doc.docDate)}</p>
+                                                </div>
+                                                <div style="color:#0f172a; line-height:1.8;">
+                                                    ${result.value}
+                                                </div>
+                                            </div>
+                                        `;
+                                    } else {
+                                        showFallbackDocCard(previewBody, doc);
+                                    }
+                                })
+                                .catch(function(err) {
+                                    console.error(err);
+                                    showFallbackDocCard(previewBody, doc);
+                                });
+                        } catch(err) {
+                            console.error(err);
+                            showFallbackDocCard(previewBody, doc);
+                        }
                     }
 
-                    // ປຸ່ມດາວໂຫຼດສີນ້ຳເງິນ (ເຮັດວຽກພຽງແຕ່ເມື່ອກົດປຸ່ມນີ້)
+                    // ປຸ່ມດາວໂຫຼດສີນ້ຳເງິນ (ດາວໂຫຼດເມື່ອກົດປຸ່ມນີ້)
                     downloadBtn.onclick = function() {
                         const a = document.createElement('a');
                         a.href = doc.fileDataUrl;
@@ -864,6 +904,21 @@
                     document.getElementById('file-preview-modal').style.display = 'flex';
                 }
             });
+        }
+
+        function showFallbackDocCard(container, doc) {
+            container.innerHTML = `
+                <div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#f8fafc; border-radius:8px; padding:20px; box-sizing:border-box;">
+                    <div style="font-size: 64px; margin-bottom: 10px;">📄</div>
+                    <h3 style="color: #0f172a; margin: 5px 0 15px 0; font-size: 18px; text-align:center;">${doc.fileName}</h3>
+                    <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:15px 20px; width:85%; text-align:left; box-shadow:0 1px 3px rgba(0,0,0,0.05); margin-bottom:15px;">
+                        <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>📝 ເນື້ອໃນເອກະສານ:</strong> ${doc.content}</p>
+                        <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>🔢 ເລກທີເອກະສານ:</strong> ${doc.docNo}</p>
+                        <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>📅 ວັນ/ເດືອນ/ປີ ເອກະສານ:</strong> ${formatDateDDMMYYYY(doc.docDate)}</p>
+                        <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>🕒 ວັນທີບັນທຶກເອກະສານ:</strong> ${doc.recordDate}</p>
+                    </div>
+                </div>
+            `;
         }
 
         function closeFilePreviewModal() {
