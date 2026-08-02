@@ -400,16 +400,16 @@
                 </div>
             </div>
 
-            <!-- 3. ຍຸດທະສາດ (ສັງລວມຫຍໍ້ແຜນ) -->
-            <div class="tool-item" onclick="showStrategySummaryTable()">
+            <!-- 3. ວຽກທົ່ວໄປ -->
+            <div class="tool-item" onclick="showGeneralSummaryTable()">
                 <span class="icon">📊</span>
-                <span>ຍຸດທະສາດ</span>
+                <span>ວຽກທົ່ວໄປ</span>
             </div>
             
-            <!-- 4. ວຽກງານຈຸດສຸມ (ສັງລວມຫຍໍ້ແຜນ) -->
-            <div class="tool-item" onclick="showFocusWorkSummaryTable()">
+            <!-- 4. ຍຸດທະສາດ/ວຽກຈຸດສຸມ -->
+            <div class="tool-item" onclick="showStrategySummaryTable()">
                 <span class="icon">🎯</span>
-                <span>ວຽກງານຈຸດສຸມ</span>
+                <span>ຍຸດທະສາດ/ວຽກຈຸດສຸມ</span>
             </div>
 
             <!-- 5. ປ້ອນວຽກງານຈຸດສຸມ -->
@@ -1166,17 +1166,17 @@
             });
         }
 
-        function showStrategySummaryTable() {
-            showDocListTable('strategy');
+        function showGeneralSummaryTable() {
+            showDocListTable('general');
         }
 
-        function showFocusWorkSummaryTable() {
+        function showStrategySummaryTable() {
             showDocListTable('strategy');
         }
 
         function showDocListTable(type) {
             closeAllDropdowns();
-            const titleName = (type === 'general') ? 'ຂໍ້ມູນວຽກທົ່ວໄປ' : '📈 ບົດສັງລວມຫຍໍ້ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ຈາກການນຳເຂົ້າແຜນ)';
+            const titleName = (type === 'general') ? '📁 ບົດສັງລວມຫຍໍ້ວຽກທົ່ວໄປ (ຈາກການນຳເຂົ້າແຜນ)' : '📈 ບົດສັງລວມຫຍໍ້ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ຈາກການນຳເຂົ້າແຜນ)';
 
             getAllDocsFromIDB(type, function(allDocsList) {
                 const contentDisplay = document.getElementById('content-display');
