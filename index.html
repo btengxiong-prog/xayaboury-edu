@@ -41,6 +41,9 @@
             border-left: 4px solid #b5651d;
             margin-top: 25px;
             margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .unit-summary-row td {
@@ -593,7 +596,7 @@
         }
 
         /* ----------------------------------------------------
-           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ (ພ້ອມແຖບສະຫຼຸບແຍກປະຈຳຂະແໜງ)
+           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ (ພ້ອມປຸ່ມປ້ອນແຜນປະຈຳຂະແໜງ)
         ---------------------------------------------------- */
         function showStrategy(unitName) {
             const contentDisplay = document.getElementById('content-display');
@@ -698,7 +701,12 @@
 
                 let actionHeader = isAdmin ? `<th style="width: 15%; text-align: center;">ຈັດການ</th>` : '';
 
-                // 📌 ແຖບສະຫຼຸບລວມແຍກປະຈຳຂະແໜງການ (ຢູ່ກົ້ນຕາຕະລາງຂອງຂະແໜງການ)
+                // 📌 ປຸ່ມ "ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ" ຢູ່ແຖບຫົວຂໍ້ຂະແໜງການ (ສະເພາະ ADMIN)
+                let addBtnUnitHeader = isAdmin ? `
+                    <button type="button" class="save-btn" style="background:#2563eb; font-size:12px; padding:5px 12px;" onclick="showAddStrategyForm('${unit}')">📝 ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</button>
+                ` : '';
+
+                // 📌 ແຖບສະຫຼຸບລວມແຍກປະຈຳຂະແໜງການ
                 let unitSummaryRow = `
                     <tr class="unit-summary-row">
                         <td style="color:#b5651d;">📊 ສະຫຼຸບລວມປະຈຳຂະແໜງ: ${unitStratCount} ແຜນຍຸດທະສາດ</td>
@@ -711,7 +719,10 @@
                 `;
 
                 htmlContent += `
-                    <div class="unit-section-title">🏫 ${unit}</div>
+                    <div class="unit-section-title">
+                        <span>🏫 ${unit}</span>
+                        ${addBtnUnitHeader}
+                    </div>
                     <table class="strategy-table">
                         <thead>
                             <tr>
@@ -774,6 +785,7 @@
             closeAllDropdowns();
             const contentDisplay = document.getElementById('content-display');
 
+            let isEdit = (editIndex !== null && editIndex !== undefined);
             let unitOptions = '';
             allUnits.forEach(unit => {
                 let selected = (unit === defaultUnit) ? 'selected' : '';
@@ -782,7 +794,6 @@
 
             let stratVal = '';
             let focusVal = '';
-            let isEdit = (editIndex !== null && editIndex !== undefined);
 
             if (isEdit) {
                 let stratsData = getMergedStrategiesData();
@@ -803,7 +814,7 @@
 
                     <div class="form-field">
                         <label style="font-size:13px;">🏢 ເລືອກຂະແໜງການ / ຫົວໜ່ວຍງານ:</label>
-                        <select id="new-strat-unit" ${isEdit ? 'disabled' : ''}>
+                        <select id="new-strat-unit" ${defaultUnit !== '' ? 'disabled' : ''}>
                             ${unitOptions}
                         </select>
                     </div>
@@ -819,8 +830,8 @@
                     </div>
 
                     <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:25px;">
-                        <button type="button" class="btn-cancel" onclick="showStrategy('${defaultUnit || 'ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ'}')">ຍົກເລີກ</button>
-                        <button type="button" class="save-btn" onclick="saveStrategyEntryData()">💾 ບັນທຶກແຜນຍຸດທະສາດ</button>
+                        <button type="button" class="btn-cancel" onclick="showStrategy('${defaultUnit || 'ALL'}')">ຍົກເລີກ</button>
+                        <button type="button" class="save-btn" onclick="saveStrategyEntryData('${defaultUnit}')">💾 ບັນທຶກແຜນຍຸດທະສາດ</button>
                     </div>
                 </div>
             `;
@@ -830,13 +841,13 @@
             showAddStrategyForm(unitName, index);
         }
 
-        function saveStrategyEntryData() {
+        function saveStrategyEntryData(presetUnit = '') {
             if (currentUser && currentUser.type !== 'admin') {
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດເພີ່ມ/ດັດແກ້ແຜນຍຸດທະສາດ!', false);
                 return;
             }
 
-            const selectedUnit = document.getElementById('new-strat-unit').value;
+            const selectedUnit = presetUnit !== '' ? presetUnit : document.getElementById('new-strat-unit').value;
             const stratTitle = document.getElementById('new-strat-title').value.trim();
             const stratFocus = document.getElementById('new-strat-focus').value.trim();
             const editIndex = document.getElementById('edit-strat-index').value;
@@ -881,7 +892,7 @@
 
             saveAllStrategiesDataStore(stratsData);
             showCustomAlert(`✅ ບັນທຶກການປ່ຽນແປງແຜນຍຸດທະສາດ ເຂົ້າໃນ "${selectedUnit}" ສຳເລັດແລ້ວ!`);
-            showStrategy(selectedUnit);
+            showStrategy('ALL');
         }
 
         function deleteStrategyEntry(unitName, index) {
@@ -896,7 +907,7 @@
                     stratsData[unitName].splice(index, 1);
                     saveAllStrategiesDataStore(stratsData);
                     showCustomAlert('🗑️ ລົບແຜນຍຸດທະສາດ ຮຽບຮ້ອຍແລ້ວ!');
-                    showStrategy(unitName);
+                    showStrategy('ALL');
                 }
             });
         }
