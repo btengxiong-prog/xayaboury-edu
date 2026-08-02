@@ -45,8 +45,10 @@
             cursor: pointer;
             user-select: none;
         }
-        .status-option input[type="radio"] {
+        .status-option input[type="checkbox"] {
             cursor: pointer;
+            width: 16px;
+            height: 16px;
         }
         
         .upload-proof-box {
@@ -562,7 +564,7 @@
         }
 
         /* ----------------------------------------------------
-           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ ພ້ອມ Radio 2 ສະຖານະ ແລະ ປຸ່ມອັບໂຫຼດໄຟລ໌
+           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ ພ້ອມ Checkbox Toggle (ກົດ 1 ບາດ ຕິກ, ກົດບາດ 2 ຍົກເລີກ)
         ---------------------------------------------------- */
         function showStrategy(unitName) {
             const contentDisplay = document.getElementById('content-display');
@@ -609,12 +611,12 @@
                             <td style="width: 30%; vertical-align: top !important;">${fItem.trim()}</td>
                             <td style="width: 25%; vertical-align: top !important;">
                                 <div class="status-container">
-                                    <label class="status-option">
-                                        <input type="radio" name="status_radio_${uniqueKey}" value="none" ${savedStatus === 'none' ? 'checked' : ''} onchange="updateExecutionStatus('${uniqueKey}', 'none', '${unitName}')">
+                                    <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'none', '${unitName}')">
+                                        <input type="checkbox" ${savedStatus === 'none' ? 'checked' : ''} style="pointer-events:none;">
                                         ❌ ບໍ່ໄດ້ຈັດຕັ້ງ
                                     </label>
-                                    <label class="status-option">
-                                        <input type="radio" name="status_radio_${uniqueKey}" value="done" ${savedStatus === 'done' ? 'checked' : ''} onchange="updateExecutionStatus('${uniqueKey}', 'done', '${unitName}')">
+                                    <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'done', '${unitName}')">
+                                        <input type="checkbox" ${savedStatus === 'done' ? 'checked' : ''} style="pointer-events:none;">
                                         ✅ ຈັດຕັ້ງ
                                     </label>
                                     ${proofHTML}
@@ -667,10 +669,20 @@
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນຈັດການສະຖານະການຈັດຕັ້ງປະຕິບັດ ແລະ ອັບໂຫຼດໄຟລ໌
+           ຟັງຊັນ Toggle Checkbox: ກົດ 1 ບາດ ຕິກ, ກົດບາດທີ 2 ຍົກເລີກການຕິກ
         ---------------------------------------------------- */
-        function updateExecutionStatus(key, status, unitName) {
-            localStorage.setItem(`status_${key}`, status);
+        function toggleStatusCheck(event, key, targetStatus, unitName) {
+            event.preventDefault();
+            let currentStatus = localStorage.getItem(`status_${key}`) || '';
+
+            if (currentStatus === targetStatus) {
+                // ກົດບາດທີ 2 -> ຍົກເລີກການ Check
+                localStorage.removeItem(`status_${key}`);
+            } else {
+                // ກົດບາດທີ 1 -> ຕິກ Check
+                localStorage.setItem(`status_${key}`, targetStatus);
+            }
+
             showStrategy(unitName);
         }
 
@@ -824,7 +836,6 @@
         }
 
         function editStrategyEntry(unitName, index) {
-            // ກົດດັດແກ້ທັນທີໂດຍບໍ່ມີການຖາມ Confirm
             showAddStrategyForm(unitName, index);
         }
 
@@ -869,16 +880,12 @@
             showStrategy(selectedUnit);
         }
 
-        /* ----------------------------------------------------
-           ຟັງຊັນ ລົບແຜນຍຸດທະສາດ ທັນທີໂດຍບໍ່ຖາມ Confirm (ສະເພາະ ADMIN)
-        ---------------------------------------------------- */
         function deleteStrategyEntry(unitName, index) {
             if (currentUser && currentUser.type !== 'admin') {
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດລົບແຜນຍຸດທະສາດ!', false);
                 return;
             }
 
-            // ລົບອອກທັນທີ ໂດຍບໍ່ໃຊ້ confirm()
             let stratsData = getMergedStrategiesData();
             if (stratsData[unitName] && stratsData[unitName][index]) {
                 stratsData[unitName].splice(index, 1);
@@ -1126,24 +1133,7 @@
                             mammoth.convertToHtml({ arrayBuffer: bytes.buffer })
                                 .then(function(result) {
                                     if (result.value && result.value.trim().length > 0) {
-                                        let summarizedText = createTextSummary(result.value);
-
-                                        previewBody.innerHTML = `
-                                            <div style="width:100%; font-family:'Phetsarath OT', 'Saysana', sans-serif;">
-                                                <div class="summary-badge">
-                                                    📌 ບົດສັງລວມເນື້ອໃນເອກະສານໂດຍຫຍໍ້ (ຄັດເລືອກຈາກໄຟລ໌)
-                                                </div>
-                                                <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:12px 18px; margin-bottom:15px; font-size:13px; color:#334155;">
-                                                    <p style="margin:3px 0;"><strong>📝 ເນື້ອໃນ/ຊື່ເອກະສານ:</strong> ${doc.content}</p>
-                                                    <p style="margin:3px 0;"><strong>🔢 ເລກທີເອກະສານ:</strong> ${doc.docNo} | <strong>📅 ວັນທີ:</strong> ${formatDateDDMMYYYY(doc.docDate)}</p>
-                                                    <p style="margin:3px 0;"><strong>🏢 ຂະແໜງການ:</strong> ${doc.ownerName || 'ADMIN'}</p>
-                                                </div>
-                                                <div class="summary-box-content">
-                                                    <h4 style="margin-top:0; color:#0f172a; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">📖 ປະໂຫຍກ ແລະ ຫົວຂໍ້ບູລິມະສິດສຳຄັນ:</h4>
-                                                    ${summarizedText}
-                                                </div>
-                                            </div>
-                                        `;
+                                        previewBody.innerHTML = `<div style="line-height:1.8; color:#0f172a;">${result.value}</div>`;
                                     } else {
                                         showSummaryCardDoc(previewBody, doc);
                                     }
@@ -1191,7 +1181,6 @@
         }
 
         function deleteDocEntry(id, type) {
-            // ລົບເອກະສານໃນຕາຕະລາງເອກະສານອ້າງອີງ
             deleteDocFromIDB(type, id, function(success) {
                 showCustomAlert('ລົບເອກະສານเรียບຮ້ອຍແລ້ວ!');
                 showDocListTable(type);
