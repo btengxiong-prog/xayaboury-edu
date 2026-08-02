@@ -412,13 +412,25 @@
                 <span>ຍຸດທະສາດ/ວຽກຈຸດສຸມ</span>
             </div>
 
-            <!-- 5. ຈັດຕັ້ງປະຕິບັດ (ອັບໂຫຼດບົດສະຫຼຸບ, ລາຍງານ word, excel, pdf, ຮູບ) -->
+            <!-- 5. ນຳເຂົ້າປະຕິບັດ (ອັບໂຫຼດບົດສະຫຼຸບ, ລາຍງານ word, excel, pdf, ຮູບ) -->
             <div class="tool-item admin-only-btn" onclick="openImportModal('general')">
                 <span class="icon">📋</span>
-                <span>ຈັດຕັ້ງປະຕິບັດ</span>
+                <span>ນຳເຂົ້າປະຕິບັດ</span>
+            </div>
+
+            <!-- 6. ປະຕິບັດ -->
+            <div class="tool-item" onclick="showExecutionTable()">
+                <span class="icon">⚙️</span>
+                <span>ປະຕິບັດ</span>
+            </div>
+
+            <!-- 7. ທຽບແຜນ/ປະຕິບັດ -->
+            <div class="tool-item" onclick="showCompareTable()">
+                <span class="icon">⚖️</span>
+                <span>ທຽບແຜນ/ປະຕິບັດ</span>
             </div>
             
-            <!-- 6. ລາຍງານ ▾ -->
+            <!-- 8. ລາຍງານ ▾ -->
             <div class="dropdown-container">
                 <div class="tool-item" onclick="toggleDropdown(event, 'report-dropdown-menu')">
                     <span class="icon">🖨️</span>
@@ -1067,7 +1079,7 @@
             currentImportType = type;
             tempFileData = null;
             
-            document.getElementById('doc-modal-title').innerText = (type === 'general') ? '📁 ຈັດຕັ້ງປະຕິບັດ (ອັບໂຫຼດບົດສະຫຼຸບ/ລາຍງານ)' : '📊 ນຳເຂົ້າແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ';
+            document.getElementById('doc-modal-title').innerText = (type === 'general') ? '📁 ນຳເຂົ້າປະຕິບັດ (ອັບໂຫຼດບົດສະຫຼຸບ/ລາຍງານ)' : '📊 ນຳເຂົ້າແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ';
             document.getElementById('modal-doc-content').value = '';
             document.getElementById('modal-doc-no').value = '';
             document.getElementById('modal-doc-date').value = new Date().toISOString().split('T')[0];
@@ -1162,6 +1174,51 @@
             showDocListTable('strategy');
         }
 
+        function showExecutionTable() {
+            closeAllDropdowns();
+            document.getElementById('content-display').innerHTML = `
+                <div class="report-container" style="max-width: 100%;">
+                    <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">⚙️ ຂໍ້ມູນການປະຕິບັດຕົວຈິງ</h2>
+                    <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້າຕາຕະລາງນີ້ສະແດງຜົນ ແລະ ບົດລາຍງານການຈັດຕັ້ງປະຕິບັດຕົວຈິງ.</p>
+                    <table class="strategy-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%; text-align: center;">ລຳດັບ</th>
+                                <th style="width: 40%;">ເນື້ອໃນການປະຕິບັດ</th>
+                                <th style="width: 25%; text-align: center;">ເອກະສານອ້າງອີງ</th>
+                                <th style="width: 25%; text-align: center;">ວັນທີບັນທຶກ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນການປະຕິບັດຕົວຈິງ</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function showCompareTable() {
+            closeAllDropdowns();
+            document.getElementById('content-display').innerHTML = `
+                <div class="report-container" style="max-width: 100%;">
+                    <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">⚖️ ຕາຕະລາງທຽບແຜນ / ປະຕິບັດ</h2>
+                    <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້າຕາຕະລາງນີ້ໃຊ້ສຳລັບປຽບທຽບລະຫວ່າງແຜນການທີ່ວາງໄວ້ ແລະ ຜົນການຈັດຕັ້ງປະຕິບັດຕົວຈິງ.</p>
+                    <table class="strategy-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%; text-align: center;">ລຳດັບ</th>
+                                <th style="width: 45%;">ເນື້ອໃນແຜນການ</th>
+                                <th style="width: 45%;">ຜົນການປະຕິບັດຕົວຈິງ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນການປຽບທຽບແຜນ ແລະ ປະຕິບັດ</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
         function showDocListTable(type) {
             closeAllDropdowns();
             const titleName = (type === 'general') ? '📁 ບົດສັງລວມຫຍໍ້ວຽກທົ່ວໄປ (ຈາກການນຳເຂົ້າແຜນ)' : '📈 ບົດສັງລວມຫຍໍ້ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ຈາກການນຳເຂົ້າແຜນ)';
@@ -1200,7 +1257,7 @@
                         `;
                     });
                 } else {
-                    rowsHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານທີ່ນຳເຂົ້າໃນລະບົບ (ກະລຸນາກົດເມນູ "ຈັດຕັ້ງປະຕິບັດ" ຫຼື "ນຳເຂົ້າແຜນ" ເພື່ອເພີ່ມເອກະສານ)</td></tr>`;
+                    rowsHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານທີ່ນຳເຂົ້າໃນລະບົບ (ກະລຸນາກົດເມນູ "ນຳເຂົ້າປະຕິບັດ" ຫຼື "ນຳເຂົ້າແຜນ" ເພື່ອເພີ່ມເອກະສານ)</td></tr>`;
                 }
 
                 contentDisplay.innerHTML = `
@@ -1209,7 +1266,7 @@
                             <h2 style="color: #b5651d; margin: 0;">📋 ${titleName} ${currentUser && currentUser.type !== 'admin' ? `<span style="font-size:14px; color:#475569;">(${currentUser.name})</span>` : ''}</h2>
                             <div style="display: flex; gap: 10px;">
                                 <button type="button" class="save-btn" style="background:#10b981;" onclick="showCustomAlert('💾 ບັນທຶກການປ່ຽນແປງຂໍ້ມູນທັງໝົດແລ້ວ!')">💾 ບັນທຶກການປ່ຽນແປງ</button>
-                                <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ຈັດຕັ້ງປະຕິບັດ (ເພີ່ມເອກະສານ)</button>
+                                <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າປະຕິບັດ (ເພີ່ມເອກະສານ)</button>
                             </div>
                         </div>
                         <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້າຕາຕະລາງນີ້ເຮັດໜ້າທີ່ສັງລວມຫຍໍ້ ແລະ ຈັດເກັບບົດລາຍງານ, ບົດສະຫຼຸບ (Word, Excel, PDF, ຮູບ) ເພື່ອງ່າຍຕໍ່ການກວດສອບຢ່າງກະທັດຮັດ (ບໍ່ສາມາດລົບຂໍ້ມູນໄດ້).</p>
