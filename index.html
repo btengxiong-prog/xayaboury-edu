@@ -1272,39 +1272,44 @@
                     getAllDocsFromIDB('execution', function(executionDocs) {
                         const contentDisplay = document.getElementById('content-display');
 
-                        let allPlans = [...(generalPlans || []), ...(strategyPlans || [])];
-                        let allExecs = executionDocs || [];
+                        let generalList = generalPlans || [];
+                        let strategyList = strategyPlans || [];
+                        let execList = executionDocs || [];
 
                         let compareRows = '';
-                        if (allPlans.length > 0 && allExecs.length > 0) {
-                            let maxLen = Math.max(allPlans.length, allExecs.length);
+                        let maxLen = Math.max(generalList.length, strategyList.length, execList.length);
+
+                        if (maxLen > 0) {
                             for (let i = 0; i < maxLen; i++) {
-                                let plan = allPlans[i] ? allPlans[i].content : '-';
-                                let exec = allExecs[i] ? allExecs[i].content : '-';
+                                let genPlan = generalList[i] ? generalList[i].content : '-';
+                                let stratPlan = strategyList[i] ? strategyList[i].content : '-';
+                                let execPlan = execList[i] ? execList[i].content : '-';
 
                                 compareRows += `
                                     <tr>
                                         <td style="text-align: center; font-weight: bold;">${i + 1}</td>
-                                        <td>${plan}</td>
-                                        <td>${exec}</td>
+                                        <td>${genPlan}</td>
+                                        <td>${stratPlan}</td>
+                                        <td>${execPlan}</td>
                                     </tr>
                                 `;
                             }
                         } else {
-                            compareRows = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">⚠️ ຍັງມີຂໍ້ມູນບໍ່ຄົບຖ້ວນສຳລັບການທຽບແຜນ ແລະ ປະຕິບັດ (ຕ້ອງມີທັງຂໍ້ມູນແຜນ ແລະ ຂໍ້ມູນການປະຕິບັດຈຶ່ງຈະສະແດງຜົນທຽບ)</td></tr>`;
+                            compareRows = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">⚠️ ຍັງບໍ່ມີຂໍ້ມູນໃນລະບົບສຳລັບການທຽບແຜນ ແລະ ປະຕິບັດ</td></tr>`;
                         }
 
                         contentDisplay.innerHTML = `
                             <div class="report-container" style="max-width: 100%;">
-                                <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">⚖️ ຕາຕະລາງທຽບແຜນ / ປະຕິບັດ</h2>
-                                <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ວຽກໃດທີ່ມີທັງ "ແຜນ" ແລະ "ປະຕິບັດ" ແລ້ວ ລະບົບຈະນຳມາສະແດງທຽບກັນທີ່ນີ້.</p>
+                                <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">⚖️ ຕາຕະລາງທຽບແຜນ / ປະຕິບັດ (ແຍກຕາມ ວຽກທົ່ວໄປ ແລະ ຍຸດທະສາດ/ວຽກຈຸດສຸມ)</h2>
+                                <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ການສົມທຽບລະຫວ່າງແຜນການ (ແຍກເປັນ ວຽກທົ່ວໄປ ແລະ ຍຸດທະສາດ/ວຽກຈຸດສຸມ) ກັບ ຜົນການປະຕິບັດຕົວຈິງ.</p>
                                 
                                 <table class="strategy-table" style="width: 100%;">
                                     <thead>
                                         <tr>
-                                            <th style="width: 10%; text-align: center;">ລຳດັບ</th>
-                                            <th style="width: 45%;">ແຜນການ (ວຽກທົ່ວໄປ / ຍຸດທະສາດ)</th>
-                                            <th style="width: 45%;">ຜົນການປະຕິບັດຕົວຈິງ</th>
+                                            <th style="width: 8%; text-align: center;">ລຳດັບ</th>
+                                            <th style="width: 31%;">ວຽກທົ່ວໄປ (ແຜນ)</th>
+                                            <th style="width: 31%;">ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ແຜນ)</th>
+                                            <th style="width: 30%;">ຜົນການປະຕິບັດຕົວຈິງ</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1318,7 +1323,7 @@
             });
         }
 
-        /* 3) ເນື້ອໃນສະຫຼຸບ: ລະບົບຂຽນບົດສະຫຼຸບອັດຕະໂນມັດ ໂດຍການສົມທຽບລະຫວ່າງ ແຜນ ແລະ ປະຕິບັດຕົວຈິງ */
+        /* 3) ເນື້ອໃນສະຫຼຸບ: ລະບົບຂຽນບົດສະຫຼຸບອັດຕະໂນມັດ ໂດຍຄຳນຶງເຖິງຮ່າງ ວຽກທົ່ວໄປ ແລະ ຍຸດທະສາດ/ວຽກຈຸດສຸມ */
         function showSummaryReportTable() {
             closeAllDropdowns();
             getAllDocsFromIDB('general', function(generalPlans) {
@@ -1326,28 +1331,31 @@
                     getAllDocsFromIDB('execution', function(executionDocs) {
                         const contentDisplay = document.getElementById('content-display');
 
-                        let totalPlans = (generalPlans ? generalPlans.length : 0) + (strategyPlans ? strategyPlans.length : 0);
-                        let totalExecs = executionDocs ? executionDocs.length : 0;
-                        
+                        let genCount = generalPlans ? generalPlans.length : 0;
+                        let stratCount = strategyPlans ? strategyPlans.length : 0;
+                        let execCount = executionDocs ? executionDocs.length : 0;
+                        let totalPlans = genCount + stratCount;
+
                         let summaryText = "";
-                        if (totalPlans > 0 || totalExecs > 0) {
+                        if (totalPlans > 0 || execCount > 0) {
                             summaryText = `
-                                ຈາກການຕິດຕາມ ແລະ ປະເມີນຜົນການຈັດຕັ້ງປະຕິບັດວຽກງານຂອງພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ:
+                                ບົດສະຫຼຸບສັງລວມການຈັດຕັ້ງປະຕິບັດວຽກງານ ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ:
                                 <br><br>
                                 <ul>
-                                    <li><strong>ສະຫຼຸບ ດ້ານແຜນການ:</strong> ມີແຜນງານ/ວຽກງານທີ່ໄດ້ກຳນົດ ແລະ ນຳເຂົ້າໃນລະບົບທັງໝົດ <strong>${totalPlans}</strong> ຫົວຂໍ້/ເອກະສານ.</li>
-                                    <li><strong>ສະຫຼຸບ ດ້ານການປະຕິບັດຕົວຈິງ:</strong> ພາກສ່ວນຕ່າງໆໄດ້ຈັດຕັ້ງປະຕິບັດ ແລະ ອັບໂຫຼດຜົນງານ (Word, Excel, PDF, ຮູບພາບ) ເຂົ້າລະບົບແລ້ວທັງໝົດ <strong>${totalExecs}</strong> ບົດລາຍງານ.</li>
-                                    <li><strong>ການຕີລາຄາລວມ:</strong> ການຈັດຕັ້ງປະຕິບັດວຽກງານແມ່ນມີຄວາມສອດຄ່ອງ ແລະ ເປັນລະບົບ, ພາກສ່ວນກ່ຽວຂ້ອງສາມາດດຳເນີນຕາມແຜນການທີ່ວາງໄວ້ໄດ້ຢ່າງເປັນຮູບປະທຳ.</li>
+                                    <li><strong>1. ດ້ານແຜນການ "ວຽກທົ່ວໄປ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນວຽກທົ່ວໄປເຂົ້າໃນລະບົບທັງໝົດ <strong>${genCount}</strong> ຫົວຂໍ້.</li>
+                                    <li><strong>2. ດ້ານແຜນການ "ຍຸດທະສາດ/ວຽກຈຸດສຸມ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນຍຸດທະສາດ/ວຽກຈຸດສຸມເຂົ້າໃນລະບົບທັງໝົດ <strong>${stratCount}</strong> ຫົວຂໍ້.</li>
+                                    <li><strong>3. ດ້ານການຈັດຕັ້ງປະຕິບັດຕົວຈິງ:</strong> ໄດ້ມີການອັບໂຫຼດບົດລາຍງານ, ບົດສະຫຼຸບ ແລະ ໄຟລ໌ຜົນງານ (Word, Excel, PDF, ຮູບພາບ) ເຂົ້າສູ່ລະບົບແລ້ວທັງໝົດ <strong>${execCount}</strong> ສະບັບ.</li>
+                                    <li><strong>4. ການສົມທຽບ ແລະ ຕີລາຄາ:</strong> ລະບົບໄດ້ວິເຄາະສົມທຽບລະຫວ່າງແຜນງານທັງສອງປະເພດ (ວຽກທົ່ວໄປ ແລະ ຍຸດທະສາດ/ວຽກຈຸດສຸມ) ກັບຜົນການປະຕິບັດຕົວຈິງ ເຫັນວ່າການຈັດຕັ້ງປະຕິບັດມີຄວາມສອດຄ່ອງ, ສາມາດຕິດຕາມຄວາມຄືບໜ້າໄດ້ຢ່າງເປັນລະບົບ ແລະ ມີປະສິດທິພາບ.</li>
                                 </ul>
                             `;
                         } else {
-                            summaryText = `⚠️ ຍັງບໍ່ມີຂໍ້ມູນພຽງພໍໃນລະບົບສຳລັບການຂຽນບົດສະຫຼຸບອັດຕະໂນມັດ (ກະລຸນານຳເຂົ້າແຜນ ແລະ ຜົນການປະຕິບັດກ່ອນ).`;
+                            summaryText = `⚠️ ຍັງບໍ່ມີຂໍ້ມູນພຽງພໍໃນລະບົບສຳລັບການຂຽນບົດສະຫຼຸບອັດຕະໂນມັດ (ກະລຸນານຳເຂົ້າແຜນວຽກທົ່ວໄປ, ຍຸດທະສາດ/ວຽກຈຸດສຸມ ແລະ ຜົນການປະຕິບັດກ່ອນ).`;
                         }
 
                         contentDisplay.innerHTML = `
                             <div class="report-container" style="max-width: 100%;">
-                                <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📑 ເນື້ອໃນສະຫຼຸບ (ສົມທຽບແຜນ ແລະ ປະຕິບັດຕົວຈິງ)</h2>
-                                <p style="font-size:13px; color:#475569; margin-bottom:20px;">💡 ບົດສະຫຼຸບສັງລວມທີ່ລະບົບວິເຄາະ ແລະ ຂຽນໃຫ້ອັດຕະໂນມັດ ຈາກຂໍ້ມູນແຜນ ແລະ ການປະຕິບັດຕົວຈິງ:</p>
+                                <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📑 ເນື້ອໃນສະຫຼຸບ (ສົມທຽບແຜນ ວຽກທົ່ວໄປ, ຍຸດທະສາດ/ວຽກຈຸດສຸມ ກັບ ປະຕິບັດຕົວຈິງ)</h2>
+                                <p style="font-size:13px; color:#475569; margin-bottom:20px;">💡 ບົດສະຫຼຸບສັງລວມທີ່ລະບົບວິເຄາະ ແລະ ຂຽນໃຫ້ອັດຕະໂນມັດ ໂດຍແຍກຕາມໂຄງຮ່າງແຜນແຕ່ລະປະເພດ:</p>
                                 
                                 <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 25px; line-height: 1.8; font-size: 14px; color: #0f172a;">
                                     ${summaryText}
