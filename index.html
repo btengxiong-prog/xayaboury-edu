@@ -45,7 +45,6 @@
             border-top: 2px solid #b5651d;
         }
         
-        /* Input ສະໄຕລ໌ສຳລັບແກ້ໄຂໃນຕາຕະລາງ */
         .table-inline-input {
             width: 100%;
             padding: 6px 8px;
@@ -342,13 +341,14 @@
                 <span>ວຽກງານຈຸດສຸມ</span>
             </div>
 
-            <!-- ປຸ່ມສະເພາະ ADMIN ເທົ່ານັ້ນ -->
+            <!-- ປຸ່ມ ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ສະເພາະ ADMIN) -->
             <div class="tool-item admin-only-btn" onclick="showAddStrategyForm()">
                 <span class="icon">📝</span>
-                <span>ປ້ອນແຜນຍຸດທະສາດ</span>
+                <span>ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</span>
             </div>
 
-            <div class="tool-item admin-only-btn" onclick="showAddFocusWorkForm()">
+            <!-- ປຸ່ມ ປ້ອນວຽກງານຈຸດສຸມ (ປະໄວ້ຫວ່າງໆ ສຳລັບໃຊ້ງານອື່ນ) -->
+            <div class="tool-item admin-only-btn" onclick="showPlaceholderFocusWork()">
                 <span class="icon">📋</span>
                 <span>ປ້ອນວຽກງານຈຸດສຸມ</span>
             </div>
@@ -580,7 +580,6 @@
                 document.getElementById('main-screen').style.display = 'flex';
                 document.getElementById('welcome-user').innerText = "ຍິນດີຕ້ອນຮັບ: " + currentUser.name;
 
-                // ຄວບຄຸມການສະແດງປຸ່ມສຳລັບ ADMIN ເທົ່ານັ້ນ
                 const adminBtns = document.querySelectorAll('.admin-only-btn');
                 adminBtns.forEach(btn => {
                     if (currentUser.type === 'admin') {
@@ -640,11 +639,9 @@
                 tableRows = `<tr><td colspan="3" style="text-align: center; color: #666;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດສຳລັບໜ່ວຍງານນີ້</td></tr>`;
             }
 
-            // ສະແດງປຸ່ມປ້ອນແຜນ/ປ້ອນວຽກ ສະເພາະ ADMIN
             let adminActionBtns = (currentUser && currentUser.type === 'admin') ? `
                 <div style="display:flex; gap:8px;">
-                    <button type="button" class="save-btn" style="background:#2563eb;" onclick="showAddStrategyForm('${unitName}')">📝 ປ້ອນແຜນຍຸດທະສາດໃໝ່</button>
-                    <button type="button" class="save-btn" style="background:#b5651d;" onclick="showAddFocusWorkForm('${unitName}')">📋 ປ້ອນວຽກງານຈຸດສຸມ</button>
+                    <button type="button" class="save-btn" style="background:#2563eb;" onclick="showAddStrategyForm('${unitName}')">📝 ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</button>
                 </div>
             ` : '';
 
@@ -671,7 +668,7 @@
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນ ປ້ອນແຜນຍຸດທະສາດໃໝ່ (ສະເພາະ ADMIN)
+           ຟັງຊັນ ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ໂຮມກັນແບບຮູບທີ 2, ສະເພາະ ADMIN)
         ---------------------------------------------------- */
         function showAddStrategyForm(defaultUnit = '') {
             if (currentUser && currentUser.type !== 'admin') {
@@ -690,8 +687,8 @@
 
             contentDisplay.innerHTML = `
                 <div class="report-container" style="max-width:700px; margin:0 auto; text-align:left;">
-                    <h2 style="color:#b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📝 ປ້ອນແຜນຍຸດທະສາດໃໝ່ (ADMIN)</h2>
-                    <p style="font-size:13px; color:#64748b; margin-bottom:20px;">ເລືອກຂະແໜງການ ແລະ ພິມ ຫຼື Copy ເນື້ອໃນແຜນມາວາງ (Paste) ໃສ່ບ່ອນນີ້:</p>
+                    <h2 style="color:#b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📝 ປ້ອນແຜນຍຸດທະສາດໃໝ່ / ວຽກງານຈຸດສຸມ</h2>
+                    <p style="font-size:13px; color:#64748b; margin-bottom:20px;">ກະລຸນາເລືອກຂະແໜງການ ແລະ ພິມ ຫຼື Copy ເນື້ອໃນແຜນມາວາງ (Paste) ໃສ່ບ່ອນນີ້:</p>
                     
                     <div class="form-field">
                         <label style="font-size:13px;">🏢 ເລືອກຂະແໜງການ / ຫົວໜ່ວຍງານ:</label>
@@ -702,7 +699,12 @@
 
                     <div class="form-field">
                         <label style="font-size:13px;">🎯 ເນື້ອໃນແຜນຍຸດທະສາດ (ພິມ ຫຼື Copy ມາວາງໃສ່):</label>
-                        <textarea id="new-strat-title" rows="6" placeholder="ຕົວຢ່າງ: ຍຸດທະສາດ 05: ສ້າງຄວາມເຂັ້ມແຂງໃນການຈັດຕັ້ງປະຕິບັດ..."></textarea>
+                        <textarea id="new-strat-title" rows="4" placeholder="ຕົວຢ່າງ: ຍຸດທະສາດ 05: ສ້າງຄວາມເຂັ້ມແຂງໃນການຈັດຕັ້ງປະຕິບັດ..."></textarea>
+                    </div>
+
+                    <div class="form-field">
+                        <label style="font-size:13px;">📋 ວຽກງານຈຸດສຸມ (ພິມ ຫຼື Copy ມາວາງໃສ່):</label>
+                        <textarea id="new-strat-focus" rows="5" placeholder="ຕົວຢ່າງ: 1. ຝຶກອົບຮົມວິຊາຊີບ...\n2. ຕິດຕາມ ແລະ ປະເມີນຜົນ..."></textarea>
                     </div>
 
                     <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:25px;">
@@ -721,11 +723,14 @@
 
             const selectedUnit = document.getElementById('new-strat-unit').value;
             const stratTitle = document.getElementById('new-strat-title').value.trim();
+            const stratFocus = document.getElementById('new-strat-focus').value.trim();
 
             if (!stratTitle) {
                 alert('ກະລຸນາປ້ອນເນື້ອໃນແຜນຍຸດທະສາດ!');
                 return;
             }
+
+            let formattedFocus = stratFocus.replace(/\n/g, '<br>');
 
             if (!customStrategiesData[selectedUnit]) {
                 customStrategiesData[selectedUnit] = [];
@@ -733,119 +738,20 @@
 
             customStrategiesData[selectedUnit].push({
                 strat: stratTitle,
-                focus: '-',
+                focus: formattedFocus || '-',
                 isCustom: true
             });
 
             localStorage.setItem("custom_strategies_data", JSON.stringify(customStrategiesData));
-            showCustomAlert(`✅ ບັນທຶກແຜນຍຸດທະສາດໃໝ່ເຂົ້າໃນ "${selectedUnit}" ສຳເລັດແລ້ວ!`);
+            showCustomAlert(`✅ ບັນທຶກແຜນຍຸດທະສາດໃໝ່ ແລະ ວຽກຈຸດສຸມ ເຂົ້າໃນ "${selectedUnit}" ສຳເລັດແລ້ວ!`);
             showStrategy(selectedUnit);
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນ ປ້ອນວຽກງານຈຸດສຸມໃໝ່ (ສະເພາະ ADMIN)
+           ຟັງຊັນປຸ່ມ "ປ້ອນວຽກງານຈຸດສຸມ" (ເກັບໄວ້ສຳລັບໃຊ້ງານອື່ນໃນອະນາຄົດ)
         ---------------------------------------------------- */
-        function showAddFocusWorkForm(defaultUnit = '') {
-            if (currentUser && currentUser.type !== 'admin') {
-                showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດເພີ່ມ/ດັດແກ້ ວຽກງານຈຸດສຸມ!', false);
-                return;
-            }
-
-            closeAllDropdowns();
-            const contentDisplay = document.getElementById('content-display');
-
-            let unitOptions = '';
-            allUnits.forEach(unit => {
-                let selected = (unit === defaultUnit) ? 'selected' : '';
-                unitOptions += `<option value="${unit}" ${selected}>${unit}</option>`;
-            });
-
-            contentDisplay.innerHTML = `
-                <div class="report-container" style="max-width:700px; margin:0 auto; text-align:left;">
-                    <h2 style="color:#b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📋 ປ້ອນວຽກງານຈຸດສຸມໃໝ່ (ADMIN)</h2>
-                    <p style="font-size:13px; color:#64748b; margin-bottom:20px;">ເລືອກຂະແໜງການ, ເລືອກແຜນຍຸດທະສາດ ແລະ ພິມ ຫຼື Copy ວຽກງານຈຸດສຸມມາວາງ (Paste) ໃສ່ບ່ອນນີ້:</p>
-                    
-                    <div class="form-field">
-                        <label style="font-size:13px;">🏢 1. ເລືອກຂະແໜງການ / ຫົວໜ່ວຍງານ:</label>
-                        <select id="focus-unit-select" onchange="updateStrategyDropdownOptions(this.value)">
-                            ${unitOptions}
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label style="font-size:13px;">📊 2. ເລືອກແຜນຍຸດທະສາດ:</label>
-                        <select id="focus-strat-select">
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label style="font-size:13px;">🎯 3. ເນື້ອໃນວຽກງານຈຸດສຸມ (ພິມ ຫຼື Copy ມາວາງໃສ່):</label>
-                        <textarea id="focus-work-content" rows="6" placeholder="ຕົວຢ່າງ: 1. ຝຶກອົບຮົມວິຊາຊີບ...\n2. ຕິດຕາມ ແລະ ປະເມີນຜົນ..."></textarea>
-                    </div>
-
-                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:25px;">
-                        <button type="button" class="btn-cancel" onclick="showAllStrategies()">ຍົກເລີກ</button>
-                        <button type="button" class="save-btn" onclick="saveNewFocusWorkEntry()">💾 ບັນທຶກວຽກງານຈຸດສຸມ</button>
-                    </div>
-                </div>
-            `;
-
-            const initialUnit = document.getElementById('focus-unit-select').value;
-            updateStrategyDropdownOptions(initialUnit);
-        }
-
-        function updateStrategyDropdownOptions(unitName) {
-            const stratSelect = document.getElementById('focus-strat-select');
-            let stratsData = getMergedStrategiesData();
-            let strats = stratsData[unitName] || [];
-
-            stratSelect.innerHTML = '';
-            if (strats.length > 0) {
-                strats.forEach((item, idx) => {
-                    let shortStrat = item.strat.length > 80 ? item.strat.substring(0, 80) + '...' : item.strat;
-                    stratSelect.innerHTML += `<option value="${idx}">ຂໍ້ ${idx + 1}: ${shortStrat}</option>`;
-                });
-            } else {
-                stratSelect.innerHTML = `<option value="">(ຍັງບໍ່ມີແຜນຍຸດທະສາດໃນຂະແໜງນີ້)</option>`;
-            }
-        }
-
-        function saveNewFocusWorkEntry() {
-            if (currentUser && currentUser.type !== 'admin') {
-                showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດເພີ່ມ/ດັດແກ້ ວຽກງານຈຸດສຸມ!', false);
-                return;
-            }
-
-            const selectedUnit = document.getElementById('focus-unit-select').value;
-            const stratIndex = document.getElementById('focus-strat-select').value;
-            const focusContent = document.getElementById('focus-work-content').value.trim();
-
-            if (stratIndex === "" || stratIndex === null) {
-                alert('ກະລຸນາເລືອກແຜນຍຸດທະສາດກ່ອນ!');
-                return;
-            }
-            if (!focusContent) {
-                alert('ກະລຸນາປ້ອນເນື້ອໃນວຽກງານຈຸດສຸມ!');
-                return;
-            }
-
-            let formattedFocus = focusContent.replace(/\n/g, '<br>');
-            let stratsData = getMergedStrategiesData();
-            
-            if (stratsData[selectedUnit] && stratsData[selectedUnit][stratIndex]) {
-                let currentFocus = stratsData[selectedUnit][stratIndex].focus;
-                if (currentFocus === '-' || !currentFocus) {
-                    stratsData[selectedUnit][stratIndex].focus = formattedFocus;
-                } else {
-                    stratsData[selectedUnit][stratIndex].focus += '<br>' + formattedFocus;
-                }
-
-                customStrategiesData = stratsData;
-                localStorage.setItem("custom_strategies_data", JSON.stringify(customStrategiesData));
-
-                showCustomAlert(`✅ ບັນທຶກວຽກງານຈຸດສຸມເຂົ້າໃນ "${selectedUnit}" ສຳເລັດແລ້ວ!`);
-                showStrategy(selectedUnit);
-            }
+        function showPlaceholderFocusWork() {
+            showCustomAlert('ℹ️ ປຸ່ມນີ້ເກັບໄວ້ສຳລັບການຂະຫຍາຍຟັງຊັນອື່ນໆ ໃນອະນາຄົດ');
         }
 
         function deleteCustomStrategy(unitName, index) {
