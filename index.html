@@ -568,7 +568,7 @@
         }
 
         /* ----------------------------------------------------
-           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ
+           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ ພ້ອມ Checkbox Toggle
         ---------------------------------------------------- */
         function showStrategy(unitName) {
             const contentDisplay = document.getElementById('content-display');
@@ -734,7 +734,7 @@
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນ ບັນທຶກແຜນຍຸດທະສາດ (ເພີ່ມລະບົບກວດສອບ ແລະ ປ້ອງກັນຂໍ້ມູນຊ້ຳກັນ)
+           ຟັງຊັນບັນທຶກແຜນ - ເພີ່ມເງື່ອນໄຂ ກວດສອບຂໍ້ມູນຊ້ຳກັນ
         ---------------------------------------------------- */
         function saveStrategyEntryData() {
             if (currentUser && currentUser.type !== 'admin') {
@@ -752,30 +752,28 @@
                 return;
             }
 
-            let formattedFocus = stratFocus.replace(/\n/g, '<br>');
             let stratsData = getMergedStrategiesData();
 
             if (!stratsData[selectedUnit]) {
                 stratsData[selectedUnit] = [];
             }
 
-            let isEdit = (editIndex !== '' && editIndex !== null && editIndex !== undefined);
+            let formattedFocus = stratFocus.replace(/\n/g, '<br>');
 
-            // 🔍 ລະບົບກວດສອບຂໍ້ມູນຊ້ຳກັນ (Prevent Duplicate Plan)
+            // 🔍 ເຊັກການປ້ອນຂໍ້ມູນຊ້ຳກັນ (Duplicate Check)
             let isDuplicate = stratsData[selectedUnit].some((item, idx) => {
-                // ຖ້າເປັນການດັດແກ້, ໃຫ້ຂ້າມການກວດສອບຕົວມັນເອງ
-                if (isEdit && idx === parseInt(editIndex)) return false;
-                
-                // ເປรียບທຽບເນື້ອໃນແຜນຍຸດທະສາດ (ຕັດຍ່ານຫວ່າງອອກ)
+                if (editIndex !== '' && editIndex !== null && editIndex !== undefined && parseInt(editIndex) === idx) {
+                    return false; // ຂ້າມຂໍ້ທີ່ກຳລັງດັດແກ້ຢູ່
+                }
                 return item.strat.trim().toLowerCase() === stratTitle.toLowerCase();
             });
 
             if (isDuplicate) {
-                showCustomAlert('⚠️ ແຜນຍຸດທະສາດນີ້ມີຢູ່ໃນຂະແໜງການດັ່ງກ່າວແລ້ວ! ບໍ່ສາມາດປ້ອນຊ້ຳກັນໄດ້.', false);
+                showCustomAlert('⚠️ ແຜນຍຸດທະສາດນີ້ມີຢູ່ໃນລະບົບແລ້ວ! ບໍ່ສາມາດປ້ອນຊ້ຳກັນໄດ້.', false);
                 return;
             }
 
-            if (isEdit) {
+            if (editIndex !== '' && editIndex !== null && editIndex !== undefined) {
                 let idx = parseInt(editIndex);
                 if (stratsData[selectedUnit] && stratsData[selectedUnit][idx]) {
                     stratsData[selectedUnit][idx].strat = stratTitle;
@@ -794,7 +792,7 @@
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນ ລົບແຜນຍຸດທະສາດ ພ້ອມ Custom Confirm Dialog
+           ຟັງຊັນ ລົບແຜນຍຸດທະສາດ ພ້ອມ Custom Confirm Dialog ("ຕົກລົງ" ແລະ "ຍົກເລີກ")
         ---------------------------------------------------- */
         function deleteStrategyEntry(unitName, index) {
             if (currentUser && currentUser.type !== 'admin') {
@@ -814,7 +812,7 @@
         }
 
         /* ----------------------------------------------------
-           ຟັງຊັນ Toggle Checkbox
+           ຟັງຊັນ Toggle Checkbox: ກົດ 1 ບາດ ຕິກ, ກົດບາດທີ 2 ຍົກເລີກ
         ---------------------------------------------------- */
         function toggleStatusCheck(event, key, targetStatus, unitName) {
             event.preventDefault();
