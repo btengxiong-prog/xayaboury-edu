@@ -596,7 +596,7 @@
         }
 
         /* ----------------------------------------------------
-           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ (ພ້ອມປຸ່ມປ້ອນແຜນປະຈຳຂະແໜງ)
+           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ (ອັບເດດຂໍ້ຄວາມສະຫຼຸບຕາມຄຳຮ້ອງຂໍ)
         ---------------------------------------------------- */
         function showStrategy(unitName) {
             const contentDisplay = document.getElementById('content-display');
@@ -701,16 +701,15 @@
 
                 let actionHeader = isAdmin ? `<th style="width: 15%; text-align: center;">ຈັດການ</th>` : '';
 
-                // 📌 ປຸ່ມ "ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ" ຢູ່ແຖບຫົວຂໍ້ຂະແໜງການ (ສະເພາະ ADMIN)
                 let addBtnUnitHeader = isAdmin ? `
                     <button type="button" class="save-btn" style="background:#2563eb; font-size:12px; padding:5px 12px;" onclick="showAddStrategyForm('${unit}')">📝 ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</button>
                 ` : '';
 
-                // 📌 ແຖບສະຫຼຸບລວມແຍກປະຈຳຂະແໜງການ
+                // 📌 ແຖບສະຫຼຸບລວມແຍກປະຈຳຂະແໜງການ (ປ່ຽນຂໍ້ຄວາມສະຫຼຸບ)
                 let unitSummaryRow = `
                     <tr class="unit-summary-row">
                         <td style="color:#b5651d;">📊 ສະຫຼຸບລວມປະຈຳຂະແໜງ: ${unitStratCount} ແຜນຍຸດທະສາດ</td>
-                        <td style="color:#1e293b;">📋 ${unitFocusCount} ວຽກງານຈຸດສຸມ</td>
+                        <td style="color:#1e293b;">📋 ${unitFocusCount} ວຽກຈຸດສຸມ</td>
                         <td colspan="${isAdmin ? 2 : 1}">
                             <span style="color:#ef4444; margin-right:12px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${unitNotDoneCount} ຂໍ້</span>
                             <span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${unitDoneCount} ຂໍ້</span>
@@ -740,7 +739,7 @@
                 `;
             });
 
-            // ແຖບສະຫຼຸບລວມຍອດທັງໝົດທຸກຂະແໜງຢູ່ລຸ່ມສຸດ (Total Summary Footer)
+            // 📌 ແຖບສະຫຼຸບລວມຍອດທັງໝົດທຸກຂະແໜງຢູ່ລຸ່ມສຸດ (ປ່ຽນຂໍ້ຄວາມສະຫຼຸບຕາມຄຳຮ້ອງຂໍ)
             let totalSummaryFooter = `
                 <div style="margin-top:35px; border-top:3px solid #b5651d; padding-top:10px;">
                     <h3 style="color:#b5651d; margin-bottom:10px;">📊 ບົດສະຫຼຸບສັງລວມລວມທັງໝົດ (ທຸກຂະແໜງການ):</h3>
@@ -754,8 +753,8 @@
                         </thead>
                         <tbody>
                             <tr style="font-weight:bold; font-size:14px; color:#1e293b;">
-                                <td>📌 ${totalStratCount} ຂໍ້ / ແຜນ</td>
-                                <td>📋 ${totalFocusCount} ຂໍ້ / ວຽກ</td>
+                                <td>📌 ${totalStratCount} ແຜນຍຸດທະສາດ</td>
+                                <td>📋 ${totalFocusCount} ວຽກຈຸດສຸມ</td>
                                 <td colspan="${isAdmin ? 2 : 1}">
                                     <span style="color:#ef4444; margin-right:15px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${totalNotDoneCount} ຂໍ້</span>
                                     <span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${totalDoneCount} ຂໍ້</span>
