@@ -335,6 +335,13 @@
     <div id="main-screen" class="main-wrapper" style="display: none;">
         
         <div class="top-toolbar">
+            <!-- 1. ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ -->
+            <div class="tool-item admin-only-btn" onclick="showAddStrategyForm()">
+                <span class="icon">📝</span>
+                <span>ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</span>
+            </div>
+
+            <!-- 2. ນຳເຂົ້າແຜນ ▾ -->
             <div class="dropdown-container">
                 <div class="tool-item" onclick="toggleDropdown(event, 'import-dropdown-menu')">
                     <span class="icon">📥</span>
@@ -349,27 +356,25 @@
                 </div>
             </div>
 
+            <!-- 3. ຍຸດທະສາດ -->
             <div class="tool-item" onclick="showStrategySummaryTable()">
                 <span class="icon">📊</span>
                 <span>ຍຸດທະສາດ</span>
             </div>
             
+            <!-- 4. ວຽກງານຈຸດສຸມ -->
             <div class="tool-item" onclick="showFocusWorkSummaryTable()">
                 <span class="icon">🎯</span>
                 <span>ວຽກງານຈຸດສຸມ</span>
             </div>
 
-            <!-- ປຸ່ມ ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ຢູ່ໃນ Toolbar ດ້ານເທິງ - ສະເພາະ ADMIN) -->
-            <div class="tool-item admin-only-btn" onclick="showAddStrategyForm()">
-                <span class="icon">📝</span>
-                <span>ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</span>
-            </div>
-
+            <!-- 5. ປ້ອນວຽກງານຈຸດສຸມ -->
             <div class="tool-item admin-only-btn" onclick="showPlaceholderFocusWork()">
                 <span class="icon">📋</span>
                 <span>ປ້ອນວຽກງານຈຸດສຸມ</span>
             </div>
             
+            <!-- 6. ລາຍງານ ▾ -->
             <div class="dropdown-container">
                 <div class="tool-item" onclick="toggleDropdown(event, 'report-dropdown-menu')">
                     <span class="icon">🖨️</span>
@@ -596,7 +601,7 @@
         }
 
         /* ----------------------------------------------------
-           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ (ອັບເດດຂໍ້ຄວາມສະຫຼຸບຕາມຄຳຮ້ອງຂໍ)
+           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ
         ---------------------------------------------------- */
         function showStrategy(unitName) {
             const contentDisplay = document.getElementById('content-display');
@@ -705,7 +710,6 @@
                     <button type="button" class="save-btn" style="background:#2563eb; font-size:12px; padding:5px 12px;" onclick="showAddStrategyForm('${unit}')">📝 ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</button>
                 ` : '';
 
-                // 📌 ແຖບສະຫຼຸບລວມແຍກປະຈຳຂະແໜງການ (ປ່ຽນຂໍ້ຄວາມສະຫຼຸບ)
                 let unitSummaryRow = `
                     <tr class="unit-summary-row">
                         <td style="color:#b5651d;">📊 ສະຫຼຸບລວມປະຈຳຂະແໜງ: ${unitStratCount} ແຜນຍຸດທະສາດ</td>
@@ -739,7 +743,6 @@
                 `;
             });
 
-            // 📌 ແຖບສະຫຼຸບລວມຍອດທັງໝົດທຸກຂະແໜງຢູ່ລຸ່ມສຸດ (ປ່ຽນຂໍ້ຄວາມສະຫຼຸບຕາມຄຳຮ້ອງຂໍ)
             let totalSummaryFooter = `
                 <div style="margin-top:35px; border-top:3px solid #b5651d; padding-top:10px;">
                     <h3 style="color:#b5651d; margin-bottom:10px;">📊 ບົດສະຫຼຸບສັງລວມລວມທັງໝົດ (ທຸກຂະແໜງການ):</h3>
