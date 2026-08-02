@@ -1208,14 +1208,11 @@
                                 </td>
                                 <td style="text-align: center;">${fileLink}</td>
                                 <td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td>
-                                <td style="text-align: center;">
-                                    <button type="button" class="remove-file-btn" onclick="deleteDocEntry(${doc.id}, '${type}')">ລົບ</button>
-                                </td>
                             </tr>
                         `;
                     });
                 } else {
-                    rowsHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານທີ່ນຳເຂົ້າໃນລະບົບ (ກະລຸນາກົດເມນູ "ນຳເຂົ້າແຜນ..." ເພື່ອເພີ່ມເອກະສານ)</td></tr>`;
+                    rowsHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານທີ່ນຳເຂົ້າໃນລະບົບ (ກະລຸນາກົດເມນູ "ນຳເຂົ້າແຜນ..." ເພື່ອເພີ່ມເອກະສານ)</td></tr>`;
                 }
 
                 contentDisplay.innerHTML = `
@@ -1227,18 +1224,17 @@
                                 <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າເອກະສານໃໝ່</button>
                             </div>
                         </div>
-                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້າຕາຕະລາງນີ້ເຮັດໜ້າທີ່ສັງລວມຫຍໍ້ ແລະ ຈັດເກັບເນື້ອໃນແຜນທີ່ໄດ້ຈາກການນຳເຂົ້າ ເພື່ອງ່າຍຕໍ່ການກວດສອບຢ່າງກະທັດຮັດ.</p>
+                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້າຕາຕະລາງນີ້ເຮັດໜ້າທີ່ສັງລວມຫຍໍ້ ແລະ ຈັດເກັບເນື້ອໃນແຜນທີ່ໄດ້ຈາກການນຳເຂົ້າ ເພື່ອງ່າຍຕໍ່ການກວດສອບຢ່າງກະທັດຮັດ (ບໍ່ສາມາດລົບຂໍ້ມູນໄດ້).</p>
 
                         <table class="strategy-table" style="width: 100%;">
                             <thead>
                                 <tr>
                                     <th style="width: 5%; text-align: center;">ລຳດັບ</th>
-                                    <th style="width: 30%;">ເນື້ອໃນສັງລວມຫຍໍ້ແຜນ</th>
+                                    <th style="width: 35%;">ເນື້ອໃນສັງລວມຫຍໍ້ແຜນ</th>
                                     <th style="width: 15%; text-align: center;">ເລກທີເອກະສານ</th>
                                     <th style="width: 15%; text-align: center;">ວັນ/ເດືອນ/ປີເອກະສານ</th>
                                     <th style="width: 15%; text-align: center;">ເອກະສານອ້າງອີງ</th>
-                                    <th style="width: 13%; text-align: center;">ວັນທີບັນທຶກ</th>
-                                    <th style="width: 7%; text-align: center;">ຈັດການ</th>
+                                    <th style="width: 15%; text-align: center;">ວັນທີບັນທຶກ</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1338,13 +1334,6 @@
             document.getElementById('file-preview-modal').style.display = 'none';
         }
 
-        function deleteDocEntry(id, type) {
-            deleteDocFromIDB(type, id, function(success) {
-                showCustomAlert('ລົບເອກະສານ ຮຽບຮ້ອຍແລ້ວ!');
-                showDocListTable(type);
-            });
-        }
-
         function showGeneralReport() {
             closeAllDropdowns();
             document.getElementById('content-display').innerHTML = `<h2>📁 ບົດລາຍງານວຽກທົ່ວໄປ</h2>`;
@@ -1370,27 +1359,6 @@
             btnOk.style.background = '#10b981';
             btnOk.onclick = function() {
                 closeCustomAlert();
-            };
-
-            document.getElementById('custom-alert').style.display = 'flex';
-        }
-
-        function showCustomConfirm(msg, onConfirmCallback) {
-            document.getElementById('custom-alert-icon').innerText = '❓';
-            document.getElementById('custom-alert-msg').innerText = msg;
-
-            const btnCancel = document.getElementById('custom-alert-btn-cancel');
-            const btnOk = document.getElementById('custom-alert-btn-ok');
-
-            btnCancel.style.display = 'inline-block';
-            btnCancel.innerText = 'ຍົກເລີກ';
-            
-            btnOk.innerText = 'ຕົກລົງ';
-            btnOk.style.background = '#2563eb';
-
-            btnOk.onclick = function() {
-                closeCustomAlert();
-                if (onConfirmCallback) onConfirmCallback();
             };
 
             document.getElementById('custom-alert').style.display = 'flex';
