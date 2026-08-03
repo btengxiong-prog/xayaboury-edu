@@ -530,6 +530,14 @@
             req.onerror = (e) => callback && callback(false);
         }
 
+        function deleteDocFromIDB(type, id, callback) {
+            const tx = db.transaction([getStoreName(type)], "readwrite");
+            const store = tx.objectStore(getStoreName(type));
+            const req = store.delete(Number(id));
+            req.onsuccess = () => callback && callback(true);
+            req.onerror = () => callback && callback(false);
+        }
+
         function getAllDocsFromIDB(type, callback) {
             if (!db) {
                 setTimeout(() => getAllDocsFromIDB(type, callback), 200);
@@ -876,8 +884,6 @@
                 const file = input.files[0];
                 const reader = new FileReader();
                 document.getElementById('modal-doc-date').value = new Date(file.lastModified || Date.now()).toISOString().split('T')[0];
-                
-                // 🌟 ອັດຕະໂນມັດເອົາຊື່ໄຟລ໌ມາໃສ່ຊ່ອງເນື້ອໃນຫຍໍ້ ແຕ່ຜູ້ໃຊ້ສາມາດພິມ/ແກ້ໄຂເພີ່ມເຕີມໄດ້ທັນທີ
                 let cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
                 document.getElementById('modal-doc-content').value = cleanName;
 
@@ -895,27 +901,38 @@
             const docDate = document.getElementById('modal-doc-date').value;
             if (!content) { alert('ກະລຸນາປ້ອນເນື້ອໃນ!'); return; }
 
-            const now = new Date();
-            const recordDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${now.toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit' })}`;
-
-            const newDoc = {
-                id: Date.now(), content, docNo: docNo || '-', docDate: docDate || '-',
-                fileName: tempFileData ? tempFileData.fileName : 'ບໍ່ມີໄຟລ໌',
-                fileDataUrl: tempFileData ? tempFileData.fileDataUrl : '',
-                fileType: tempFileData ? tempFileData.fileType : '',
-                isImage: tempFileData ? tempFileData.isImage : false,
-                isPDF: tempFileData ? tempFileData.isPDF : false,
-                isDocx: tempFileData ? tempFileData.isDocx : false,
-                recordDate, owner: currentUser ? currentUser.username : 'EDUXYBL', ownerName: currentUser ? currentUser.name : 'ADMIN'
-            };
-
-            addDocToIDB(currentImportType, newDoc, function(success) {
-                if (success) {
-                    closeDocModal();
-                    showCustomAlert('✅ ບັນທຶກສຳເລັດ!');
-                    if (currentImportType === 'execution') showExecutionTable();
-                    else showDocListTable(currentImportType);
+            // 🌟 1. ກວດສອບບໍ່ໃຫ້ອັບໂຫຼດໄຟລ໌ຊ້ຳກັນ (ກວດຈາກຊື່ໄຟລ໌ fileName)
+            getAllDocsFromIDB(currentImportType, function(existingDocs) {
+                if (tempFileData && tempFileData.fileName) {
+                    let isDuplicate = existingDocs.some(d => d.fileName === tempFileData.fileName);
+                    if (isDuplicate) {
+                        showCustomAlert(`⚠️ ໄຟລ໌ "${tempFileData.fileName}" ມີຢູ່ໃນລະບົບແລ້ວ! ບໍ່ສາມາດອັບໂຫຼດໄຟລ໌ຊ້ຳກັນໄດ້.`, false);
+                        return;
+                    }
                 }
+
+                const now = new Date();
+                const recordDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${now.toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit' })}`;
+
+                const newDoc = {
+                    id: Date.now(), content, docNo: docNo || '-', docDate: docDate || '-',
+                    fileName: tempFileData ? tempFileData.fileName : 'ບໍ່ມີໄຟລ໌',
+                    fileDataUrl: tempFileData ? tempFileData.fileDataUrl : '',
+                    fileType: tempFileData ? tempFileData.fileType : '',
+                    isImage: tempFileData ? tempFileData.isImage : false,
+                    isPDF: tempFileData ? tempFileData.isPDF : false,
+                    isDocx: tempFileData ? tempFileData.isDocx : false,
+                    recordDate, owner: currentUser ? currentUser.username : 'EDUXYBL', ownerName: currentUser ? currentUser.name : 'ADMIN'
+                };
+
+                addDocToIDB(currentImportType, newDoc, function(success) {
+                    if (success) {
+                        closeDocModal();
+                        showCustomAlert('✅ ບັນທຶກສຳເລັດ!');
+                        if (currentImportType === 'execution') showExecutionTable();
+                        else showDocListTable(currentImportType);
+                    }
+                });
             });
         }
 
@@ -1032,11 +1049,12 @@
         function showDocListTable(type) {
             closeAllDropdowns();
             const titleName = (type === 'general') ? '📁 ຂໍ້ມູນວຽກທົ່ວໄປ (ສະບັບເຕັມ/ຕົ້ນສະບັບ)' : '📈 ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ສະບັບເຕັມ/ຕົ້ນສະບັບ)';
+            let isAdmin = (currentUser && currentUser.type === 'admin');
 
             getAllDocsFromIDB(type, function(allDocsList) {
                 const contentDisplay = document.getElementById('content-display');
                 let docsList = allDocsList || [];
-                if (currentUser && currentUser.type !== 'admin') {
+                if (!isAdmin) {
                     docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
                 }
 
@@ -1045,6 +1063,9 @@
                     docsList.forEach((doc, idx) => {
                         let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
                         let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງໄຟລ໌ຕົ້ນສະບັບ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+                        
+                        // 🌟 2. ປຸ່ມລົບສຳລັບ ADMIN
+                        let deleteBtnHTML = isAdmin ? `<button type="button" class="remove-file-btn" onclick="deleteDocEntry('${type}', ${doc.id})">🗑️ ລົບ</button>` : `<span style="color:#64748b; font-size:11px;">(ສະເພາະ ADMIN)</span>`;
 
                         rowsHTML += `
                             <tr>
@@ -1054,11 +1075,12 @@
                                 <td><input type="date" class="table-inline-input" style="text-align: center;" value="${doc.docDate !== '-' ? doc.docDate : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docDate', this.value)"></td>
                                 <td style="text-align: center;">${fileLink}</td>
                                 <td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td>
+                                <td style="text-align: center;">${deleteBtnHTML}</td>
                             </tr>
                         `;
                     });
                 } else {
-                    rowsHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານສະບັບເຕັມທີ່ນຳເຂົ້າ</td></tr>`;
+                    rowsHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານສະບັບເຕັມທີ່ນຳເຂົ້າ</td></tr>`;
                 }
 
                 contentDisplay.innerHTML = `
@@ -1068,12 +1090,30 @@
                             <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າເອກະສານໃໝ່</button>
                         </div>
                         <table class="strategy-table" style="width: 100%;">
-                            <thead><tr><th style="width: 5%; text-align: center;">ລຳດັບ</th><th style="width: 35%;">ເນື້ອໃນເອກະສານ (ສະບັບເຕັມ)</th><th style="width: 15%; text-align: center;">ເລກທີ</th><th style="width: 15%; text-align: center;">ວັນທີ</th><th style="width: 15%; text-align: center;">ໄຟລ໌</th><th style="width: 15%; text-align: center;">ບັນທຶກ</th></tr></thead>
+                            <thead><tr><th style="width: 5%; text-align: center;">ລຳດັບ</th><th style="width: 30%;">ເນື້ອໃນເອກະສານ (ສະບັບເຕັມ)</th><th style="width: 12%; text-align: center;">ເລກທີ</th><th style="width: 13%; text-align: center;">ວັນທີ</th><th style="width: 15%; text-align: center;">ໄຟລ໌</th><th style="width: 15%; text-align: center;">ບັນທຶກ</th><th style="width: 10%; text-align: center;">ຈັດການ</th></tr></thead>
                             <tbody>${rowsHTML}</tbody>
                         </table>
                     </div>
                 `;
             });
+        }
+
+        // 🌟 ຟັງຊັນສຳລັບ ADMIN ລົບເອກະສານອອກ
+        function deleteDocEntry(type, id) {
+            if (currentUser && currentUser.type !== 'admin') {
+                showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດລົບເອກະສານ!', false);
+                return;
+            }
+            if (confirm('🗑️ ທ່ານຕ້ອງການລົບເອກະສານນີ້ອອກຈາກລະບົບແທ້ ຫຼື ບໍ່?')) {
+                deleteDocFromIDB(type, id, function(success) {
+                    if (success) {
+                        showCustomAlert('🗑️ ລົບເອກະສານສຳເລັດ!');
+                        showDocListTable(type);
+                    } else {
+                        showCustomAlert('⚠️ ບໍ່ສາມາດລົບເອກະສານໄດ້!', false);
+                    }
+                });
+            }
         }
 
         function showExecutionTable() {
@@ -1197,7 +1237,6 @@
                         </div>
                     `;
 
-                    // 🌟 ຖ້າເປັນໄຟລ໌ Word ໃຫ້ Parse ເນື້ອໃນເພີ່ມເຕີມ
                     if (doc.isDocx) {
                         try {
                             const base64Data = doc.fileDataUrl.split(',')[1];
