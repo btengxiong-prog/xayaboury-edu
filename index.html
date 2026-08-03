@@ -189,7 +189,7 @@
             background: #ffffff;
             border-radius: 12px;
             padding: 24px;
-            width: 340px;
+            width: 320px;
             text-align: center;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             border: 1px solid #e2e8f0;
@@ -198,14 +198,9 @@
         .custom-alert-title { font-size: 16px; font-weight: bold; color: #0f172a; margin-bottom: 6px; }
         .custom-alert-msg { font-size: 13px; color: #475569; margin-bottom: 20px; line-height: 1.5; }
         .custom-alert-btn {
-            background: #10b981; color: white; border: none; padding: 9px 24px;
+            background: #10b981; color: white; border: none; padding: 9px 28px;
             border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;
         }
-        .custom-alert-btn-danger {
-            background: #ef4444; color: white; border: none; padding: 9px 24px;
-            border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;
-        }
-        .custom-alert-btn-danger:hover { background: #dc2626; }
 
         .input-modal-box {
             background: #ffffff;
@@ -333,7 +328,7 @@
         </div>
     </div>
 
-    <!-- Custom Alert Popup ສວຍງາມ -->
+    <!-- Custom Alert Popup -->
     <div id="custom-alert" class="custom-alert-overlay">
         <div class="custom-alert-box">
             <div id="custom-alert-icon" class="custom-alert-icon">✅</div>
@@ -906,6 +901,7 @@
             const docDate = document.getElementById('modal-doc-date').value;
             if (!content) { alert('ກະລຸນາປ້ອນເນື້ອໃນ!'); return; }
 
+            // 🌟 1. ກວດສອບບໍ່ໃຫ້ອັບໂຫຼດໄຟລ໌ຊ້ຳກັນ (ກວດຈາກຊື່ໄຟລ໌ fileName)
             getAllDocsFromIDB(currentImportType, function(existingDocs) {
                 if (tempFileData && tempFileData.fileName) {
                     let isDuplicate = existingDocs.some(d => d.fileName === tempFileData.fileName);
@@ -1068,6 +1064,7 @@
                         let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
                         let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງໄຟລ໌ຕົ້ນສະບັບ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
                         
+                        // 🌟 2. ປຸ່ມລົບສຳລັບ ADMIN
                         let deleteBtnHTML = isAdmin ? `<button type="button" class="remove-file-btn" onclick="deleteDocEntry('${type}', ${doc.id})">🗑️ ລົບ</button>` : `<span style="color:#64748b; font-size:11px;">(ສະເພາະ ADMIN)</span>`;
 
                         rowsHTML += `
@@ -1101,13 +1098,13 @@
             });
         }
 
-        // 🌟 ຟັງຊັນລົບເອກະສານແບບ Custom Confirm ສວຍງາມ (ບໍ່ໃຊ້ browser confirm)
+        // 🌟 ຟັງຊັນສຳລັບ ADMIN ລົບເອກະສານອອກ
         function deleteDocEntry(type, id) {
             if (currentUser && currentUser.type !== 'admin') {
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດລົບເອກະສານ!', false);
                 return;
             }
-            showCustomConfirm('🗑️ ທ່ານຕ້ອງການລົບເອກະສານນີ້ออกจากລະບົບແທ້ ຫຼື ບໍ່?', function() {
+            if (confirm('🗑️ ທ່ານຕ້ອງການລົບເອກະສານນີ້ອອກຈາກລະບົບແທ້ ຫຼື ບໍ່?')) {
                 deleteDocFromIDB(type, id, function(success) {
                     if (success) {
                         showCustomAlert('🗑️ ລົບເອກະສານສຳເລັດ!');
@@ -1116,7 +1113,7 @@
                         showCustomAlert('⚠️ ບໍ່ສາມາດລົບເອກະສານໄດ້!', false);
                     }
                 });
-            });
+            }
         }
 
         function showExecutionTable() {
@@ -1277,35 +1274,11 @@
         function closeFilePreviewModal() { document.getElementById('file-preview-modal').style.display = 'none'; }
         function showGeneralReport() { closeAllDropdowns(); document.getElementById('content-display').innerHTML = `<h2>📁 ບົດລາຍງານວຽກທົ່ວໄປ</h2>`; }
         function showStrategyPlanReport() { closeAllDropdowns(); document.getElementById('content-display').innerHTML = `<h2>📊 ບົດລາຍງານແຜນຍຸດທະສາດ</h2>`; }
-        
         function showCustomAlert(msg, isSuccess = true) {
             document.getElementById('custom-alert-icon').innerText = isSuccess ? '✅' : '⚠️';
             document.getElementById('custom-alert-msg').innerText = msg;
-            document.getElementById('custom-alert-btn-cancel').style.display = 'none';
-            document.getElementById('custom-alert-btn-ok').className = 'custom-alert-btn';
-            document.getElementById('custom-alert-btn-ok').innerText = 'ຕົກລົງ';
-            document.getElementById('custom-alert-btn-ok').onclick = closeCustomAlert;
             document.getElementById('custom-alert').style.display = 'flex';
         }
-
-        function showCustomConfirm(msg, onConfirm) {
-            document.getElementById('custom-alert-icon').innerText = '🗑️';
-            document.getElementById('custom-alert-msg').innerText = msg;
-            const cancelBtn = document.getElementById('custom-alert-btn-cancel');
-            cancelBtn.style.display = 'inline-block';
-            cancelBtn.innerText = 'ຍົກເລີກ';
-            cancelBtn.onclick = closeCustomAlert;
-
-            const okBtn = document.getElementById('custom-alert-btn-ok');
-            okBtn.className = 'custom-alert-btn-danger';
-            okBtn.innerText = 'ລົບອອກ';
-            okBtn.onclick = function() {
-                closeCustomAlert();
-                if (onConfirm) onConfirm();
-            };
-            document.getElementById('custom-alert').style.display = 'flex';
-        }
-
         function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
         function handleLogout() { currentUser = null; document.getElementById('login-screen').style.display = 'flex'; document.getElementById('main-screen').style.display = 'none'; }
     </script>
