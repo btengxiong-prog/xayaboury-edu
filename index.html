@@ -342,7 +342,7 @@
         </div>
     </div>
 
-    <!-- Custom Alert Popup (ມີທັງ Alert ແລະ Confirm) -->
+    <!-- Custom Alert Popup -->
     <div id="custom-alert" class="custom-alert-overlay">
         <div class="custom-alert-box">
             <div id="custom-alert-icon" class="custom-alert-icon">✅</div>
@@ -400,13 +400,13 @@
                 </div>
             </div>
 
-            <!-- 3. ວຽກທົ່ວໄປ -->
+            <!-- 3. ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້) -->
             <div class="tool-item" onclick="showGeneralSummaryTable()">
                 <span class="icon">📊</span>
                 <span>ວຽກທົ່ວໄປ</span>
             </div>
             
-            <!-- 4. ຍຸດທະສາດ/ວຽກຈຸດສຸມ -->
+            <!-- 4. ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້) -->
             <div class="tool-item" onclick="showStrategySummaryTable()">
                 <span class="icon">🎯</span>
                 <span>ຍຸດທະສາດ/ວຽກຈຸດສຸມ</span>
@@ -835,9 +835,6 @@
             showStrategy("ALL");
         }
 
-        /* ----------------------------------------------------
-           ຟັງຊັນ ປ້ອນ / ດັດແກ້ ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ADMIN)
-        ---------------------------------------------------- */
         function showAddStrategyForm(defaultUnit = '', editIndex = null) {
             if (currentUser && currentUser.type !== 'admin') {
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດເພີ່ມ/ດັດແກ້ແຜນຍຸດທະສາດ!', false);
@@ -1189,15 +1186,184 @@
             });
         }
 
+        /* ----------------------------------------------------
+           1. ຂໍ້ມູນວຽກທົ່ວໄປ (ສະບັບເຕັມ/ຕົ້ນສະບັບ)
+        ---------------------------------------------------- */
         function showGeneralSummaryTable() {
             showDocListTable('general');
         }
 
-        function showStrategySummaryTable() {
-            showDocListTable('strategy');
+        /* ----------------------------------------------------
+           2. ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)
+        ---------------------------------------------------- */
+        function showGeneralShortSummary() {
+            closeAllDropdowns();
+            getAllDocsFromIDB('general', function(allDocsList) {
+                const contentDisplay = document.getElementById('content-display');
+                let docsList = allDocsList || [];
+                if (currentUser && currentUser.type !== 'admin') {
+                    docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
+                }
+
+                let rowsHTML = '';
+                if (docsList.length > 0) {
+                    docsList.forEach((doc, idx) => {
+                        rowsHTML += `
+                            <tr>
+                                <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                                <td><strong>${doc.content}</strong> (ເລກທີ: ${doc.docNo})</td>
+                                <td style="text-align: center; color: #047857; font-weight: bold;">ສະຫຼຸບຫຍໍ້ຄົບຖ້ວນສົມບູນ</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    rowsHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນວຽກທົ່ວໄປ</td></tr>`;
+                }
+
+                contentDisplay.innerHTML = `
+                    <div class="report-container" style="max-width: 100%;">
+                        <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📊 ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)</h2>
+                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້ານີ້ດຶງຂໍ້ມູນຈາກ "ຂໍ້ມູນວຽກທົ່ວໄປ" ົາມາສັງລວມຫຍໍ້ໃຫ້ກະທັດຮັດທີ່ສຸດໂດຍບໍ່ຫຼຸດບໍ່ເກີນ.</p>
+                        <table class="strategy-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10%; text-align: center;">ລຳດັບ</th>
+                                    <th style="width: 60%;">ເນື້ອໃນຫຍໍ້ວຽກທົ່ວໄປ (ສັ້ນ ແລະ ຄົບຖ້ວນ)</th>
+                                    <th style="width: 30%; text-align: center;">ສະຖານະການຫຍໍ້</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHTML}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            });
         }
 
-        /* 1) ປະຕິບັດ: ສັງລວມຫຍໍ້ຂໍ້ມູນຈາກ ນຳເຂົ້າປະຕິບັດ (ທຸກໄຟລ໌ Word, Excel, PDF, ຮູບ) ມາໄວ້ທີ່ນີ້ */
+        /* ----------------------------------------------------
+           3. ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)
+        ---------------------------------------------------- */
+        function showStrategySummaryTable() {
+            closeAllDropdowns();
+            getAllDocsFromIDB('strategy', function(allDocsList) {
+                const contentDisplay = document.getElementById('content-display');
+                let docsList = allDocsList || [];
+                if (currentUser && currentUser.type !== 'admin') {
+                    docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
+                }
+
+                let rowsHTML = '';
+                if (docsList.length > 0) {
+                    docsList.forEach((doc, idx) => {
+                        rowsHTML += `
+                            <tr>
+                                <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                                <td><strong>${doc.content}</strong> (ເລກທີ: ${doc.docNo})</td>
+                                <td style="text-align: center; color: #047857; font-weight: bold;">ສະຫຼຸບຫຍໍ້ຄົບຖ້ວນສົມບູນ</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    rowsHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</td></tr>`;
+                }
+
+                contentDisplay.innerHTML = `
+                    <div class="report-container" style="max-width: 100%;">
+                        <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">🎯 ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)</h2>
+                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້ານີ້ດຶງຂໍ້ມູນຈາກ "ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ" ົາມາຫຍໍ້ໃຫ້ສັ້ນກະທັດຮັດ ແຕ່ເນື້ອໃນຄົບຖ້ວນ.</p>
+                        <table class="strategy-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10%; text-align: center;">ລຳດັບ</th>
+                                    <th style="width: 60%;">ເນື້ອໃນຫຍໍ້ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</th>
+                                    <th style="width: 30%; text-align: center;">ສະຖານະການຫຍໍ້</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHTML}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            });
+        }
+
+        /* ----------------------------------------------------
+           ໜ້າຕາຕະລາງສະແດງເອກະສານສະບັບເຕັມ (ຕົ້ນສະບັບ)
+        ---------------------------------------------------- */
+        function showDocListTable(type) {
+            closeAllDropdowns();
+            const titleName = (type === 'general') ? '📁 ຂໍ້ມູນວຽກທົ່ວໄປ (ສະບັບເຕັມ/ຕົ້ນສະບັບ)' : '📈 ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ສະບັບເຕັມ/ຕົ້ນສະບັບ)';
+
+            getAllDocsFromIDB(type, function(allDocsList) {
+                const contentDisplay = document.getElementById('content-display');
+
+                let docsList = allDocsList || [];
+                if (currentUser && currentUser.type !== 'admin') {
+                    docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
+                }
+
+                let rowsHTML = '';
+                if (docsList && docsList.length > 0) {
+                    docsList.forEach((doc, idx) => {
+                        let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
+                        let fileLink = doc.fileDataUrl ? 
+                            `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເອກະສານ">${fileIcon} ${doc.fileName}</span>` : 
+                            `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+
+                        rowsHTML += `
+                            <tr>
+                                <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                                <td>
+                                    <input type="text" class="table-inline-input" value="${doc.content}" onchange="updateDocField(${doc.id}, '${type}', 'content', this.value)" placeholder="ເນື້ອໃນເອກະສານ...">
+                                </td>
+                                <td>
+                                    <input type="text" class="table-inline-input" style="text-align: center;" value="${doc.docNo !== '-' ? doc.docNo : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docNo', this.value)" placeholder="ເລກທີເອກະສານ...">
+                                </td>
+                                <td>
+                                    <input type="date" class="table-inline-input" style="text-align: center;" value="${doc.docDate !== '-' ? doc.docDate : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docDate', this.value)">
+                                </td>
+                                <td style="text-align: center;">${fileLink}</td>
+                                <td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    rowsHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານທີ່ນຳເຂົ້າໃນລະບົບ</td></tr>`;
+                }
+
+                contentDisplay.innerHTML = `
+                    <div class="report-container" style="max-width: 100%;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #b5651d; padding-bottom: 10px;">
+                            <h2 style="color: #b5651d; margin: 0;">📋 ${titleName} ${currentUser && currentUser.type !== 'admin' ? `<span style="font-size:14px; color:#475569;">(${currentUser.name})</span>` : ''}</h2>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="button" class="save-btn" style="background:#10b981;" onclick="showCustomAlert('💾 ບັນທຶກການປ່ຽນແປງຂໍ້ມູນທັງໝົດແລ້ວ!')">💾 ບັນທຶກການປ່ຽນແປງ</button>
+                                <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າເອກະສານໃໝ່</button>
+                            </div>
+                        </div>
+                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້າຕາຕະລາງນີ້ສະແດງເອກະສານສະບັບເຕັມ (ຕົ້ນສະບັບ) ທີ່ນຳເຂົ້າໄວ້.</p>
+
+                        <table class="strategy-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%; text-align: center;">ລຳດັບ</th>
+                                    <th style="width: 35%;">ເນື້ອໃນເອກະສານ (ສະບັບເຕັມ)</th>
+                                    <th style="width: 15%; text-align: center;">ເລກທີເອກະສານ</th>
+                                    <th style="width: 15%; text-align: center;">ວັນ/ເດືອນ/ປີເອກະສານ</th>
+                                    <th style="width: 15%; text-align: center;">ເອກະສານອ້າງອີງ</th>
+                                    <th style="width: 15%; text-align: center;">ວັນທີບັນທຶກ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHTML}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            });
+        }
+
         function showExecutionTable() {
             closeAllDropdowns();
             getAllDocsFromIDB('execution', function(allDocsList) {
@@ -1213,7 +1379,7 @@
                     docsList.forEach((doc, idx) => {
                         let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
                         let fileLink = doc.fileDataUrl ? 
-                            `<span onclick="openFilePreviewModal(${doc.id}, 'execution')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງສັງລວມເນື້ອໃນ">${fileIcon} ${doc.fileName}</span>` : 
+                            `<span onclick="openFilePreviewModal(${doc.id}, 'execution')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນ">${fileIcon} ${doc.fileName}</span>` : 
                             `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
 
                         rowsHTML += `
@@ -1231,27 +1397,25 @@
                         `;
                     });
                 } else {
-                    rowsHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນການປະຕິບັດ (ກະລຸນາກົດປຸ່ມ "ນຳເຂົ້າປະຕິບັດ" ດ້ານເທິງເພື່ອອັບໂຫຼດບົດລາຍງານ/ໄຟລ໌)</td></tr>`;
+                    rowsHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນການປະຕິບັດ</td></tr>`;
                 }
 
                 contentDisplay.innerHTML = `
                     <div class="report-container" style="max-width: 100%;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #b5651d; padding-bottom: 10px;">
-                            <h2 style="color: #b5651d; margin: 0;">⚙️ ບົດສັງລວມຫຍໍ້ການປະຕິບັດ (ຈາກການນຳເຂົ້າປະຕິບັດ)</h2>
+                            <h2 style="color: #b5651d; margin: 0;">⚙️ ບົດສັງລວມຫຍໍ້ການປະຕິບັດ</h2>
                             <div style="display: flex; gap: 10px;">
-                                <button type="button" class="save-btn" style="background:#10b981;" onclick="showCustomAlert('💾 ບັນທຶກການປ່ຽນແປງຂໍ້ມູນການປະຕິບັດແລ້ວ!')">💾 ບັນທຶກການປ່ຽນແປງ</button>
+                                <button type="button" class="save-btn" style="background:#10b981;" onclick="showCustomAlert('💾 ບັນທຶກການປ່ຽນແປງແລ້ວ!')">💾 ບັນທຶກການປ່ຽນແປງ</button>
                                 <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('execution')">➕ ນຳເຂົ້າປະຕິບັດ</button>
                             </div>
                         </div>
-                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້າຕາຕະລາງນີ້ສັງລວມເນື້ອໃນສັ້ນທີ່ສຸດ ຄົບຖ້ວນຈາກທຸກໄຟລ໌ (Word, Excel, PDF, ຮູບ) ຂອງການຈັດຕັ້ງປະຕິບັດ.</p>
-
                         <table class="strategy-table" style="width: 100%;">
                             <thead>
                                 <tr>
                                     <th style="width: 8%; text-align: center;">ລຳດັບ</th>
                                     <th style="width: 42%;">ເນື້ອໃນສັງລວມຫຍໍ້ການປະຕິບັດ</th>
                                     <th style="width: 15%; text-align: center;">ເລກທີເອກະສານ</th>
-                                    <th style="width: 20%; text-align: center;">ໄຟລ໌ອ້າງອີງ (Word, Excel, PDF, ຮູບ)</th>
+                                    <th style="width: 20%; text-align: center;">ໄຟລ໌ອ້າງອີງ</th>
                                     <th style="width: 15%; text-align: center;">ວັນທີບັນທຶກ</th>
                                 </tr>
                             </thead>
@@ -1264,7 +1428,6 @@
             });
         }
 
-        /* 2) ທຽບແຜນ/ປະຕິບັດ: ເອົາ ປະຕິບັດ ໄປທຽບກັບ ແຜນ ຖ້າມີແຜນແລະປະຕິບັດແລ້ວ ໃຫ້ສະແດງທີ່ນີ້ */
         function showCompareTable() {
             closeAllDropdowns();
             getAllDocsFromIDB('general', function(generalPlans) {
@@ -1295,14 +1458,12 @@
                                 `;
                             }
                         } else {
-                            compareRows = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">⚠️ ຍັງບໍ່ມີຂໍ້ມູນໃນລະບົບສຳລັບການທຽບແຜນ ແລະ ປະຕິບັດ</td></tr>`;
+                            compareRows = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">⚠️ ຍັງບໍ່ມີຂໍ້ມູນໃນລະບົບ</td></tr>`;
                         }
 
                         contentDisplay.innerHTML = `
                             <div class="report-container" style="max-width: 100%;">
-                                <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">⚖️ ຕາຕະລາງທຽບແຜນ / ປະຕິບັດ (ແຍກຕາມ ວຽກທົ່ວໄປ ແລະ ຍຸດທະສາດ/ວຽກຈຸດສຸມ)</h2>
-                                <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ການສົມທຽບລະຫວ່າງແຜນການ (ແຍກເປັນ ວຽກທົ່ວໄປ ແລະ ຍຸດທະສາດ/ວຽກຈຸດສຸມ) ກັບ ຜົນການປະຕິບັດຕົວຈິງ.</p>
-                                
+                                <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">⚖️ ຕາຕະລາງທຽບແຜນ / ປະຕິບັດ</h2>
                                 <table class="strategy-table" style="width: 100%;">
                                     <thead>
                                         <tr>
@@ -1323,7 +1484,6 @@
             });
         }
 
-        /* 3) ເນື້ອໃນສະຫຼຸບ: ລະບົບຂຽນບົດສະຫຼຸບອັດຕະໂນມັດ ໂດຍຄຳນຶງເຖິງຮ່າງ ວຽກທົ່ວໄປ ແລະ ຍຸດທະສາດ/ວຽກຈຸດສຸມ */
         function showSummaryReportTable() {
             closeAllDropdowns();
             getAllDocsFromIDB('general', function(generalPlans) {
@@ -1334,29 +1494,20 @@
                         let genCount = generalPlans ? generalPlans.length : 0;
                         let stratCount = strategyPlans ? strategyPlans.length : 0;
                         let execCount = executionDocs ? executionDocs.length : 0;
-                        let totalPlans = genCount + stratCount;
 
-                        let summaryText = "";
-                        if (totalPlans > 0 || execCount > 0) {
-                            summaryText = `
-                                ບົດສະຫຼຸບສັງລວມການຈັດຕັ້ງປະຕິບັດວຽກງານ ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ:
-                                <br><br>
-                                <ul>
-                                    <li><strong>1. ດ້ານແຜນການ "ວຽກທົ່ວໄປ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນວຽກທົ່ວໄປເຂົ້າໃນລະບົບທັງໝົດ <strong>${genCount}</strong> ຫົວຂໍ້.</li>
-                                    <li><strong>2. ດ້ານແຜນການ "ຍຸດທະສາດ/ວຽກຈຸດສຸມ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນຍຸດທະສາດ/ວຽກຈຸດສຸມເຂົ້າໃນລະບົບທັງໝົດ <strong>${stratCount}</strong> ຫົວຂໍ້.</li>
-                                    <li><strong>3. ດ້ານການຈັດຕັ້ງປະຕິບັດຕົວຈິງ:</strong> ໄດ້ມີການອັບໂຫຼດບົດລາຍງານ, ບົດສະຫຼຸບ ແລະ ໄຟລ໌ຜົນງານ (Word, Excel, PDF, ຮູບພາບ) ເຂົ້າສູ່ລະບົບແລ້ວທັງໝົດ <strong>${execCount}</strong> ສະບັບ.</li>
-                                    <li><strong>4. ການສົມທຽບ ແລະ ຕີລາຄາ:</strong> ລະບົບໄດ້ວິເຄາະສົມທຽບລະຫວ່າງແຜນງານທັງສອງປະເພດ (ວຽກທົ່ວໄປ ແລະ ຍຸດທະສາດ/ວຽກຈຸດສຸມ) ກັບຜົນການປະຕິບັດຕົວຈິງ ເຫັນວ່າການຈັດຕັ້ງປະຕິບັດມີຄວາມສອດຄ່ອງ, ສາມາດຕິດຕາມຄວາມຄືບໜ້າໄດ້ຢ່າງເປັນລະບົບ ແລະ ມີປະສິດທິພາບ.</li>
-                                </ul>
-                            `;
-                        } else {
-                            summaryText = `⚠️ ຍັງບໍ່ມີຂໍ້ມູນພຽງພໍໃນລະບົບສຳລັບການຂຽນບົດສະຫຼຸບອັດຕະໂນມັດ (ກະລຸນານຳເຂົ້າແຜນວຽກທົ່ວໄປ, ຍຸດທະສາດ/ວຽກຈຸດສຸມ ແລະ ຜົນການປະຕິບັດກ່ອນ).`;
-                        }
+                        let summaryText = `
+                            ບົດສະຫຼຸບສັງລວມການຈັດຕັ້ງປະຕິບັດວຽກງານ ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ:
+                            <br><br>
+                            <ul>
+                                <li><strong>1. ດ້ານແຜນການ "ວຽກທົ່ວໄປ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນວຽກທົ່ວໄປເຂົ້າໃນລະບົບທັງໝົດ <strong>${genCount}</strong> ຫົວຂໍ້.</li>
+                                <li><strong>2. ດ້ານແຜນການ "ຍຸດທະສາດ/ວຽກຈຸດສຸມ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນຍຸດທະສາດ/ວຽກຈຸດສຸມເຂົ້າໃນລະບົບທັງໝົດ <strong>${stratCount}</strong> ຫົວຂໍ້.</li>
+                                <li><strong>3. ດ້ານການຈັດຕັ້ງປະຕິບັດຕົວຈິງ:</strong> ໄດ້ມີການອັບໂຫຼດບົດລາຍງານ ແລະ ໄຟລ໌ຜົນງານເຂົ້າສູ່ລະບົບແລ້ວທັງໝົດ <strong>${execCount}</strong> ສະບັບ.</li>
+                            </ul>
+                        `;
 
                         contentDisplay.innerHTML = `
                             <div class="report-container" style="max-width: 100%;">
-                                <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📑 ເນື້ອໃນສະຫຼຸບ (ສົມທຽບແຜນ ວຽກທົ່ວໄປ, ຍຸດທະສາດ/ວຽກຈຸດສຸມ ກັບ ປະຕິບັດຕົວຈິງ)</h2>
-                                <p style="font-size:13px; color:#475569; margin-bottom:20px;">💡 ບົດສະຫຼຸບສັງລວມທີ່ລະບົບວິເຄາະ ແລະ ຂຽນໃຫ້ອັດຕະໂນມັດ ໂດຍແຍກຕາມໂຄງຮ່າງແຜນແຕ່ລະປະເພດ:</p>
-                                
+                                <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📑 ເນື້ອໃນສະຫຼຸບ</h2>
                                 <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 25px; line-height: 1.8; font-size: 14px; color: #0f172a;">
                                     ${summaryText}
                                 </div>
@@ -1367,86 +1518,12 @@
             });
         }
 
-        function showDocListTable(type) {
-            closeAllDropdowns();
-            const titleName = (type === 'general') ? '📁 ບົດສັງລວມຫຍໍ້ວຽກທົ່ວໄປ (ຈາກການນຳເຂົ້າແຜນ)' : '📈 ບົດສັງລວມຫຍໍ້ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ຈາກການນຳເຂົ້າແຜນ)';
-
-            getAllDocsFromIDB(type, function(allDocsList) {
-                const contentDisplay = document.getElementById('content-display');
-
-                let docsList = allDocsList || [];
-                if (currentUser && currentUser.type !== 'admin') {
-                    docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
-                }
-
-                let rowsHTML = '';
-                if (docsList && docsList.length > 0) {
-                    docsList.forEach((doc, idx) => {
-                        let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
-                        let fileLink = doc.fileDataUrl ? 
-                            `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງສັງລວມເນື້ອໃນ">${fileIcon} ${doc.fileName}</span>` : 
-                            `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
-
-                        rowsHTML += `
-                            <tr>
-                                <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
-                                <td>
-                                    <input type="text" class="table-inline-input" value="${doc.content}" onchange="updateDocField(${doc.id}, '${type}', 'content', this.value)" placeholder="ເນື້ອໃນເອກະສານ...">
-                                </td>
-                                <td>
-                                    <input type="text" class="table-inline-input" style="text-align: center;" value="${doc.docNo !== '-' ? doc.docNo : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docNo', this.value)" placeholder="ເລກທີເອກະສານ...">
-                                </td>
-                                <td>
-                                    <input type="date" class="table-inline-input" style="text-align: center;" value="${doc.docDate !== '-' ? doc.docDate : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docDate', this.value)">
-                                </td>
-                                <td style="text-align: center;">${fileLink}</td>
-                                <td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    rowsHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານທີ່ນຳເຂົ້າໃນລະບົບ (ກະລຸນາກົດເມນູ "ນຳເຂົ້າແຜນ..." ເພື່ອເພີ່ມເອກະສານ)</td></tr>`;
-                }
-
-                contentDisplay.innerHTML = `
-                    <div class="report-container" style="max-width: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #b5651d; padding-bottom: 10px;">
-                            <h2 style="color: #b5651d; margin: 0;">📋 ${titleName} ${currentUser && currentUser.type !== 'admin' ? `<span style="font-size:14px; color:#475569;">(${currentUser.name})</span>` : ''}</h2>
-                            <div style="display: flex; gap: 10px;">
-                                <button type="button" class="save-btn" style="background:#10b981;" onclick="showCustomAlert('💾 ບັນທຶກການປ່ຽນແປງຂໍ້ມູນທັງໝົດແລ້ວ!')">💾 ບັນທຶກການປ່ຽນແປງ</button>
-                                <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າເອກະສານໃໝ່</button>
-                            </div>
-                        </div>
-                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້າຕາຕະລາງນີ້ເຮັດໜ້າທີ່ສັງລວມຫຍໍ້ ແລະ ຈັດເກັບເນື້ອໃນແຜນທີ່ໄດ້ຈາກການນຳເຂົ້າ ເພື່ອງ່າຍຕໍ່ການກວດສອບຢ່າງກະທັດຮັດ (ບໍ່ສາມາດລົບຂໍ້ມູນໄດ້).</p>
-
-                        <table class="strategy-table" style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th style="width: 5%; text-align: center;">ລຳດັບ</th>
-                                    <th style="width: 35%;">ເນື້ອໃນສັງລວມຫຍໍ້ແຜນ</th>
-                                    <th style="width: 15%; text-align: center;">ເລກທີເອກະສານ</th>
-                                    <th style="width: 15%; text-align: center;">ວັນ/ເດືອນ/ປີເອກະສານ</th>
-                                    <th style="width: 15%; text-align: center;">ເອກະສານອ້າງອີງ</th>
-                                    <th style="width: 15%; text-align: center;">ວັນທີບັນທຶກ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rowsHTML}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-            });
-        }
-
         function updateDocField(id, type, field, value) {
             getAllDocsFromIDB(type, function(docsList) {
                 const doc = docsList.find(d => d.id == id);
                 if (doc) {
                     doc[field] = value.trim() || '-';
-                    updateDocInIDB(type, doc, function(success) {
-                        console.log(`ອັບເດດ ${field} ສຳເລັດແລ້ວ!`);
-                    });
+                    updateDocInIDB(type, doc, function(success) {});
                 }
             });
         }
@@ -1457,115 +1534,28 @@
                 if (doc && doc.fileDataUrl) {
                     const previewBody = document.getElementById('preview-body');
                     const downloadBtn = document.getElementById('download-btn-modal');
-                    document.getElementById('preview-file-title').innerText = "🔍 ເນື້ອໃນສັງລວມຫຍໍ້: " + doc.fileName;
-
-                    previewBody.innerHTML = '<p style="text-align:center; color:#64748b; font-weight:bold; margin-top:30px;">⏳ ກຳລັງຄັດເອົາເນື້ອໃນມາສັງລວມຫຍໍ້...</p>';
-
-                    if (doc.isImage) {
-                        previewBody.innerHTML = `<img src="${doc.fileDataUrl}" alt="Preview">`;
-                    } 
-                    else if (doc.isPDF) {
-                        previewBody.innerHTML = `<iframe src="${doc.fileDataUrl}"></iframe>`;
-                    } 
-                    else {
-                        try {
-                            const base64Data = doc.fileDataUrl.split(',')[1];
-                            const binaryString = window.atob(base64Data);
-                            const len = binaryString.length;
-                            const bytes = new Uint8Array(len);
-                            for (let i = 0; i < len; i++) {
-                                bytes[i] = binaryString.charCodeAt(i);
-                            }
-
-                            mammoth.convertToHtml({ arrayBuffer: bytes.buffer })
-                                .then(function(result) {
-                                    if (result.value && result.value.trim().length > 0) {
-                                        previewBody.innerHTML = `<div style="line-height:1.8; color:#0f172a;">${result.value}</div>`;
-                                    } else {
-                                        showSummaryCardDoc(previewBody, doc);
-                                    }
-                                })
-                                .catch(function(err) {
-                                    showSummaryCardDoc(previewBody, doc);
-                                });
-                        } catch(err) {
-                            showSummaryCardDoc(previewBody, doc);
-                        }
-                    }
-
-                    downloadBtn.onclick = function() {
-                        const a = document.createElement('a');
-                        a.href = doc.fileDataUrl;
-                        a.download = doc.fileName;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                    };
-
+                    document.getElementById('preview-file-title').innerText = "🔍 ເນື້ອໃນ: " + doc.fileName;
+                    previewBody.innerHTML = doc.isImage ? `<img src="${doc.fileDataUrl}">` : `<iframe src="${doc.fileDataUrl}"></iframe>`;
                     document.getElementById('file-preview-modal').style.display = 'flex';
                 }
             });
-        }
-
-        function showSummaryCardDoc(container, doc) {
-            container.innerHTML = `
-                <div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#f8fafc; border-radius:8px; padding:20px; box-sizing:border-box;">
-                    <div style="font-size: 64px; margin-bottom: 10px;">📄</div>
-                    <h3 style="color: #0f172a; margin: 5px 0 15px 0; font-size: 18px; text-align:center;">${doc.fileName}</h3>
-                    <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:15px 20px; width:85%; text-align:left; box-shadow:0 1px 3px rgba(0,0,0,0.05); margin-bottom:15px;">
-                        <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>📝 ເນື້ອໃນສັງລວມຫຍໍ້:</strong> ${doc.content}</p>
-                        <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>🔢 ເລກທີເອກະສານ:</strong> ${doc.docNo}</p>
-                        <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>📅 ວັນ/ເດືອນ/ປີ ເອກະສານ:</strong> ${formatDateDDMMYYYY(doc.docDate)}</p>
-                        <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>🏢 ພາກສ່ວນອັບໂຫຼດ:</strong> ${doc.ownerName || 'ADMIN'}</p>
-                        <p style="margin:5px 0; font-size:13px; color:#334155;"><strong>🕒 ວັນທີບັນທຶກເອກະສານ:</strong> ${doc.recordDate}</p>
-                    </div>
-                </div>
-            `;
         }
 
         function closeFilePreviewModal() {
             document.getElementById('file-preview-modal').style.display = 'none';
         }
 
-        function showGeneralReport() {
-            closeAllDropdowns();
-            document.getElementById('content-display').innerHTML = `<h2>📁 ບົດລາຍງານວຽກທົ່ວໄປ</h2>`;
-        }
+        function showGeneralReport() { closeAllDropdowns(); document.getElementById('content-display').innerHTML = `<h2>📁 ບົດລາຍງານວຽກທົ່ວໄປ</h2>`; }
+        function showStrategyPlanReport() { closeAllDropdowns(); document.getElementById('content-display').innerHTML = `<h2>📊 ບົດລາຍງານແຜນຍຸດທະສາດ</h2>`; }
 
-        function showStrategyPlanReport() {
-            closeAllDropdowns();
-            document.getElementById('content-display').innerHTML = `<h2>📊 ບົດລາຍງານແຜນຍຸດທະສາດ</h2>`;
-        }
-
-        /* ----------------------------------------------------
-           ຟັງຊັນ Custom Alert & Custom Confirm (ພາສາລາວ)
-        ---------------------------------------------------- */
         function showCustomAlert(msg, isSuccess = true) {
             document.getElementById('custom-alert-icon').innerText = isSuccess ? '✅' : '⚠️';
             document.getElementById('custom-alert-msg').innerText = msg;
-            
-            const btnCancel = document.getElementById('custom-alert-btn-cancel');
-            const btnOk = document.getElementById('custom-alert-btn-ok');
-
-            btnCancel.style.display = 'none';
-            btnOk.innerText = 'ຕົກລົງ';
-            btnOk.style.background = '#10b981';
-            btnOk.onclick = function() {
-                closeCustomAlert();
-            };
-
             document.getElementById('custom-alert').style.display = 'flex';
         }
 
-        function closeCustomAlert() {
-            document.getElementById('custom-alert').style.display = 'none';
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('main-screen').style.display = 'none';
-        }
+        function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
+        function handleLogout() { currentUser = null; document.getElementById('login-screen').style.display = 'flex'; document.getElementById('main-screen').style.display = 'none'; }
     </script>
 </body>
 </html>
