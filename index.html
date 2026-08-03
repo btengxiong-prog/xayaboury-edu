@@ -287,9 +287,9 @@
 </head>
 <body onclick="closeAllDropdowns(event)">
 
-    <!-- Hidden File Inputs -->
-    <input type="file" id="hidden-file-input" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileSelected(event)">
-    <input type="file" id="proof-file-input" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleProofFileSelected(event)">
+    <!-- 🌟 1. กำหนด Accept เฉพาะ Word ແລະ Excel ເທົ່ານັ້ນ -->
+    <input type="file" id="hidden-file-input" style="display:none;" accept=".doc,.docx,.xls,.xlsx" onchange="handleFileSelected(event)">
+    <input type="file" id="proof-file-input" style="display:none;" accept=".doc,.docx,.xls,.xlsx" onchange="handleProofFileSelected(event)">
 
     <!-- Modal Preview ເບິ່ງເນື້ອໃນຫຍໍ້ -->
     <div id="file-preview-modal" class="image-modal-overlay" onclick="closeFilePreviewModal()">
@@ -308,15 +308,15 @@
         <div class="input-modal-box">
             <h3 id="doc-modal-title">📝 ປ້ອນຂໍ້ມູນເອກະສານ</h3>
             <div class="form-field">
-                <label>ເລືອກໄຟລ໌ເອກະສານ / ຮູບພາບ (Word, PDF, ຮູບ, Excel):</label>
+                <label>ເລືອກໄຟລ໌ເອກະສານ (ສະເພາະ Word, Excel):</label>
                 <div style="display:flex; gap:8px;">
                     <button type="button" onclick="document.getElementById('hidden-file-input').click()" style="padding:6px 12px; background:#e2e8f0; border:1px solid #cbd5e1; border-radius:4px; cursor:pointer; font-size:12px;">📎 ເລືອກໄຟລ໌</button>
                     <span id="selected-filename-display" style="font-size:12px; color:#2563eb; align-self:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px;">ຍັງບໍ່ໄດ້ເລືອກໄຟລ໌</span>
                 </div>
             </div>
             <div class="form-field">
-                <label>ເນື້ອໃນບົດຫຍໍ້ (ສຳລັບ PDF, ຮູບພາບ ແລະ ທຸກໄຟລ໌ - ສາມາດພິມ/ແກ້ໄຂເພີ່ມເຕີມໄດ້):</label>
-                <textarea id="modal-doc-content" rows="4" placeholder="ປ້ອນ ຫຼື ວາງ (Paste) ບົດຫຍໍ້/ລາຍລະອຽດທີ່ຕ້ອງການໃຫ້ລະບົບສະຫຼຸບ..."></textarea>
+                <label>ເນື້ອໃນເອກະສານ (ສຳລັບ Word / Excel):</label>
+                <textarea id="modal-doc-content" rows="4" placeholder="ປ້ອນ ຫຼື ວາງ (Paste) ເນື້ອໃນ..."></textarea>
             </div>
             <div class="form-field">
                 <label>ເລກທີເອກະສານ:</label>
@@ -834,9 +834,16 @@
             const input = event.target;
             if (input.files && input.files[0] && currentUploadProofTargetKey) {
                 const file = input.files[0];
+                // 🌟 ຕັດສິດໄຟລ໌ PDF/ຮູບພາບ ບໍ່ໃຫ້ອັບໂຫຼດ
+                const fileName = file.name.toLowerCase();
+                if (fileName.endsWith('.pdf') || fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || fileName.endsWith('.png')) {
+                    showCustomAlert('⚠️ ລະບົບไม่อະນຸຍາດໃຫ້ນຳໃຊ້ໄຟລ໌ PDF ຫຼື ຮູບພາບ! ກະລຸນາເລືອກສະເພາະໄຟລ໌ Word ຫຼື Excel.', false);
+                    input.value = '';
+                    return;
+                }
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const proofData = { fileName: file.name, fileDataUrl: e.target.result, fileType: file.type, isImage: file.type.startsWith('image/'), isPDF: file.type === 'application/pdf', isDocx: file.name.toLowerCase().endsWith('.docx') };
+                    const proofData = { fileName: file.name, fileDataUrl: e.target.result, fileType: file.type, isImage: false, isPDF: false, isDocx: file.name.toLowerCase().endsWith('.docx') };
                     localStorage.setItem(`proof_${currentUploadProofTargetKey}`, JSON.stringify(proofData));
                     showCustomAlert('✅ ອັບໂຫຼດໄຟລ໌ສຳເລັດ!');
                     showStrategy(currentUploadProofTargetKey.split('_')[0]);
@@ -887,13 +894,24 @@
             const input = event.target;
             if (input.files && input.files[0]) {
                 const file = input.files[0];
+                const fileName = file.name.toLowerCase();
+
+                // 🌟 2. ປ້ອງກັນບໍ່ໃຫ້ເລືອກໄຟລ໌ PDF ຫຼື ຮູບພາບ (ກວດສອບນາມສະກຸນ)
+                if (fileName.endsWith('.pdf') || fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || fileName.endsWith('.png') || fileName.endsWith('.gif')) {
+                    showCustomAlert('⚠️ ລະບົບไม่อະນຸຍາດໃຫ້ນຳເຂົ້າໄຟລ໌ PDF ຫຼື ຮູບພາບ! ກະລຸນາເລືອກສະເພາະໄຟລ໌ Word (.doc, .docx) ຫຼື Excel (.xls, .xlsx).', false);
+                    input.value = '';
+                    document.getElementById('selected-filename-display').innerText = 'ຍັງບໍ່ໄດ້ເລືອກໄຟລ໌';
+                    tempFileData = null;
+                    return;
+                }
+
                 const reader = new FileReader();
                 document.getElementById('modal-doc-date').value = new Date(file.lastModified || Date.now()).toISOString().split('T')[0];
                 let cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
                 document.getElementById('modal-doc-content').value = cleanName;
 
                 reader.onload = function(e) {
-                    tempFileData = { fileName: file.name, fileDataUrl: e.target.result, fileType: file.type, isImage: file.type.startsWith('image/'), isPDF: file.type === 'application/pdf', isDocx: file.name.toLowerCase().endsWith('.docx') };
+                    tempFileData = { fileName: file.name, fileDataUrl: e.target.result, fileType: file.type, isImage: false, isPDF: false, isDocx: file.name.toLowerCase().endsWith('.docx') };
                     document.getElementById('selected-filename-display').innerText = '📎 ' + file.name;
                 };
                 reader.readAsDataURL(file);
@@ -905,14 +923,13 @@
             const docNo = document.getElementById('modal-doc-no').value.trim();
             const docDate = document.getElementById('modal-doc-date').value;
             if (!content) { alert('ກະລຸນາປ້ອນເນື້ອໃນ!'); return; }
+            if (!tempFileData) { showCustomAlert('⚠️ ກະລຸນາເລືອກໄຟລ໌ເອກະສານ (Word ຫຼື Excel) ກ່ອນ!', false); return; }
 
             getAllDocsFromIDB(currentImportType, function(existingDocs) {
-                if (tempFileData && tempFileData.fileName) {
-                    let isDuplicate = existingDocs.some(d => d.fileName === tempFileData.fileName);
-                    if (isDuplicate) {
-                        showCustomAlert(`⚠️ ໄຟລ໌ "${tempFileData.fileName}" ມີຢູ່ໃນລະບົບແລ້ວ! ບໍ່ສາມາດອັບໂຫຼດໄຟລ໌ຊ້ຳກັນໄດ້.`, false);
-                        return;
-                    }
+                let isDuplicate = existingDocs.some(d => d.fileName === tempFileData.fileName);
+                if (isDuplicate) {
+                    showCustomAlert(`⚠️ ໄຟລ໌ "${tempFileData.fileName}" ມີຢູ່ໃນລະບົບແລ້ວ! ບໍ່ສາມາດອັບໂຫຼດໄຟລ໌ຊ້ຳກັນໄດ້.`, false);
+                    return;
                 }
 
                 const now = new Date();
@@ -920,12 +937,12 @@
 
                 const newDoc = {
                     id: Date.now(), content, docNo: docNo || '-', docDate: docDate || '-',
-                    fileName: tempFileData ? tempFileData.fileName : 'ບໍ່ມີໄຟລ໌',
-                    fileDataUrl: tempFileData ? tempFileData.fileDataUrl : '',
-                    fileType: tempFileData ? tempFileData.fileType : '',
-                    isImage: tempFileData ? tempFileData.isImage : false,
-                    isPDF: tempFileData ? tempFileData.isPDF : false,
-                    isDocx: tempFileData ? tempFileData.isDocx : false,
+                    fileName: tempFileData.fileName,
+                    fileDataUrl: tempFileData.fileDataUrl,
+                    fileType: tempFileData.fileType,
+                    isImage: false,
+                    isPDF: false,
+                    isDocx: tempFileData.isDocx,
                     recordDate, owner: currentUser ? currentUser.username : 'EDUXYBL', ownerName: currentUser ? currentUser.name : 'ADMIN'
                 };
 
@@ -962,7 +979,7 @@
                 let rowsHTML = '';
                 if (docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
-                        let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
+                        let fileIcon = doc.isDocx ? '📄' : '📊';
                         let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, 'general')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນຫຍໍ້">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
 
                         rowsHTML += `
@@ -1012,7 +1029,7 @@
                 let rowsHTML = '';
                 if (docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
-                        let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
+                        let fileIcon = doc.isDocx ? '📄' : '📊';
                         let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, 'strategy')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນຫຍໍ້">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
 
                         rowsHTML += `
@@ -1065,7 +1082,7 @@
                 let rowsHTML = '';
                 if (docsList && docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
-                        let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
+                        let fileIcon = doc.isDocx ? '📄' : '📊';
                         let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງໄຟລ໌ຕົ້ນສະບັບ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
                         
                         let deleteBtnHTML = isAdmin ? `<button type="button" class="remove-file-btn" onclick="deleteDocEntry('${type}', ${doc.id})">🗑️ ລົບ</button>` : `<span style="color:#64748b; font-size:11px;">(ສະເພາະ ADMIN)</span>`;
@@ -1101,13 +1118,12 @@
             });
         }
 
-        // 🌟 ຟັງຊັນລົບເອກະສານແບບ Custom Confirm ສວຍງາມ (ບໍ່ໃຊ້ browser confirm)
         function deleteDocEntry(type, id) {
             if (currentUser && currentUser.type !== 'admin') {
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດລົບເອກະສານ!', false);
                 return;
             }
-            showCustomConfirm('🗑️ ທ່ານຕ້ອງການລົບເອກະສານນີ້ออกจากລະບົບແທ້ ຫຼື ບໍ່?', function() {
+            showCustomConfirm('🗑️ ທ່ານຕ້ອງການລົບເອກະສານນີ້ອອກຈາກລະບົບແທ້ ຫຼື ບໍ່?', function() {
                 deleteDocFromIDB(type, id, function(success) {
                     if (success) {
                         showCustomAlert('🗑️ ລົບເອກະສານສຳເລັດ!');
@@ -1214,7 +1230,7 @@
         }
 
         /* ----------------------------------------------------
-           Modal Preview: ສະແດງເນື້ອໃນຫຍໍ້ (doc.content) ຢ່າງຈະແຈ້ງ 100% ທຸກປະເພດໄຟລ໌
+           Modal Preview: ສະແດງເນື້ອໃນຫຍໍ້ (doc.content) ຢ່າງຈະແຈ້ງ 100%
         ---------------------------------------------------- */
         function openFilePreviewModal(id, type) {
             getAllDocsFromIDB(type, function(docsList) {
@@ -1234,7 +1250,7 @@
                         </div>
                         <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px;">
                             <p style="margin: 0 0 10px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📄 ລາຍລະອຽດເນື້ອໃນບົດຄວາມທັງໝົດ:</p>
-                            <div style="background: #f8fafc; border-left: 4px solid #2563eb; padding: 15px; border-radius: 4px; color: #1e293b; font-size: 14px; line-height: 1.8;">
+                            <div id="word-parsed-content" style="background: #f8fafc; border-left: 4px solid #2563eb; padding: 15px; border-radius: 4px; color: #1e293b; font-size: 14px; line-height: 1.8;">
                                 ${doc.content}
                             </div>
                         </div>
@@ -1251,10 +1267,7 @@
                             }
                             mammoth.convertToHtml({ arrayBuffer: bytes.buffer })
                                 .then(function(result) {
-                                    const extraDiv = document.createElement('div');
-                                    extraDiv.style.cssText = "margin-top: 15px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px; color: #1e293b; font-size: 13px; line-height: 1.8;";
-                                    extraDiv.innerHTML = `<p style="margin: 0 0 10px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📄 ຂໍ້ຄວາມຈາກໄຟລ໌ Word:</p>` + result.value;
-                                    previewBody.appendChild(extraDiv);
+                                    document.getElementById('word-parsed-content').innerHTML = result.value;
                                 })
                                 .catch(function() {});
                         } catch(e) {}
