@@ -165,7 +165,7 @@
             display: block;
             margin: 0 auto;
         }
-        .preview-container iframe, .preview-container embed {
+        .preview-container iframe {
             width: 100%;
             height: 100%;
             border: none;
@@ -853,7 +853,7 @@
             if (proofData && proofData.fileDataUrl) {
                 const previewBody = document.getElementById('preview-body');
                 document.getElementById('preview-file-title').innerText = "🔍 ເບິ່ງໄຟລ໌: " + proofData.fileName;
-                previewBody.innerHTML = proofData.isImage ? `<img src="${proofData.fileDataUrl}">` : `<embed src="${proofData.fileDataUrl}" type="application/pdf">`;
+                previewBody.innerHTML = proofData.isImage ? `<img src="${proofData.fileDataUrl}">` : `<iframe src="${proofData.fileDataUrl}"></iframe>`;
                 document.getElementById('file-preview-modal').style.display = 'flex';
             }
         }
@@ -937,7 +937,7 @@
         }
 
         /* ----------------------------------------------------
-           2. ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້ - ກົດເບິ່ງໄຟລ໌ຕົ້ນສະບັບ)
+           2. ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້)
         ---------------------------------------------------- */
         function showGeneralShortSummary() {
             closeAllDropdowns();
@@ -952,7 +952,7 @@
                 if (docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
                         let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
-                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, 'general')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງໄຟລ໌ຕົ້ນສະບັບ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, 'general')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
 
                         rowsHTML += `
                             <tr>
@@ -970,13 +970,12 @@
                 contentDisplay.innerHTML = `
                     <div class="report-container" style="max-width: 100%;">
                         <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📊 ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)</h2>
-                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້ານີ້ດຶງຂໍ້ມູນຈາກ "ຂໍ້ມູນວຽກທົ່ວໄປ" ົາມາຫຍໍ້ໃຫ້ສັ້ນກະທັດຮັດ ພ້ອມໄຟລ໌ອ້າງອີງສະບັບຕົ້ນ.</p>
                         <table class="strategy-table" style="width: 100%;">
                             <thead>
                                 <tr>
                                     <th style="width: 8%; text-align: center;">ລຳດັບ</th>
                                     <th style="width: 42%;">ເນື້ອໃນຫຍໍ້ວຽກທົ່ວໄປ</th>
-                                    <th style="width: 25%; text-align: center;">ໄຟລ໌ຕົ້ນສະບັບ (ກົດເບິ່ງໄດ້)</th>
+                                    <th style="width: 25%; text-align: center;">ໄຟລ໌ອ້າງອີງ</th>
                                     <th style="width: 25%; text-align: center;">ສະຖານະ</th>
                                 </tr>
                             </thead>
@@ -988,7 +987,7 @@
         }
 
         /* ----------------------------------------------------
-           3. ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້ - ກົດເບິ່ງໄຟລ໌ຕົ້ນສະບັບ)
+           3. ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້)
         ---------------------------------------------------- */
         function showStrategyShortSummary() {
             closeAllDropdowns();
@@ -1003,7 +1002,7 @@
                 if (docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
                         let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
-                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, 'strategy')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງໄຟລ໌ຕົ້ນສະບັບ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, 'strategy')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
 
                         rowsHTML += `
                             <tr>
@@ -1021,13 +1020,12 @@
                 contentDisplay.innerHTML = `
                     <div class="report-container" style="max-width: 100%;">
                         <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">🎯 ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)</h2>
-                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້ານີ້ດຶງຂໍ້ມູນຈາກ "ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ" ົາມາຫຍໍ້ໃຫ້ສັ້ນກະທັດຮັດ ພ້ອມໄຟລ໌ອ້າງອີງສະບັບຕົ້ນ.</p>
                         <table class="strategy-table" style="width: 100%;">
                             <thead>
                                 <tr>
                                     <th style="width: 8%; text-align: center;">ລຳດັບ</th>
                                     <th style="width: 42%;">ເນື້ອໃນຫຍໍ້ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</th>
-                                    <th style="width: 25%; text-align: center;">ໄຟລ໌ຕົ້ນສະບັບ (ກົດເບິ່ງໄດ້)</th>
+                                    <th style="width: 25%; text-align: center;">ໄຟລ໌ອ້າງອີງ</th>
                                     <th style="width: 25%; text-align: center;">ສະຖານະ</th>
                                 </tr>
                             </thead>
@@ -1039,7 +1037,7 @@
         }
 
         /* ----------------------------------------------------
-           4. ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ສະບັບເຕັມ/ຕົ້ນສະບັບ)
+           4. ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ສະບັບເຕັມ/ຕົ້ນສະບັບ) - ໃຫ້ກົດເບິ່ງໄຟລ໌ສະບັບຕົ້ນໄດ້
         ---------------------------------------------------- */
         function showDocListTable(type) {
             closeAllDropdowns();
@@ -1056,6 +1054,7 @@
                 if (docsList && docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
                         let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
+                        /* 🌟 ຮັບປະກັນວ່າເມື່ອກົດຊື່ໄຟລ໌ໃນ "ຂໍ້ມູນວຽກທົ່ວໄປ" ແລະ "ຂໍ້ມູນແຜນຍຸດທະສາດ" ຈະເປີດ Modal Preview ສະບັບຕົ້ນຂຶ້ນມາ */
                         let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງໄຟລ໌ຕົ້ນສະບັບ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
 
                         rowsHTML += `
@@ -1199,7 +1198,7 @@
                         previewBody.innerHTML = `<img src="${doc.fileDataUrl}" alt="Preview">`;
                     } 
                     else if (doc.isPDF) {
-                        previewBody.innerHTML = `<embed src="${doc.fileDataUrl}" type="application/pdf">`;
+                        previewBody.innerHTML = `<embed src="${doc.fileDataUrl}" type="application/pdf" width="100%" height="100%">`;
                     } 
                     else if (doc.isDocx) {
                         try {
