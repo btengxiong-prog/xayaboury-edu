@@ -929,14 +929,14 @@
         }
 
         /* ----------------------------------------------------
-           1. ຂໍ້ມູນວຽກທົ່ວໄປ (ສະບັບເຕັມ/ຕົ້ນສະບັບ - ຈາກເມນູລຸ່ມ)
+           1. ຂໍ້ມູນວຽກທົ່ວໄປ (ສະບັບເຕັມ/ຕົ້ນສະບັບ)
         ---------------------------------------------------- */
         function showGeneralSummaryTable() {
             showDocListTable('general');
         }
 
         /* ----------------------------------------------------
-           2. ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ - ຈາກເມນູເທິງ)
+           2. ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ - ພ້ອມໄຟລ໌ອ້າງອີງກົດເບິ່ງໄດ້)
         ---------------------------------------------------- */
         function showGeneralShortSummary() {
             closeAllDropdowns();
@@ -950,18 +950,35 @@
                 let rowsHTML = '';
                 if (docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
-                        rowsHTML += `<tr><td style="text-align: center; font-weight: bold;">${idx + 1}</td><td><strong>${doc.content}</strong> (ເລກທີ: ${doc.docNo})</td><td style="text-align: center; color: #047857; font-weight: bold;">✅ ສະຫຼຸບຫຍໍ້ຄົບຖ້ວນ (ບໍ່ຫຼຸດບໍ່ເກີນ)</td></tr>`;
+                        let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
+                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, 'general')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+
+                        rowsHTML += `
+                            <tr>
+                                <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                                <td><strong>${doc.content}</strong> (ເລກທີ: ${doc.docNo !== '-' ? doc.docNo : '-'})</td>
+                                <td style="text-align: center;">${fileLink}</td>
+                                <td style="text-align: center; color: #047857; font-weight: bold;">✅ ສະຫຼຸບຫຍໍ້ຄົບຖ້ວນ (ບໍ່ຫຼຸດບໍ່ເກີນ)</td>
+                            </tr>
+                        `;
                     });
                 } else {
-                    rowsHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນວຽກທົ່ວໄປທີ່ນຳເຂົ້າ</td></tr>`;
+                    rowsHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນວຽກທົ່ວໄປທີ່ນຳເຂົ້າ</td></tr>`;
                 }
 
                 contentDisplay.innerHTML = `
                     <div class="report-container" style="max-width: 100%;">
                         <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📊 ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)</h2>
-                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້ານີ້ດຶງຂໍ້ມູນຈາກ "ຂໍ້ມູນວຽກທົ່ວໄປ" ົາມາຫຍໍ້ໃຫ້ສັ້ນກະທັດຮັດທີ່ສຸດ.</p>
+                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້ານີ້ດຶງຂໍ້ມູນຈາກ "ຂໍ້ມູນວຽກທົ່ວໄປ" ົາມາຫຍໍ້ໃຫ້ສັ້ນກະທັດຮັດ ພ້ອມໄຟລ໌ອ້າງອີງທີ່ສາມາດກົດເບິ່ງໄດ້.</p>
                         <table class="strategy-table" style="width: 100%;">
-                            <thead><tr><th style="width: 10%; text-align: center;">ລຳດັບ</th><th style="width: 60%;">ເນື້ອໃນຫຍໍ້ວຽກທົ່ວໄປ</th><th style="width: 30%; text-align: center;">ສະຖານະ</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th style="width: 8%; text-align: center;">ລຳດັບ</th>
+                                    <th style="width: 42%;">ເນື້ອໃນຫຍໍ້ວຽກທົ່ວໄປ</th>
+                                    <th style="width: 25%; text-align: center;">ໄຟລ໌ອ້າງອີງ (ກົດເບິ່ງໄດ້)</th>
+                                    <th style="width: 25%; text-align: center;">ສະຖານະ</th>
+                                </tr>
+                            </thead>
                             <tbody>${rowsHTML}</tbody>
                         </table>
                     </div>
@@ -970,7 +987,7 @@
         }
 
         /* ----------------------------------------------------
-           3. ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ - ຈາກເມນູເທິງ)
+           3. ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ - ພ້ອມໄຟລ໌ອ້າງອີງກົດເບິ່ງໄດ້)
         ---------------------------------------------------- */
         function showStrategyShortSummary() {
             closeAllDropdowns();
@@ -984,18 +1001,35 @@
                 let rowsHTML = '';
                 if (docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
-                        rowsHTML += `<tr><td style="text-align: center; font-weight: bold;">${idx + 1}</td><td><strong>${doc.content}</strong> (ເລກທີ: ${doc.docNo})</td><td style="text-align: center; color: #047857; font-weight: bold;">✅ ສະຫຼຸບຫຍໍ້ຄົບຖ້ວນ (ບໍ່ຫຼຸດບໍ່ເກີນ)</td></tr>`;
+                        let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
+                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, 'strategy')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+
+                        rowsHTML += `
+                            <tr>
+                                <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                                <td><strong>${doc.content}</strong> (ເລກທີ: ${doc.docNo !== '-' ? doc.docNo : '-'})</td>
+                                <td style="text-align: center;">${fileLink}</td>
+                                <td style="text-align: center; color: #047857; font-weight: bold;">✅ ສະຫຼຸບຫຍໍ້ຄົບຖ້ວນ (ບໍ່ຫຼຸດບໍ່ເກີນ)</td>
+                            </tr>
+                        `;
                     });
                 } else {
-                    rowsHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມທີ່ນຳເຂົ້າ</td></tr>`;
+                    rowsHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມທີ່ນຳເຂົ້າ</td></tr>`;
                 }
 
                 contentDisplay.innerHTML = `
                     <div class="report-container" style="max-width: 100%;">
                         <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">🎯 ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)</h2>
-                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້ານີ້ດຶງຂໍ້ມູນຈາກ "ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ" ົາມາຫຍໍ້ໃຫ້ສັ້ນກະທັດຮັດ.</p>
+                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້ານີ້ດຶງຂໍ້ມູນຈາກ "ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ" ົາມາຫຍໍ້ໃຫ້ສັ້ນກະທັດຮັດ ພ້ອມໄຟລ໌ອ້າງອີງ.</p>
                         <table class="strategy-table" style="width: 100%;">
-                            <thead><tr><th style="width: 10%; text-align: center;">ລຳດັບ</th><th style="width: 60%;">ເນື້ອໃນຫຍໍ້ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</th><th style="width: 30%; text-align: center;">ສະຖານະ</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th style="width: 8%; text-align: center;">ລຳດັບ</th>
+                                    <th style="width: 42%;">ເນື້ອໃນຫຍໍ້ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</th>
+                                    <th style="width: 25%; text-align: center;">ໄຟລ໌ອ້າງອີງ (ກົດເບິ່ງໄດ້)</th>
+                                    <th style="width: 25%; text-align: center;">ສະຖານະ</th>
+                                </tr>
+                            </thead>
                             <tbody>${rowsHTML}</tbody>
                         </table>
                     </div>
@@ -1004,7 +1038,7 @@
         }
 
         /* ----------------------------------------------------
-           4. ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ສະບັບເຕັມ/ຕົ້ນສະບັບ - ຈາກເມນູລຸ່ມ)
+           4. ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ສະບັບເຕັມ/ຕົ້ນສະບັບ)
         ---------------------------------------------------- */
         function showDocListTable(type) {
             closeAllDropdowns();
