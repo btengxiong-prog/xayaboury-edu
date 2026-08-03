@@ -165,7 +165,7 @@
             display: block;
             margin: 0 auto;
         }
-        .preview-container iframe {
+        .preview-container iframe, .preview-container embed {
             width: 100%;
             height: 100%;
             border: none;
@@ -300,7 +300,7 @@
     <input type="file" id="hidden-file-input" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileSelected(event)">
     <input type="file" id="proof-file-input" style="display:none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleProofFileSelected(event)">
 
-    <!-- Modal Preview ເບິ່ງເນື້ອໃນໄຟລ໌ (ຕາມຮູບ 2) -->
+    <!-- Modal Preview ເບິ່ງເນື້ອໃນໄຟລ໌ -->
     <div id="file-preview-modal" class="image-modal-overlay" onclick="closeFilePreviewModal()">
         <div class="image-modal-content" onclick="event.stopPropagation()">
             <h3 id="preview-file-title" style="margin-top:0; color:#0f172a; font-size:15px; margin-bottom:12px;">🔍 ເນື້ອໃນ: </h3>
@@ -853,7 +853,7 @@
             if (proofData && proofData.fileDataUrl) {
                 const previewBody = document.getElementById('preview-body');
                 document.getElementById('preview-file-title').innerText = "🔍 ເບິ່ງໄຟລ໌: " + proofData.fileName;
-                previewBody.innerHTML = proofData.isImage ? `<img src="${proofData.fileDataUrl}">` : `<iframe src="${proofData.fileDataUrl}"></iframe>`;
+                previewBody.innerHTML = proofData.isImage ? `<img src="${proofData.fileDataUrl}">` : `<embed src="${proofData.fileDataUrl}" type="application/pdf">`;
                 document.getElementById('file-preview-modal').style.display = 'flex';
             }
         }
@@ -937,7 +937,7 @@
         }
 
         /* ----------------------------------------------------
-           2. ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ - ກົດເບິ່ງ Modal Preview ຕາມຮູບ 2)
+           2. ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)
         ---------------------------------------------------- */
         function showGeneralShortSummary() {
             closeAllDropdowns();
@@ -988,7 +988,7 @@
         }
 
         /* ----------------------------------------------------
-           3. ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ - ກົດເບິ່ງ Modal Preview ຕາມຮູບ 2)
+           3. ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)
         ---------------------------------------------------- */
         function showStrategyShortSummary() {
             closeAllDropdowns();
@@ -1056,7 +1056,7 @@
                 if (docsList && docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
                         let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
-                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
 
                         rowsHTML += `
                             <tr>
@@ -1183,7 +1183,7 @@
         }
 
         /* ----------------------------------------------------
-           Modal Preview ເປີດອ່ານເນື້ອໃນກ่อนດາວໂຫຼດ (ຕາມຮູບ 2)
+           Modal Preview ເປີດອ່ານເນື້ອໃນ PDF, Word, ຮູບພາບ ກ່ອນດາວໂຫຼດ
         ---------------------------------------------------- */
         function openFilePreviewModal(id, type) {
             getAllDocsFromIDB(type, function(docsList) {
@@ -1199,7 +1199,8 @@
                         previewBody.innerHTML = `<img src="${doc.fileDataUrl}" alt="Preview">`;
                     } 
                     else if (doc.isPDF) {
-                        previewBody.innerHTML = `<iframe src="${doc.fileDataUrl}"></iframe>`;
+                        // 🌟 ແກ້ໄຂ: ใช้ <embed> ສຳລັບ PDF ເພື່ອໃຫ້ Browser ສະແດງຜົນໄດ້ຢ່າງສົມບູນ 100%
+                        previewBody.innerHTML = `<embed src="${doc.fileDataUrl}" type="application/pdf">`;
                     } 
                     else if (doc.isDocx) {
                         try {
@@ -1215,7 +1216,7 @@
                                     previewBody.innerHTML = `<div style="line-height:1.8; color:#0f172a;">${result.value}</div>`;
                                 })
                                 .catch(function() {
-                                    previewBody.innerHTML = `<p style="text-align:center; padding:30px;">📄 ໄຟລ໌: ${doc.fileName}</p>`;
+                                    previewBody.innerHTML = `<p style="text-align:center; padding:30px;">📄 ໄຟລ໌: ${doc.fileName} (ບໍ່ສາມາດສະແດງຜົນຕົວໜັງສືໄດ້ໂດຍກົງ)</p>`;
                                 });
                         } catch(e) {
                             previewBody.innerHTML = `<p style="text-align:center; padding:30px;">📄 ໄຟລ໌: ${doc.fileName}</p>`;
@@ -1224,7 +1225,6 @@
                         previewBody.innerHTML = `<p style="text-align:center; padding:30px;">📄 ໄຟລ໌: ${doc.fileName}</p>`;
                     }
 
-                    // ປຸ່ມດາວໂຫຼດໃຫ້ກົດໂຫຼດພາຍຫຼັງ (ຕາມຮູບ 2)
                     downloadBtn.onclick = function() {
                         const a = document.createElement('a');
                         a.href = doc.fileDataUrl;
