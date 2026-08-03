@@ -165,7 +165,7 @@
             display: block;
             margin: 0 auto;
         }
-        .preview-container embed, .preview-container iframe {
+        .preview-container iframe {
             width: 100%;
             height: 100%;
             border: none;
@@ -379,17 +379,17 @@
     <div id="main-screen" class="main-wrapper" style="display: none;">
         
         <div class="top-toolbar">
-            <!-- 1. ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ -->
+            <!-- 1. ແຜນຍຸດທະສາດ/ຈຸດສຸມ (ປ່ຽນຊື່ຕາມຮ້ອງຂໍ) -->
             <div class="tool-item admin-only-btn" onclick="showAddStrategyForm()">
                 <span class="icon">📝</span>
-                <span>ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</span>
+                <span>ແຜນຍຸດທະສາດ/ຈຸດສຸມ</span>
             </div>
 
-            <!-- 2. ນຳເຂົ້າແຜນ ▾ -->
+            <!-- 2. ນຳເຂົ້າແຜນປະຕິບັດ ▾ (ປ່ຽນຊື່ຕາມຮ້ອງຂໍ) -->
             <div class="dropdown-container">
                 <div class="tool-item" onclick="toggleDropdown(event, 'import-dropdown-menu')">
                     <span class="icon">📥</span>
-                    <span>ນຳເຂົ້າແຜນ ▾</span>
+                    <span>ນຳເຂົ້າແຜນປະຕິບັດ ▾</span>
                 </div>
                 <div id="import-dropdown-menu" class="dropdown-menu">
                     <div onclick="openImportModal('general')">📁 ນຳເຂົ້າແຜນວຽກທົ່ວໄປ</div>
@@ -1181,12 +1181,28 @@
         }
 
         /* ----------------------------------------------------
-           Modal Preview ປ່ຽນມາໃຊ້ Blob URL ສຳລັບ PDF ຮັບປະກັນເປີດຂຶ້ນ 100%
+           Modal Preview: ใช้ window.open เพื่อเปิด PDF ในแท็บใหม่ทันที (แก้ปัญหา White Screen ใน Modal 100%)
         ---------------------------------------------------- */
         function openFilePreviewModal(id, type) {
             getAllDocsFromIDB(type, function(docsList) {
                 const doc = docsList.find(d => d.id == id);
                 if (doc && doc.fileDataUrl) {
+                    if (doc.isPDF) {
+                        // 🌟 สำหรับ PDF เปิดในแท็บใหม่ของ Browser โดยตรงเพื่อให้แสดงผลและดาวน์โหลดได้อย่างสมบูรณ์ 100%
+                        const arr = doc.fileDataUrl.split(',');
+                        const mime = arr[0].match(/:(.*?);/)[1];
+                        const bstr = atob(arr[1]);
+                        let n = bstr.length;
+                        const u8arr = new Uint8Array(n);
+                        while (n--) {
+                            u8arr[n] = bstr.charCodeAt(n);
+                        }
+                        const blob = new Blob([u8arr], { type: mime });
+                        const blobUrl = URL.createObjectURL(blob);
+                        window.open(blobUrl, '_blank');
+                        return;
+                    }
+
                     const previewBody = document.getElementById('preview-body');
                     const downloadBtn = document.getElementById('download-btn-modal');
                     document.getElementById('preview-file-title').innerText = "🔍 ໄຟລ໌ຕົ້ນສະບັບ: " + doc.fileName;
@@ -1195,24 +1211,6 @@
 
                     if (doc.isImage) {
                         previewBody.innerHTML = `<img src="${doc.fileDataUrl}" alt="Preview">`;
-                    } 
-                    else if (doc.isPDF) {
-                        // 🌟 แปลง Base64 เป็น Blob URL เพื่อให้ Browser ทุกตัวแสดงผล PDF ได้อย่างສົມບູນ 100%
-                        try {
-                            const arr = doc.fileDataUrl.split(',');
-                            const mime = arr[0].match(/:(.*?);/)[1];
-                            const bstr = atob(arr[1]);
-                            let n = bstr.length;
-                            const u8arr = new Uint8Array(n);
-                            while (n--) {
-                                u8arr[n] = bstr.charCodeAt(n);
-                            }
-                            const blob = new Blob([u8arr], { type: mime });
-                            const blobUrl = URL.createObjectURL(blob);
-                            previewBody.innerHTML = `<iframe src="${blobUrl}" style="width:100%; height:100%; border:none;"></iframe>`;
-                        } catch (err) {
-                            previewBody.innerHTML = `<embed src="${doc.fileDataUrl}" type="application/pdf" width="100%" height="100%">`;
-                        }
                     } 
                     else if (doc.isDocx) {
                         try {
