@@ -201,6 +201,11 @@
             background: #10b981; color: white; border: none; padding: 9px 28px;
             border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;
         }
+        .custom-alert-btn-danger {
+            background: #ef4444; color: white; border: none; padding: 9px 20px;
+            border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;
+        }
+        .custom-alert-btn-danger:hover { background: #dc2626; }
 
         .input-modal-box {
             background: #ffffff;
@@ -218,8 +223,8 @@
             width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; font-family: inherit;
         }
         .modal-btn-group { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-        .btn-cancel { background: #ef4444; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-cancel:hover { background: #dc2626; }
+        .btn-cancel { background: #64748b; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-cancel:hover { background: #475569; }
 
         .dropdown-container { position: relative; display: inline-block; }
         .dropdown-menu {
@@ -328,7 +333,7 @@
         </div>
     </div>
 
-    <!-- Custom Alert Popup -->
+    <!-- Custom Alert & Confirm Popup -->
     <div id="custom-alert" class="custom-alert-overlay">
         <div class="custom-alert-box">
             <div id="custom-alert-icon" class="custom-alert-icon">✅</div>
@@ -901,7 +906,6 @@
             const docDate = document.getElementById('modal-doc-date').value;
             if (!content) { alert('ກະລຸນາປ້ອນເນື້ອໃນ!'); return; }
 
-            // 🌟 1. ກວດສອບບໍ່ໃຫ້ອັບໂຫຼດໄຟລ໌ຊ້ຳກັນ (ກວດຈາກຊື່ໄຟລ໌ fileName)
             getAllDocsFromIDB(currentImportType, function(existingDocs) {
                 if (tempFileData && tempFileData.fileName) {
                     let isDuplicate = existingDocs.some(d => d.fileName === tempFileData.fileName);
@@ -1064,8 +1068,7 @@
                         let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
                         let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງໄຟລ໌ຕົ້ນສະບັບ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
                         
-                        // 🌟 2. ປຸ່ມລົບສຳລັບ ADMIN
-                        let deleteBtnHTML = isAdmin ? `<button type="button" class="remove-file-btn" onclick="deleteDocEntry('${type}', ${doc.id})">🗑️ ລົບ</button>` : `<span style="color:#64748b; font-size:11px;">(ສະເພາະ ADMIN)</span>`;
+                        let deleteBtnHTML = isAdmin ? `<button type="button" class="remove-file-btn" onclick="confirmDeleteDoc('${type}', ${doc.id})">🗑️ ລົບ</button>` : `<span style="color:#64748b; font-size:11px;">(ສະເພາະ ADMIN)</span>`;
 
                         rowsHTML += `
                             <tr>
@@ -1098,14 +1101,29 @@
             });
         }
 
-        // 🌟 ຟັງຊັນສຳລັບ ADMIN ລົບເອກະສານອອກ
-        function deleteDocEntry(type, id) {
+        // 🌟 ລະບົບແຈ້ງເຕືອນແບບສວຍງາມສຳລັບຢືນຢັນການລົບ (ທາບແທນ Browser confirm)
+        function confirmDeleteDoc(type, id) {
             if (currentUser && currentUser.type !== 'admin') {
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດລົບເອກະສານ!', false);
                 return;
             }
-            if (confirm('🗑️ ທ່ານຕ້ອງການລົບເອກະສານນີ້ອອກຈາກລະບົບແທ້ ຫຼື ບໍ່?')) {
+
+            const alertOverlay = document.getElementById('custom-alert');
+            document.getElementById('custom-alert-icon').innerText = '🗑️';
+            document.getElementById('custom-alert-msg').innerText = 'ທ່ານຕ້ອງການລົບເອກະສານນີ້ออกจากระบบແທ້ ຫຼື ບໍ່?';
+            
+            let cancelBtn = document.getElementById('custom-alert-btn-cancel');
+            let okBtn = document.getElementById('custom-alert-btn-ok');
+
+            cancelBtn.style.display = 'inline-block';
+            cancelBtn.innerText = 'ຍົກເລີກ';
+            cancelBtn.onclick = function() { closeCustomAlert(); };
+
+            okBtn.innerText = 'ລົບອອກ';
+            okBtn.className = 'custom-alert-btn-danger';
+            okBtn.onclick = function() {
                 deleteDocFromIDB(type, id, function(success) {
+                    closeCustomAlert();
                     if (success) {
                         showCustomAlert('🗑️ ລົບເອກະສານສຳເລັດ!');
                         showDocListTable(type);
@@ -1113,7 +1131,9 @@
                         showCustomAlert('⚠️ ບໍ່ສາມາດລົບເອກະສານໄດ້!', false);
                     }
                 });
-            }
+            };
+
+            alertOverlay.style.display = 'flex';
         }
 
         function showExecutionTable() {
@@ -1274,11 +1294,23 @@
         function closeFilePreviewModal() { document.getElementById('file-preview-modal').style.display = 'none'; }
         function showGeneralReport() { closeAllDropdowns(); document.getElementById('content-display').innerHTML = `<h2>📁 ບົດລາຍງານວຽກທົ່ວໄປ</h2>`; }
         function showStrategyPlanReport() { closeAllDropdowns(); document.getElementById('content-display').innerHTML = `<h2>📊 ບົດລາຍງານແຜນຍຸດທະສາດ</h2>`; }
+        
         function showCustomAlert(msg, isSuccess = true) {
+            let alertBox = document.getElementById('custom-alert');
             document.getElementById('custom-alert-icon').innerText = isSuccess ? '✅' : '⚠️';
             document.getElementById('custom-alert-msg').innerText = msg;
-            document.getElementById('custom-alert').style.display = 'flex';
+            
+            let cancelBtn = document.getElementById('custom-alert-btn-cancel');
+            let okBtn = document.getElementById('custom-alert-btn-ok');
+
+            cancelBtn.style.display = 'none';
+            okBtn.innerText = 'ຕົກລົງ';
+            okBtn.className = 'custom-alert-btn';
+            okBtn.onclick = function() { closeCustomAlert(); };
+
+            alertBox.style.display = 'flex';
         }
+
         function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
         function handleLogout() { currentUser = null; document.getElementById('login-screen').style.display = 'flex'; document.getElementById('main-screen').style.display = 'none'; }
     </script>
