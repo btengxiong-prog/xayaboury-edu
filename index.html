@@ -249,7 +249,6 @@
             max-width: 900px; margin: 0 auto; font-family: 'Phetsarath OT', 'Saysana', sans-serif; color: #1e293b; line-height: 1.6;
         }
 
-        /* 🌟 CSS ສຳລັບຈັດ Top Toolbar ໃຫ້ໄອຄອນຢູ່ເທິງ ແລະ ຂໍ້ຄວາມຢູ່ລຸ່ມສະເໝີກັນທັງໝົດ */
         .top-toolbar {
             display: flex;
             align-items: center;
@@ -332,7 +331,7 @@
                 <input type="text" id="modal-doc-no" placeholder="ຕົວຢ່າງ: 123/ພສກ.ຊບ">
             </div>
             <div class="form-field">
-                <label>ວັນ/ເດືອນ/ປີ ເອກະສານ (ຄັດເລືອກອັດຕະໂນມັດ / ສາມາດແກ້ໄຂໄດ້):</label>
+                <label>ວັນ/ເດືອນ/ປີ ເອກະສານ:</label>
                 <input type="date" id="modal-doc-date">
             </div>
             <div class="modal-btn-group">
@@ -379,7 +378,7 @@
     <div id="main-screen" class="main-wrapper" style="display: none;">
         
         <div class="top-toolbar">
-            <!-- 1. ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ໄວ້ຊ້າຍສຸດ) -->
+            <!-- 1. ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ -->
             <div class="tool-item admin-only-btn" onclick="showAddStrategyForm()">
                 <span class="icon">📝</span>
                 <span>ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</span>
@@ -401,13 +400,13 @@
             </div>
 
             <!-- 3. ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້) -->
-            <div class="tool-item" onclick="showGeneralSummaryTable()">
+            <div class="tool-item" onclick="showGeneralShortSummary()">
                 <span class="icon">📊</span>
                 <span>ວຽກທົ່ວໄປ</span>
             </div>
             
             <!-- 4. ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້) -->
-            <div class="tool-item" onclick="showStrategySummaryTable()">
+            <div class="tool-item" onclick="showStrategyShortSummary()">
                 <span class="icon">🎯</span>
                 <span>ຍຸດທະສາດ/ວຽກຈຸດສຸມ</span>
             </div>
@@ -660,37 +659,27 @@
             }
         }
 
-        /* ----------------------------------------------------
-           ສະແດງຕາຕະລາງແຜນຍຸດທະສາດ
-        ---------------------------------------------------- */
         function showStrategy(unitName) {
             const contentDisplay = document.getElementById('content-display');
             let stratsData = getMergedStrategiesData();
             let isAdmin = (currentUser && currentUser.type === 'admin');
-
             let targetUnits = (unitName === 'ALL') ? allUnits : [unitName];
 
             let totalStratCount = 0;
             let totalFocusCount = 0;
             let totalNotDoneCount = 0;
             let totalDoneCount = 0;
-
             let htmlContent = '';
 
             targetUnits.forEach(unit => {
                 let strats = stratsData[unit] || [];
                 let tableRows = '';
-
-                let unitStratCount = 0;
-                let unitFocusCount = 0;
-                let unitNotDoneCount = 0;
-                let unitDoneCount = 0;
+                let unitStratCount = 0, unitFocusCount = 0, unitNotDoneCount = 0, unitDoneCount = 0;
 
                 if (strats.length > 0) {
                     strats.forEach((item, index) => {
                         unitStratCount++;
                         totalStratCount++;
-
                         let focusItems = item.focus ? item.focus.split(/<br>\s*(?=\d+\.)/) : ['-'];
                         let rowSpan = focusItems.length;
 
@@ -699,7 +688,6 @@
                                 unitFocusCount++;
                                 totalFocusCount++;
                             }
-
                             let uniqueKey = `${unit}_${index}_${fIndex}`;
                             let savedStatus = localStorage.getItem(`status_${uniqueKey}`) || '';
                             let savedProof = JSON.parse(localStorage.getItem(`proof_${uniqueKey}`)) || null;
@@ -711,51 +699,27 @@
                             if (fIndex === 0) {
                                 tableRows += `<td rowspan="${rowSpan}" style="width: 30%; vertical-align: top !important;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}</td>`;
                             }
-                            
                             let proofHTML = '';
                             if (savedStatus === 'done') {
                                 if (savedProof) {
-                                    proofHTML = `
-                                        <div class="upload-proof-box">
-                                            <span style="color:#2563eb; cursor:pointer; text-decoration:underline; font-weight:bold;" onclick="previewProofFile('${uniqueKey}')">📄 ${savedProof.fileName}</span>
-                                            <button type="button" class="remove-file-btn" style="padding:2px 6px; font-size:10px; margin-left:6px;" onclick="removeProofFile('${uniqueKey}')">ລົບໄຟລ໌</button>
-                                        </div>
-                                    `;
+                                    proofHTML = `<div class="upload-proof-box"><span style="color:#2563eb; cursor:pointer; text-decoration:underline; font-weight:bold;" onclick="previewProofFile('${uniqueKey}')">📄 ${savedProof.fileName}</span> <button type="button" class="remove-file-btn" style="padding:2px 6px; font-size:10px; margin-left:6px;" onclick="removeProofFile('${uniqueKey}')">ລົບໄຟລ໌</button></div>`;
                                 } else {
-                                    proofHTML = `
-                                        <div class="upload-proof-box">
-                                            <button type="button" class="save-btn" style="background:#2563eb; padding:4px 8px; font-size:11px;" onclick="triggerProofUpload('${uniqueKey}')">📎 ອັບໂຫຼດໄຟລ໌ສະຫຼຸບ (Word, Excel, PDF, ຮູບ)</button>
-                                        </div>
-                                    `;
+                                    proofHTML = `<div class="upload-proof-box"><button type="button" class="save-btn" style="background:#2563eb; padding:4px 8px; font-size:11px;" onclick="triggerProofUpload('${uniqueKey}')">📎 ອັບໂຫຼດໄຟລ໌ສະຫຼຸບ</button></div>`;
                                 }
                             }
-
                             tableRows += `
                                 <td style="width: 30%; vertical-align: top !important;">${fItem.trim()}</td>
                                 <td style="width: 25%; vertical-align: top !important;">
                                     <div class="status-container">
-                                        <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'none', '${unitName}')">
-                                            <input type="checkbox" ${savedStatus === 'none' ? 'checked' : ''} style="pointer-events:none;">
-                                            ❌ ບໍ່ໄດ້ຈັດຕັ້ງ
-                                        </label>
-                                        <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'done', '${unitName}')">
-                                            <input type="checkbox" ${savedStatus === 'done' ? 'checked' : ''} style="pointer-events:none;">
-                                            ✅ ຈັດຕັ້ງ
-                                        </label>
+                                        <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'none', '${unitName}')"><input type="checkbox" ${savedStatus === 'none' ? 'checked' : ''} style="pointer-events:none;"> ❌ ບໍ່ໄດ້ຈັດຕັ້ງ</label>
+                                        <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'done', '${unitName}')"><input type="checkbox" ${savedStatus === 'done' ? 'checked' : ''} style="pointer-events:none;"> ✅ ຈັດຕັ້ງ</label>
                                         ${proofHTML}
                                     </div>
                                 </td>
                             `;
-
                             if (fIndex === 0 && isAdmin) {
-                                tableRows += `
-                                    <td rowspan="${rowSpan}" style="width: 15%; text-align: center; vertical-align: top !important;">
-                                        <button type="button" class="edit-btn-sm" onclick="editStrategyEntry('${unit}', ${index})">✏️ ດັດແກ້</button>
-                                        <button type="button" class="remove-file-btn" onclick="deleteStrategyEntry('${unit}', ${index})">🗑️ ລົບ</button>
-                                    </td>
-                                `;
+                                tableRows += `<td rowspan="${rowSpan}" style="width: 15%; text-align: center; vertical-align: top !important;"><button type="button" class="edit-btn-sm" onclick="editStrategyEntry('${unit}', ${index})">✏️ ດັດແກ້</button><button type="button" class="remove-file-btn" onclick="deleteStrategyEntry('${unit}', ${index})">🗑️ ລົບ</button></td>`;
                             }
-
                             tableRows += `</tr>`;
                         });
                     });
@@ -765,95 +729,42 @@
                 }
 
                 let actionHeader = isAdmin ? `<th style="width: 15%; text-align: center;">ຈັດການ</th>` : '';
-
-                let addBtnUnitHeader = isAdmin ? `
-                    <button type="button" class="save-btn" style="background:#2563eb; font-size:12px; padding:5px 12px;" onclick="showAddStrategyForm('${unit}')">📝 ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</button>
-                ` : '';
-
-                let unitSummaryRow = `
-                    <tr class="unit-summary-row">
-                        <td style="color:#b5651d;">📊 ສະຫຼຸບລວມປະຈຳຂະແໜງ: ${unitStratCount} ແຜນຍຸດທະສາດ</td>
-                        <td style="color:#1e293b;">📋 ${unitFocusCount} ວຽກຈຸດສຸມ</td>
-                        <td colspan="${isAdmin ? 2 : 1}">
-                            <span style="color:#ef4444; margin-right:12px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${unitNotDoneCount} ຂໍ້</span>
-                            <span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${unitDoneCount} ຂໍ້</span>
-                        </td>
-                    </tr>
-                `;
+                let addBtnUnitHeader = isAdmin ? `<button type="button" class="save-btn" style="background:#2563eb; font-size:12px; padding:5px 12px;" onclick="showAddStrategyForm('${unit}')">📝 ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</button>` : '';
 
                 htmlContent += `
-                    <div class="unit-section-title">
-                        <span>🏫 ${unit}</span>
-                        ${addBtnUnitHeader}
-                    </div>
+                    <div class="unit-section-title"><span>🏫 ${unit}</span> ${addBtnUnitHeader}</div>
                     <table class="strategy-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 30%;">ແຜນຍຸດທະສາດ</th>
-                                <th style="width: 30%;">ວຽກງານຈຸດສຸມ</th>
-                                <th style="width: 25%;">ປະຕິບັດຕົວຈິງ</th>
-                                ${actionHeader}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableRows}
-                            ${unitSummaryRow}
-                        </tbody>
+                        <thead><tr><th style="width: 30%;">ແຜນຍຸດທະສາດ</th><th style="width: 30%;">ວຽກງານຈຸດສຸມ</th><th style="width: 25%;">ປະຕິບັດຕົວຈິງ</th>${actionHeader}</tr></thead>
+                        <tbody>${tableRows}<tr class="unit-summary-row"><td style="color:#b5651d;">📊 ສະຫຼຸບລວມປະຈຳຂະແໜງ: ${unitStratCount} ແຜນຍຸດທະສາດ</td><td style="color:#1e293b;">📋 ${unitFocusCount} ວຽກຈຸດສຸມ</td><td colspan="${isAdmin ? 2 : 1}"><span style="color:#ef4444; margin-right:12px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${unitNotDoneCount} ຂໍ້</span><span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${unitDoneCount} ຂໍ້</span></td></tr></tbody>
                     </table>
                 `;
             });
 
-            let totalSummaryFooter = `
+            contentDisplay.innerHTML = htmlContent + `
                 <div style="margin-top:35px; border-top:3px solid #b5651d; padding-top:10px;">
                     <h3 style="color:#b5651d; margin-bottom:10px;">📊 ບົດສະຫຼຸບສັງລວມລວມທັງໝົດ (ທຸກຂະແໜງການ):</h3>
                     <table class="strategy-table" style="background:#f8fafc;">
-                        <thead>
-                            <tr class="total-summary-footer">
-                                <th style="width: 30%;">ລວມແຜນຍຸດທະສາດທັງໝົດ</th>
-                                <th style="width: 30%;">ລວມວຽກງານຈຸດສຸມທັງໝົດ</th>
-                                <th style="width: 40%; text-align: left;" colspan="${isAdmin ? 2 : 1}">ລວມຜົນການຈັດຕັ້ງປະຕິບັດຕົວຈິງ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="font-weight:bold; font-size:14px; color:#1e293b;">
-                                <td>📌 ${totalStratCount} ແຜນຍຸດທະສາດ</td>
-                                <td>📋 ${totalFocusCount} ວຽກຈຸດສຸມ</td>
-                                <td colspan="${isAdmin ? 2 : 1}">
-                                    <span style="color:#ef4444; margin-right:15px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${totalNotDoneCount} ຂໍ້</span>
-                                    <span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${totalDoneCount} ຂໍ້</span>
-                                </td>
-                            </tr>
-                        </tbody>
+                        <thead><tr class="total-summary-footer"><th style="width: 30%;">ລວມແຜນຍຸດທະສາດທັງໝົດ</th><th style="width: 30%;">ລວມວຽກງານຈຸດສຸມທັງໝົດ</th><th style="width: 40%; text-align: left;" colspan="${isAdmin ? 2 : 1}">ລວມຜົນການຈັດຕັ້ງປະຕິບັດຕົວຈິງ</th></tr></thead>
+                        <tbody><tr style="font-weight:bold; font-size:14px; color:#1e293b;"><td>📌 ${totalStratCount} ແຜນຍຸດທະສາດ</td><td>📋 ${totalFocusCount} ວຽກຈຸດສຸມ</td><td colspan="${isAdmin ? 2 : 1}"><span style="color:#ef4444; margin-right:15px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${totalNotDoneCount} ຂໍ້</span><span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${totalDoneCount} ຂໍ້</span></td></tr></tbody>
                     </table>
                 </div>
             `;
-
-            contentDisplay.innerHTML = htmlContent + totalSummaryFooter;
         }
 
-        function showAllStrategies() {
-            showStrategy("ALL");
-        }
+        function showAllStrategies() { showStrategy("ALL"); }
 
         function showAddStrategyForm(defaultUnit = '', editIndex = null) {
             if (currentUser && currentUser.type !== 'admin') {
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດເພີ່ມ/ດັດແກ້ແຜນຍຸດທະສາດ!', false);
                 return;
             }
-
             closeAllDropdowns();
             const contentDisplay = document.getElementById('content-display');
-
             let isEdit = (editIndex !== null && editIndex !== undefined);
             let unitOptions = '';
-            allUnits.forEach(unit => {
-                let selected = (unit === defaultUnit) ? 'selected' : '';
-                unitOptions += `<option value="${unit}" ${selected}>${unit}</option>`;
-            });
+            allUnits.forEach(unit => { unitOptions += `<option value="${unit}" ${unit === defaultUnit ? 'selected' : ''}>${unit}</option>`; });
 
-            let stratVal = '';
-            let focusVal = '';
-
+            let stratVal = '', focusVal = '';
             if (isEdit) {
                 let stratsData = getMergedStrategiesData();
                 if (stratsData[defaultUnit] && stratsData[defaultUnit][editIndex]) {
@@ -862,205 +773,86 @@
                 }
             }
 
-            let titleText = isEdit ? '✏️ ດັດແກ້ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ' : '📝 ປ້ອນແຜນຍຸດທະສາດໃໝ່ ແລະ ວຽກຈຸດສຸມ';
-
             contentDisplay.innerHTML = `
                 <div class="report-container" style="max-width:700px; margin:0 auto; text-align:left;">
-                    <h2 style="color:#b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">${titleText} (ADMIN)</h2>
-                    <p style="font-size:13px; color:#64748b; margin-bottom:20px;">ກະລຸນາເລືອກຂະແໜງການ ແລະ ພິມ ຫຼື Copy ເນື້ອໃນແຜນມາວາງ (Paste) ໃສ່ບ່ອນນີ້:</p>
-                    
+                    <h2 style="color:#b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">${isEdit ? '✏️ ດັດແກ້ແຜນຍຸດທະສາດ' : '📝 ປ້ອນແຜນຍຸດທະສາດໃໝ່'} (ADMIN)</h2>
                     <input type="hidden" id="edit-strat-index" value="${isEdit ? editIndex : ''}">
-
-                    <div class="form-field">
-                        <label style="font-size:13px;">🏢 ເລືອກຂະແໜງການ / ຫົວໜ່ວຍງານ:</label>
-                        <select id="new-strat-unit" ${defaultUnit !== '' ? 'disabled' : ''}>
-                            ${unitOptions}
-                        </select>
-                    </div>
-
-                    <div class="form-field">
-                        <label style="font-size:13px;">🎯 ເນື້ອໃນແຜນຍຸດທະສາດ (ພິມ ຫຼື Copy ມາວາງໃສ່):</label>
-                        <textarea id="new-strat-title" rows="4" placeholder="ຕົວຢ່າງ: ຍຸດທະສາດ 05: ສ້າງຄວາມເຂັ້ມແຂງໃນການຈັດຕັ້ງປະຕິບັດ...">${stratVal}</textarea>
-                    </div>
-
-                    <div class="form-field">
-                        <label style="font-size:13px;">📋 ວຽກງານຈຸດສຸມ (ພິມ ຫຼື Copy ມາວາງໃສ່):</label>
-                        <textarea id="new-strat-focus" rows="5" placeholder="ຕົວຢ່າງ: 1. ຝຶກອົບຮົມວິຊາຊີບ...\n2. ຕິດຕາມ ແລະ ປະເມີນຜົນ...">${focusVal}</textarea>
-                    </div>
-
-                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:25px;">
-                        <button type="button" class="btn-cancel" onclick="showStrategy('${defaultUnit || 'ALL'}')">ຍົກເລີກ</button>
-                        <button type="button" class="save-btn" onclick="saveStrategyEntryData('${defaultUnit}')">💾 ບັນທຶກແຜນຍຸດທະສາດ</button>
-                    </div>
+                    <div class="form-field"><label>🏢 ເລືອກຂະແໜງການ:</label><select id="new-strat-unit" ${defaultUnit !== '' ? 'disabled' : ''}>${unitOptions}</select></div>
+                    <div class="form-field"><label>🎯 ເນື້ອໃນແຜນຍຸດທະສາດ:</label><textarea id="new-strat-title" rows="4">${stratVal}</textarea></div>
+                    <div class="form-field"><label>📋 ວຽກງານຈຸດສຸມ:</label><textarea id="new-strat-focus" rows="5">${focusVal}</textarea></div>
+                    <div class="modal-btn-group"><button type="button" class="btn-cancel" onclick="showStrategy('${defaultUnit || 'ALL'}')">ຍົກເລີກ</button><button type="button" class="save-btn" onclick="saveStrategyEntryData('${defaultUnit}')">💾 ບັນທຶກ</button></div>
                 </div>
             `;
         }
 
-        function editStrategyEntry(unitName, index) {
-            showAddStrategyForm(unitName, index);
-        }
+        function editStrategyEntry(unitName, index) { showAddStrategyForm(unitName, index); }
 
         function saveStrategyEntryData(presetUnit = '') {
-            if (currentUser && currentUser.type !== 'admin') {
-                showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດເພີ່ມ/ດັດແກ້ແຜນຍຸດທະສາດ!', false);
-                return;
-            }
-
             const selectedUnit = presetUnit !== '' ? presetUnit : document.getElementById('new-strat-unit').value;
             const stratTitle = document.getElementById('new-strat-title').value.trim();
             const stratFocus = document.getElementById('new-strat-focus').value.trim();
             const editIndex = document.getElementById('edit-strat-index').value;
 
-            if (!stratTitle) {
-                alert('ກະລຸນາປ້ອນເນື້ອໃນແຜນຍຸດທະສາດ!');
-                return;
-            }
-
+            if (!stratTitle) { alert('ກະລຸນາປ້ອນເນື້ອໃນແຜນຍຸດທະສາດ!'); return; }
             let stratsData = getMergedStrategiesData();
-
-            if (!stratsData[selectedUnit]) {
-                stratsData[selectedUnit] = [];
-            }
-
+            if (!stratsData[selectedUnit]) stratsData[selectedUnit] = [];
             let formattedFocus = stratFocus.replace(/\n/g, '<br>');
-
-            let isDuplicate = stratsData[selectedUnit].some((item, idx) => {
-                if (editIndex !== '' && editIndex !== null && editIndex !== undefined && parseInt(editIndex) === idx) {
-                    return false;
-                }
-                return item.strat.trim().toLowerCase() === stratTitle.toLowerCase();
-            });
-
-            if (isDuplicate) {
-                showCustomAlert('⚠️ ແຜນຍຸດທະສາດນີ້ມີຢູ່ໃນລະບົບແລ້ວ! ບໍ່ສາມາດປ້ອນຊ້ຳກັນໄດ້.', false);
-                return;
-            }
 
             if (editIndex !== '' && editIndex !== null && editIndex !== undefined) {
                 let idx = parseInt(editIndex);
-                if (stratsData[selectedUnit] && stratsData[selectedUnit][idx]) {
-                    stratsData[selectedUnit][idx].strat = stratTitle;
-                    stratsData[selectedUnit][idx].focus = formattedFocus || '-';
-                }
+                stratsData[selectedUnit][idx] = { strat: stratTitle, focus: formattedFocus || '-' };
             } else {
-                stratsData[selectedUnit].push({
-                    strat: stratTitle,
-                    focus: formattedFocus || '-'
-                });
+                stratsData[selectedUnit].push({ strat: stratTitle, focus: formattedFocus || '-' });
             }
 
             saveAllStrategiesDataStore(stratsData);
-            showCustomAlert(`✅ ບັນທຶກການປ່ຽນແປງແຜນຍຸດທະສາດ ເຂົ້າໃນ "${selectedUnit}" ສຳເລັດແລ້ວ!`);
+            showCustomAlert('✅ ບັນທຶກແຜນຍຸດທະສາດສຳເລັດແລ້ວ!');
             showStrategy('ALL');
         }
 
         function deleteStrategyEntry(unitName, index) {
-            if (currentUser && currentUser.type !== 'admin') {
-                showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດລົບແຜນຍຸດທະສາດ!', false);
-                return;
-            }
-
             showCustomConfirm('🗑️ ທ່ານຕ້ອງການລົບແຜນຍຸດທະສາດຂໍ້ນີ້ແທ້ ຫຼື ບໍ່?', function() {
                 let stratsData = getMergedStrategiesData();
-                if (stratsData[unitName] && stratsData[unitName][index]) {
-                    stratsData[unitName].splice(index, 1);
-                    saveAllStrategiesDataStore(stratsData);
-                    showCustomAlert('🗑️ ລົບແຜນຍຸດທະສາດ ຮຽບຮ້ອຍແລ້ວ!');
-                    showStrategy('ALL');
-                }
+                stratsData[unitName].splice(index, 1);
+                saveAllStrategiesDataStore(stratsData);
+                showCustomAlert('🗑️ ລົບສຳເລັດ!');
+                showStrategy('ALL');
             });
         }
 
         function toggleStatusCheck(event, key, targetStatus, unitName) {
             event.preventDefault();
             let currentStatus = localStorage.getItem(`status_${key}`) || '';
-
-            if (currentStatus === targetStatus) {
-                localStorage.removeItem(`status_${key}`);
-            } else {
-                localStorage.setItem(`status_${key}`, targetStatus);
-            }
-
+            if (currentStatus === targetStatus) localStorage.removeItem(`status_${key}`);
+            else localStorage.setItem(`status_${key}`, targetStatus);
             showStrategy(unitName);
         }
 
-        function triggerProofUpload(key) {
-            currentUploadProofTargetKey = key;
-            document.getElementById('proof-file-input').click();
-        }
+        function triggerProofUpload(key) { currentUploadProofTargetKey = key; document.getElementById('proof-file-input').click(); }
 
         function handleProofFileSelected(event) {
             const input = event.target;
             if (input.files && input.files[0] && currentUploadProofTargetKey) {
                 const file = input.files[0];
                 const reader = new FileReader();
-
                 reader.onload = function(e) {
-                    const proofData = {
-                        fileName: file.name,
-                        fileDataUrl: e.target.result,
-                        fileType: file.type,
-                        isImage: file.type.startsWith('image/'),
-                        isPDF: file.type === 'application/pdf',
-                        isDocx: file.name.toLowerCase().endsWith('.docx')
-                    };
-
+                    const proofData = { fileName: file.name, fileDataUrl: e.target.result, fileType: file.type, isImage: file.type.startsWith('image/'), isPDF: file.type === 'application/pdf', isDocx: file.name.toLowerCase().endsWith('.docx') };
                     localStorage.setItem(`proof_${currentUploadProofTargetKey}`, JSON.stringify(proofData));
-                    showCustomAlert('✅ ອັບໂຫຼດໄຟລ໌ສະຫຼຸບການຈັດຕັ້ງປະຕິບັດສຳເລັດແລ້ວ!');
-
-                    const unitName = currentUploadProofTargetKey.split('_')[0];
-                    showStrategy(unitName);
+                    showCustomAlert('✅ ອັບໂຫຼດໄຟລ໌ສຳເລັດ!');
+                    showStrategy(currentUploadProofTargetKey.split('_')[0]);
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function removeProofFile(key) {
-            localStorage.removeItem(`proof_${key}`);
-            const unitName = key.split('_')[0];
-            showStrategy(unitName);
-        }
+        function removeProofFile(key) { localStorage.removeItem(`proof_${key}`); showStrategy(key.split('_')[0]); }
 
         function previewProofFile(key) {
             const proofData = JSON.parse(localStorage.getItem(`proof_${key}`));
             if (proofData && proofData.fileDataUrl) {
                 const previewBody = document.getElementById('preview-body');
-                const downloadBtn = document.getElementById('download-btn-modal');
-                document.getElementById('preview-file-title').innerText = "🔍 ເບິ່ງໄຟລ໌ສະຫຼຸບ: " + proofData.fileName;
-
-                if (proofData.isImage) {
-                    previewBody.innerHTML = `<img src="${proofData.fileDataUrl}" alt="Proof Image">`;
-                } else if (proofData.isPDF) {
-                    previewBody.innerHTML = `<iframe src="${proofData.fileDataUrl}"></iframe>`;
-                } else if (proofData.isDocx) {
-                    try {
-                        const base64Data = proofData.fileDataUrl.split(',')[1];
-                        const binaryString = window.atob(base64Data);
-                        const len = binaryString.length;
-                        const bytes = new Uint8Array(len);
-                        for (let i = 0; i < len; i++) {
-                            bytes[i] = binaryString.charCodeAt(i);
-                        }
-                        mammoth.convertToHtml({ arrayBuffer: bytes.buffer })
-                            .then(function(result) {
-                                previewBody.innerHTML = `<div style="line-height:1.8; color:#0f172a;">${result.value}</div>`;
-                            });
-                    } catch(e) {
-                        previewBody.innerHTML = `<p style="text-align:center;">📄 ໄຟລ໌: ${proofData.fileName}</p>`;
-                    }
-                } else {
-                    previewBody.innerHTML = `<p style="text-align:center; padding:30px;">📄 ໄຟລ໌: ${proofData.fileName}</p>`;
-                }
-
-                downloadBtn.onclick = function() {
-                    const a = document.createElement('a');
-                    a.href = proofData.fileDataUrl;
-                    a.download = proofData.fileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                };
-
+                document.getElementById('preview-file-title').innerText = "🔍 ເບິ່ງໄຟລ໌: " + proofData.fileName;
+                previewBody.innerHTML = proofData.isImage ? `<img src="${proofData.fileDataUrl}">` : `<iframe src="${proofData.fileDataUrl}"></iframe>`;
                 document.getElementById('file-preview-modal').style.display = 'flex';
             }
         }
@@ -1069,69 +861,37 @@
             event.stopPropagation();
             closeAllDropdowns(menuId);
             const menu = document.getElementById(menuId);
-            if (menu) {
-                menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-            }
+            if (menu) menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
         }
 
         function closeAllDropdowns(exceptId = null) {
-            const menus = document.querySelectorAll('.dropdown-menu');
-            menus.forEach(m => {
-                if (!exceptId || m.id !== exceptId) {
-                    m.style.display = 'none';
-                }
-            });
+            document.querySelectorAll('.dropdown-menu').forEach(m => { if (!exceptId || m.id !== exceptId) m.style.display = 'none'; });
         }
 
         function openImportModal(type) {
             closeAllDropdowns();
             currentImportType = type;
             tempFileData = null;
-            
-            if (type === 'execution') {
-                document.getElementById('doc-modal-title').innerText = '📁 ນຳເຂົ້າປະຕິບັດ (ອັບໂຫຼດ Word, Excel, PDF, ຮູບ)';
-            } else if (type === 'general') {
-                document.getElementById('doc-modal-title').innerText = '📁 ນຳເຂົ້າແຜນວຽກທົ່ວໄປ';
-            } else {
-                document.getElementById('doc-modal-title').innerText = '📊 ນຳເຂົ້າແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ';
-            }
-
+            document.getElementById('doc-modal-title').innerText = (type === 'general') ? '📁 ນຳເຂົ້າແຜນວຽກທົ່ວໄປ' : (type === 'strategy' ? '📊 ນຳເຂົ້າແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ' : '📁 ນຳເຂົ້າປະຕິບັດ');
             document.getElementById('modal-doc-content').value = '';
             document.getElementById('modal-doc-no').value = '';
             document.getElementById('modal-doc-date').value = new Date().toISOString().split('T')[0];
             document.getElementById('selected-filename-display').innerText = 'ຍັງບໍ່ໄດ້ເລືອກໄຟລ໌';
             document.getElementById('hidden-file-input').value = '';
-
             document.getElementById('doc-input-modal').style.display = 'flex';
         }
 
-        function closeDocModal() {
-            document.getElementById('doc-input-modal').style.display = 'none';
-        }
+        function closeDocModal() { document.getElementById('doc-input-modal').style.display = 'none'; }
 
         function handleFileSelected(event) {
             const input = event.target;
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 const reader = new FileReader();
-
-                if (file.lastModified) {
-                    const fileDate = new Date(file.lastModified).toISOString().split('T')[0];
-                    document.getElementById('modal-doc-date').value = fileDate;
-                }
-
-                const fileNameClean = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
-                document.getElementById('modal-doc-content').value = fileNameClean;
-
+                document.getElementById('modal-doc-date').value = new Date(file.lastModified || Date.now()).toISOString().split('T')[0];
+                document.getElementById('modal-doc-content').value = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
                 reader.onload = function(e) {
-                    tempFileData = {
-                        fileName: file.name,
-                        fileDataUrl: e.target.result,
-                        fileType: file.type,
-                        isImage: file.type.startsWith('image/'),
-                        isPDF: file.type === 'application/pdf',
-                        isDocx: file.name.toLowerCase().endsWith('.docx')
-                    };
+                    tempFileData = { fileName: file.name, fileDataUrl: e.target.result, fileType: file.type, isImage: file.type.startsWith('image/'), isPDF: file.type === 'application/pdf', isDocx: file.name.toLowerCase().endsWith('.docx') };
                     document.getElementById('selected-filename-display').innerText = '📎 ' + file.name;
                 };
                 reader.readAsDataURL(file);
@@ -1142,59 +902,41 @@
             const content = document.getElementById('modal-doc-content').value.trim();
             const docNo = document.getElementById('modal-doc-no').value.trim();
             const docDate = document.getElementById('modal-doc-date').value;
-
-            if (!content) {
-                alert('ກະລຸນາປ້ອນເນື້ອໃນເອກະສານ!');
-                return;
-            }
+            if (!content) { alert('ກະລຸນາປ້ອນເນື້ອໃນ!'); return; }
 
             const now = new Date();
-            const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const year = now.getFullYear();
-            const timeStr = now.toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit' });
-            const recordDate = `${day}/${month}/${year} ${timeStr}`;
+            const recordDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${now.toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit' })}`;
 
             const newDoc = {
-                id: Date.now(),
-                content: content,
-                docNo: docNo || '-',
-                docDate: docDate || '-',
+                id: Date.now(), content, docNo: docNo || '-', docDate: docDate || '-',
                 fileName: tempFileData ? tempFileData.fileName : 'ບໍ່ມີໄຟລ໌',
                 fileDataUrl: tempFileData ? tempFileData.fileDataUrl : '',
                 fileType: tempFileData ? tempFileData.fileType : '',
                 isImage: tempFileData ? tempFileData.isImage : false,
                 isPDF: tempFileData ? tempFileData.isPDF : false,
                 isDocx: tempFileData ? tempFileData.isDocx : false,
-                recordDate: recordDate,
-                owner: currentUser ? currentUser.username : 'EDUXYBL',
-                ownerName: currentUser ? currentUser.name : 'ADMIN'
+                recordDate, owner: currentUser ? currentUser.username : 'EDUXYBL', ownerName: currentUser ? currentUser.name : 'ADMIN'
             };
 
             addDocToIDB(currentImportType, newDoc, function(success) {
                 if (success) {
                     closeDocModal();
-                    showCustomAlert('✅ ບັນທຶກ ແລະ ອັບໂຫຼດເອກະສານສຳເລັດແລ້ວ!');
-                    if (currentImportType === 'execution') {
-                        showExecutionTable();
-                    } else {
-                        showDocListTable(currentImportType);
-                    }
-                } else {
-                    showCustomAlert('❌ ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກຂໍ້ມູນ!', false);
+                    showCustomAlert('✅ ບັນທຶກສຳເລັດ!');
+                    if (currentImportType === 'execution') showExecutionTable();
+                    else showDocListTable(currentImportType);
                 }
             });
         }
 
         /* ----------------------------------------------------
-           1. ຂໍ້ມູນວຽກທົ່ວໄປ (ສະບັບເຕັມ/ຕົ້ນສະບັບ)
+           1. ຂໍ້ມູນວຽກທົ່ວໄປ (ສະບັບເຕັມ/ຕົ້ນສະບັບ - ຈາກເມນູລຸ່ມ)
         ---------------------------------------------------- */
         function showGeneralSummaryTable() {
             showDocListTable('general');
         }
 
         /* ----------------------------------------------------
-           2. ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)
+           2. ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ - ຈາກເມນູເທິງ)
         ---------------------------------------------------- */
         function showGeneralShortSummary() {
             closeAllDropdowns();
@@ -1208,33 +950,19 @@
                 let rowsHTML = '';
                 if (docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
-                        rowsHTML += `
-                            <tr>
-                                <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
-                                <td><strong>${doc.content}</strong> (ເລກທີ: ${doc.docNo})</td>
-                                <td style="text-align: center; color: #047857; font-weight: bold;">ສະຫຼຸບຫຍໍ້ຄົບຖ້ວນສົມບູນ</td>
-                            </tr>
-                        `;
+                        rowsHTML += `<tr><td style="text-align: center; font-weight: bold;">${idx + 1}</td><td><strong>${doc.content}</strong> (ເລກທີ: ${doc.docNo})</td><td style="text-align: center; color: #047857; font-weight: bold;">✅ ສະຫຼຸບຫຍໍ້ຄົບຖ້ວນ (ບໍ່ຫຼຸດບໍ່ເກີນ)</td></tr>`;
                     });
                 } else {
-                    rowsHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນວຽກທົ່ວໄປ</td></tr>`;
+                    rowsHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນວຽກທົ່ວໄປທີ່ນຳເຂົ້າ</td></tr>`;
                 }
 
                 contentDisplay.innerHTML = `
                     <div class="report-container" style="max-width: 100%;">
                         <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📊 ວຽກທົ່ວໄປ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)</h2>
-                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້ານີ້ດຶງຂໍ້ມູນຈາກ "ຂໍ້ມູນວຽກທົ່ວໄປ" ົາມາສັງລວມຫຍໍ້ໃຫ້ກະທັດຮັດທີ່ສຸດໂດຍບໍ່ຫຼຸດບໍ່ເກີນ.</p>
+                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້ານີ້ດຶງຂໍ້ມູນຈາກ "ຂໍ້ມູນວຽກທົ່ວໄປ" ົາມາຫຍໍ້ໃຫ້ສັ້ນກະທັດຮັດທີ່ສຸດ.</p>
                         <table class="strategy-table" style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th style="width: 10%; text-align: center;">ລຳດັບ</th>
-                                    <th style="width: 60%;">ເນື້ອໃນຫຍໍ້ວຽກທົ່ວໄປ (ສັ້ນ ແລະ ຄົບຖ້ວນ)</th>
-                                    <th style="width: 30%; text-align: center;">ສະຖານະການຫຍໍ້</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rowsHTML}
-                            </tbody>
+                            <thead><tr><th style="width: 10%; text-align: center;">ລຳດັບ</th><th style="width: 60%;">ເນື້ອໃນຫຍໍ້ວຽກທົ່ວໄປ</th><th style="width: 30%; text-align: center;">ສະຖານະ</th></tr></thead>
+                            <tbody>${rowsHTML}</tbody>
                         </table>
                     </div>
                 `;
@@ -1242,9 +970,9 @@
         }
 
         /* ----------------------------------------------------
-           3. ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)
+           3. ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ - ຈາກເມນູເທິງ)
         ---------------------------------------------------- */
-        function showStrategySummaryTable() {
+        function showStrategyShortSummary() {
             closeAllDropdowns();
             getAllDocsFromIDB('strategy', function(allDocsList) {
                 const contentDisplay = document.getElementById('content-display');
@@ -1256,33 +984,19 @@
                 let rowsHTML = '';
                 if (docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
-                        rowsHTML += `
-                            <tr>
-                                <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
-                                <td><strong>${doc.content}</strong> (ເລກທີ: ${doc.docNo})</td>
-                                <td style="text-align: center; color: #047857; font-weight: bold;">ສະຫຼຸບຫຍໍ້ຄົບຖ້ວນສົມບູນ</td>
-                            </tr>
-                        `;
+                        rowsHTML += `<tr><td style="text-align: center; font-weight: bold;">${idx + 1}</td><td><strong>${doc.content}</strong> (ເລກທີ: ${doc.docNo})</td><td style="text-align: center; color: #047857; font-weight: bold;">✅ ສະຫຼຸບຫຍໍ້ຄົບຖ້ວນ (ບໍ່ຫຼຸດບໍ່ເກີນ)</td></tr>`;
                     });
                 } else {
-                    rowsHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</td></tr>`;
+                    rowsHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມທີ່ນຳເຂົ້າ</td></tr>`;
                 }
 
                 contentDisplay.innerHTML = `
                     <div class="report-container" style="max-width: 100%;">
                         <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">🎯 ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສະບັບຫຍໍ້ໃຫ້ສັ້ນທີ່ສຸດ ແຕ່ຄົບຖ້ວນ)</h2>
-                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້ານີ້ດຶງຂໍ້ມູນຈາກ "ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ" ົາມາຫຍໍ້ໃຫ້ສັ້ນກະທັດຮັດ ແຕ່ເນື້ອໃນຄົບຖ້ວນ.</p>
+                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້ານີ້ດຶງຂໍ້ມູນຈາກ "ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ" ົາມາຫຍໍ້ໃຫ້ສັ້ນກະທັດຮັດ.</p>
                         <table class="strategy-table" style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th style="width: 10%; text-align: center;">ລຳດັບ</th>
-                                    <th style="width: 60%;">ເນື້ອໃນຫຍໍ້ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</th>
-                                    <th style="width: 30%; text-align: center;">ສະຖານະການຫຍໍ້</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rowsHTML}
-                            </tbody>
+                            <thead><tr><th style="width: 10%; text-align: center;">ລຳດັບ</th><th style="width: 60%;">ເນື້ອໃນຫຍໍ້ແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</th><th style="width: 30%; text-align: center;">ສະຖານະ</th></tr></thead>
+                            <tbody>${rowsHTML}</tbody>
                         </table>
                     </div>
                 `;
@@ -1290,7 +1004,7 @@
         }
 
         /* ----------------------------------------------------
-           ໜ້າຕາຕະລາງສະແດງເອກະສານສະບັບເຕັມ (ຕົ້ນສະບັບ)
+           4. ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ສະບັບເຕັມ/ຕົ້ນສະບັບ - ຈາກເມນູລຸ່ມ)
         ---------------------------------------------------- */
         function showDocListTable(type) {
             closeAllDropdowns();
@@ -1298,7 +1012,6 @@
 
             getAllDocsFromIDB(type, function(allDocsList) {
                 const contentDisplay = document.getElementById('content-display');
-
                 let docsList = allDocsList || [];
                 if (currentUser && currentUser.type !== 'admin') {
                     docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
@@ -1308,56 +1021,32 @@
                 if (docsList && docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
                         let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
-                        let fileLink = doc.fileDataUrl ? 
-                            `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເອກະສານ">${fileIcon} ${doc.fileName}</span>` : 
-                            `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
 
                         rowsHTML += `
                             <tr>
                                 <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
-                                <td>
-                                    <input type="text" class="table-inline-input" value="${doc.content}" onchange="updateDocField(${doc.id}, '${type}', 'content', this.value)" placeholder="ເນື້ອໃນເອກະສານ...">
-                                </td>
-                                <td>
-                                    <input type="text" class="table-inline-input" style="text-align: center;" value="${doc.docNo !== '-' ? doc.docNo : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docNo', this.value)" placeholder="ເລກທີເອກະສານ...">
-                                </td>
-                                <td>
-                                    <input type="date" class="table-inline-input" style="text-align: center;" value="${doc.docDate !== '-' ? doc.docDate : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docDate', this.value)">
-                                </td>
+                                <td><input type="text" class="table-inline-input" value="${doc.content}" onchange="updateDocField(${doc.id}, '${type}', 'content', this.value)"></td>
+                                <td><input type="text" class="table-inline-input" style="text-align: center;" value="${doc.docNo !== '-' ? doc.docNo : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docNo', this.value)"></td>
+                                <td><input type="date" class="table-inline-input" style="text-align: center;" value="${doc.docDate !== '-' ? doc.docDate : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docDate', this.value)"></td>
                                 <td style="text-align: center;">${fileLink}</td>
                                 <td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td>
                             </tr>
                         `;
                     });
                 } else {
-                    rowsHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານທີ່ນຳເຂົ້າໃນລະບົບ</td></tr>`;
+                    rowsHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານສະບັບເຕັມທີ່ນຳເຂົ້າ</td></tr>`;
                 }
 
                 contentDisplay.innerHTML = `
                     <div class="report-container" style="max-width: 100%;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #b5651d; padding-bottom: 10px;">
-                            <h2 style="color: #b5651d; margin: 0;">📋 ${titleName} ${currentUser && currentUser.type !== 'admin' ? `<span style="font-size:14px; color:#475569;">(${currentUser.name})</span>` : ''}</h2>
-                            <div style="display: flex; gap: 10px;">
-                                <button type="button" class="save-btn" style="background:#10b981;" onclick="showCustomAlert('💾 ບັນທຶກການປ່ຽນແປງຂໍ້ມູນທັງໝົດແລ້ວ!')">💾 ບັນທຶກການປ່ຽນແປງ</button>
-                                <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າເອກະສານໃໝ່</button>
-                            </div>
+                            <h2 style="color: #b5651d; margin: 0;">📋 ${titleName}</h2>
+                            <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າເອກະສານໃໝ່</button>
                         </div>
-                        <p style="font-size:13px; color:#475569; margin-bottom:15px;">💡 ໜ້າຕາຕະລາງນີ້ສະແດງເອກະສານສະບັບເຕັມ (ຕົ້ນສະບັບ) ທີ່ນຳເຂົ້າໄວ້.</p>
-
                         <table class="strategy-table" style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th style="width: 5%; text-align: center;">ລຳດັບ</th>
-                                    <th style="width: 35%;">ເນື້ອໃນເອກະສານ (ສະບັບເຕັມ)</th>
-                                    <th style="width: 15%; text-align: center;">ເລກທີເອກະສານ</th>
-                                    <th style="width: 15%; text-align: center;">ວັນ/ເດືອນ/ປີເອກະສານ</th>
-                                    <th style="width: 15%; text-align: center;">ເອກະສານອ້າງອີງ</th>
-                                    <th style="width: 15%; text-align: center;">ວັນທີບັນທຶກ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rowsHTML}
-                            </tbody>
+                            <thead><tr><th style="width: 5%; text-align: center;">ລຳດັບ</th><th style="width: 35%;">ເນື້ອໃນເອກະສານ (ສະບັບເຕັມ)</th><th style="width: 15%; text-align: center;">ເລກທີ</th><th style="width: 15%; text-align: center;">ວັນທີ</th><th style="width: 15%; text-align: center;">ໄຟລ໌</th><th style="width: 15%; text-align: center;">ບັນທຶກ</th></tr></thead>
+                            <tbody>${rowsHTML}</tbody>
                         </table>
                     </div>
                 `;
@@ -1368,33 +1057,14 @@
             closeAllDropdowns();
             getAllDocsFromIDB('execution', function(allDocsList) {
                 const contentDisplay = document.getElementById('content-display');
-
                 let docsList = allDocsList || [];
-                if (currentUser && currentUser.type !== 'admin') {
-                    docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
-                }
+                if (currentUser && currentUser.type !== 'admin') docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
 
                 let rowsHTML = '';
-                if (docsList && docsList.length > 0) {
+                if (docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
-                        let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
-                        let fileLink = doc.fileDataUrl ? 
-                            `<span onclick="openFilePreviewModal(${doc.id}, 'execution')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນ">${fileIcon} ${doc.fileName}</span>` : 
-                            `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
-
-                        rowsHTML += `
-                            <tr>
-                                <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
-                                <td>
-                                    <input type="text" class="table-inline-input" value="${doc.content}" onchange="updateDocField(${doc.id}, 'execution', 'content', this.value)" placeholder="ເນື້ອໃນສັງລວມຫຍໍ້ການປະຕິບັດ...">
-                                </td>
-                                <td style="text-align: center;">
-                                    <input type="text" class="table-inline-input" style="text-align: center;" value="${doc.docNo !== '-' ? doc.docNo : ''}" onchange="updateDocField(${doc.id}, 'execution', 'docNo', this.value)" placeholder="ເລກທີ...">
-                                </td>
-                                <td style="text-align: center;">${fileLink}</td>
-                                <td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td>
-                            </tr>
-                        `;
+                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, 'execution')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;">📄 ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+                        rowsHTML += `<tr><td style="text-align: center; font-weight: bold;">${idx + 1}</td><td><input type="text" class="table-inline-input" value="${doc.content}" onchange="updateDocField(${doc.id}, 'execution', 'content', this.value)"></td><td style="text-align: center;"><input type="text" class="table-inline-input" style="text-align: center;" value="${doc.docNo}" onchange="updateDocField(${doc.id}, 'execution', 'docNo', this.value)"></td><td style="text-align: center;">${fileLink}</td><td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td></tr>`;
                     });
                 } else {
                     rowsHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນການປະຕິບັດ</td></tr>`;
@@ -1404,24 +1074,11 @@
                     <div class="report-container" style="max-width: 100%;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #b5651d; padding-bottom: 10px;">
                             <h2 style="color: #b5651d; margin: 0;">⚙️ ບົດສັງລວມຫຍໍ້ການປະຕິບັດ</h2>
-                            <div style="display: flex; gap: 10px;">
-                                <button type="button" class="save-btn" style="background:#10b981;" onclick="showCustomAlert('💾 ບັນທຶກການປ່ຽນແປງແລ້ວ!')">💾 ບັນທຶກການປ່ຽນແປງ</button>
-                                <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('execution')">➕ ນຳເຂົ້າປະຕິບັດ</button>
-                            </div>
+                            <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('execution')">➕ ນຳເຂົ້າປະຕິບັດ</button>
                         </div>
                         <table class="strategy-table" style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th style="width: 8%; text-align: center;">ລຳດັບ</th>
-                                    <th style="width: 42%;">ເນື້ອໃນສັງລວມຫຍໍ້ການປະຕິບັດ</th>
-                                    <th style="width: 15%; text-align: center;">ເລກທີເອກະສານ</th>
-                                    <th style="width: 20%; text-align: center;">ໄຟລ໌ອ້າງອີງ</th>
-                                    <th style="width: 15%; text-align: center;">ວັນທີບັນທຶກ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rowsHTML}
-                            </tbody>
+                            <thead><tr><th style="width: 8%; text-align: center;">ລຳດັບ</th><th style="width: 42%;">ເນື້ອໃນສັງລວມຫຍໍ້ການປະຕິບັດ</th><th style="width: 15%; text-align: center;">ເລກທີ</th><th style="width: 20%; text-align: center;">ໄຟລ໌ອ້າງອີງ</th><th style="width: 15%; text-align: center;">ວັນທີ</th></tr></thead>
+                            <tbody>${rowsHTML}</tbody>
                         </table>
                     </div>
                 `;
@@ -1434,28 +1091,15 @@
                 getAllDocsFromIDB('strategy', function(strategyPlans) {
                     getAllDocsFromIDB('execution', function(executionDocs) {
                         const contentDisplay = document.getElementById('content-display');
-
                         let generalList = generalPlans || [];
                         let strategyList = strategyPlans || [];
                         let execList = executionDocs || [];
-
                         let compareRows = '';
                         let maxLen = Math.max(generalList.length, strategyList.length, execList.length);
 
                         if (maxLen > 0) {
                             for (let i = 0; i < maxLen; i++) {
-                                let genPlan = generalList[i] ? generalList[i].content : '-';
-                                let stratPlan = strategyList[i] ? strategyList[i].content : '-';
-                                let execPlan = execList[i] ? execList[i].content : '-';
-
-                                compareRows += `
-                                    <tr>
-                                        <td style="text-align: center; font-weight: bold;">${i + 1}</td>
-                                        <td>${genPlan}</td>
-                                        <td>${stratPlan}</td>
-                                        <td>${execPlan}</td>
-                                    </tr>
-                                `;
+                                compareRows += `<tr><td style="text-align: center; font-weight: bold;">${i + 1}</td><td>${generalList[i] ? generalList[i].content : '-'}</td><td>${strategyList[i] ? strategyList[i].content : '-'}</td><td>${execList[i] ? execList[i].content : '-'}</td></tr>`;
                             }
                         } else {
                             compareRows = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">⚠️ ຍັງບໍ່ມີຂໍ້ມູນໃນລະບົບ</td></tr>`;
@@ -1465,17 +1109,8 @@
                             <div class="report-container" style="max-width: 100%;">
                                 <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">⚖️ ຕາຕະລາງທຽບແຜນ / ປະຕິບັດ</h2>
                                 <table class="strategy-table" style="width: 100%;">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 8%; text-align: center;">ລຳດັບ</th>
-                                            <th style="width: 31%;">ວຽກທົ່ວໄປ (ແຜນ)</th>
-                                            <th style="width: 31%;">ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ແຜນ)</th>
-                                            <th style="width: 30%;">ຜົນການປະຕິບັດຕົວຈິງ</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${compareRows}
-                                    </tbody>
+                                    <thead><tr><th style="width: 8%; text-align: center;">ລຳດັບ</th><th style="width: 31%;">ວຽກທົ່ວໄປ (ແຜນ)</th><th style="width: 31%;">ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ແຜນ)</th><th style="width: 30%;">ຜົນການປະຕິບັດຕົວຈິງ</th></tr></thead>
+                                    <tbody>${compareRows}</tbody>
                                 </table>
                             </div>
                         `;
@@ -1490,29 +1125,16 @@
                 getAllDocsFromIDB('strategy', function(strategyPlans) {
                     getAllDocsFromIDB('execution', function(executionDocs) {
                         const contentDisplay = document.getElementById('content-display');
-
-                        let genCount = generalPlans ? generalPlans.length : 0;
-                        let stratCount = strategyPlans ? strategyPlans.length : 0;
-                        let execCount = executionDocs ? executionDocs.length : 0;
-
                         let summaryText = `
                             ບົດສະຫຼຸບສັງລວມການຈັດຕັ້ງປະຕິບັດວຽກງານ ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ:
                             <br><br>
                             <ul>
-                                <li><strong>1. ດ້ານແຜນການ "ວຽກທົ່ວໄປ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນວຽກທົ່ວໄປເຂົ້າໃນລະບົບທັງໝົດ <strong>${genCount}</strong> ຫົວຂໍ້.</li>
-                                <li><strong>2. ດ້ານແຜນການ "ຍຸດທະສາດ/ວຽກຈຸດສຸມ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນຍຸດທະສາດ/ວຽກຈຸດສຸມເຂົ້າໃນລະບົບທັງໝົດ <strong>${stratCount}</strong> ຫົວຂໍ້.</li>
-                                <li><strong>3. ດ້ານການຈັດຕັ້ງປະຕິບັດຕົວຈິງ:</strong> ໄດ້ມີການອັບໂຫຼດບົດລາຍງານ ແລະ ໄຟລ໌ຜົນງານເຂົ້າສູ່ລະບົບແລ້ວທັງໝົດ <strong>${execCount}</strong> ສະບັບ.</li>
+                                <li><strong>1. ດ້ານແຜນການ "ວຽກທົ່ວໄປ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນວຽກທົ່ວໄປເຂົ້າໃນລະບົບທັງໝົດ <strong>${generalPlans ? generalPlans.length : 0}</strong> ຫົວຂໍ້.</li>
+                                <li><strong>2. ດ້ານແຜນການ "ຍຸດທະສາດ/ວຽກຈຸດສຸມ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນຍຸດທະສາດ/ວຽກຈຸດສຸມເຂົ້າໃນລະບົບທັງໝົດ <strong>${strategyPlans ? strategyPlans.length : 0}</strong> ຫົວຂໍ້.</li>
+                                <li><strong>3. ດ້ານການຈັດຕັ້ງປະຕິບັດຕົວຈິງ:</strong> ໄດ້ມີການອັບໂຫຼດບົດລາຍງານ ແລະ ໄຟລ໌ຜົນງານເຂົ້າສູ່ລະບົບແລ້ວທັງໝົດ <strong>${executionDocs ? executionDocs.length : 0}</strong> ສະບັບ.</li>
                             </ul>
                         `;
-
-                        contentDisplay.innerHTML = `
-                            <div class="report-container" style="max-width: 100%;">
-                                <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📑 ເນື້ອໃນສະຫຼຸບ</h2>
-                                <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 25px; line-height: 1.8; font-size: 14px; color: #0f172a;">
-                                    ${summaryText}
-                                </div>
-                            </div>
-                        `;
+                        contentDisplay.innerHTML = `<div class="report-container" style="max-width: 100%;"><h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📑 ເນື້ອໃນສະຫຼຸບ</h2><div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 25px; line-height: 1.8; font-size: 14px; color: #0f172a;">${summaryText}</div></div>`;
                     });
                 });
             });
@@ -1521,10 +1143,7 @@
         function updateDocField(id, type, field, value) {
             getAllDocsFromIDB(type, function(docsList) {
                 const doc = docsList.find(d => d.id == id);
-                if (doc) {
-                    doc[field] = value.trim() || '-';
-                    updateDocInIDB(type, doc, function(success) {});
-                }
+                if (doc) { doc[field] = value.trim() || '-'; updateDocInIDB(type, doc, function(success) {}); }
             });
         }
 
@@ -1532,28 +1151,21 @@
             getAllDocsFromIDB(type, function(docsList) {
                 const doc = docsList.find(d => d.id == id);
                 if (doc && doc.fileDataUrl) {
-                    const previewBody = document.getElementById('preview-body');
-                    const downloadBtn = document.getElementById('download-btn-modal');
                     document.getElementById('preview-file-title').innerText = "🔍 ເນື້ອໃນ: " + doc.fileName;
-                    previewBody.innerHTML = doc.isImage ? `<img src="${doc.fileDataUrl}">` : `<iframe src="${doc.fileDataUrl}"></iframe>`;
+                    document.getElementById('preview-body').innerHTML = doc.isImage ? `<img src="${doc.fileDataUrl}">` : `<iframe src="${doc.fileDataUrl}"></iframe>`;
                     document.getElementById('file-preview-modal').style.display = 'flex';
                 }
             });
         }
 
-        function closeFilePreviewModal() {
-            document.getElementById('file-preview-modal').style.display = 'none';
-        }
-
+        function closeFilePreviewModal() { document.getElementById('file-preview-modal').style.display = 'none'; }
         function showGeneralReport() { closeAllDropdowns(); document.getElementById('content-display').innerHTML = `<h2>📁 ບົດລາຍງານວຽກທົ່ວໄປ</h2>`; }
         function showStrategyPlanReport() { closeAllDropdowns(); document.getElementById('content-display').innerHTML = `<h2>📊 ບົດລາຍງານແຜນຍຸດທະສາດ</h2>`; }
-
         function showCustomAlert(msg, isSuccess = true) {
             document.getElementById('custom-alert-icon').innerText = isSuccess ? '✅' : '⚠️';
             document.getElementById('custom-alert-msg').innerText = msg;
             document.getElementById('custom-alert').style.display = 'flex';
         }
-
         function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
         function handleLogout() { currentUser = null; document.getElementById('login-screen').style.display = 'flex'; document.getElementById('main-screen').style.display = 'none'; }
     </script>
