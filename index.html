@@ -131,8 +131,8 @@
             padding: 20px;
             border-radius: 8px;
             width: 95%;
-            max-width: 900px;
-            max-height: 92vh;
+            max-width: 800px;
+            max-height: 90vh;
             text-align: center;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
             position: relative;
@@ -143,7 +143,7 @@
 
         .preview-container {
             width: 100%;
-            height: 68vh;
+            height: 55vh;
             overflow-y: auto;
             margin-bottom: 15px;
             border: 1px solid #cbd5e1;
@@ -156,20 +156,6 @@
             color: #0f172a;
             font-family: 'Phetsarath OT', 'Saysana', sans-serif;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        .preview-container img {
-            max-width: 100%;
-            max-height: 60vh;
-            border-radius: 4px;
-            object-fit: contain;
-            display: block;
-            margin: 0 auto;
-        }
-        .preview-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 4px;
         }
 
         .save-btn {
@@ -853,7 +839,7 @@
             if (proofData && proofData.fileDataUrl) {
                 const previewBody = document.getElementById('preview-body');
                 document.getElementById('preview-file-title').innerText = "🔍 ໄຟລ໌ສະບັບປັບປຸງ (ຫຍໍ້): " + proofData.fileName;
-                previewBody.innerHTML = proofData.isImage ? `<img src="${proofData.fileDataUrl}">` : `<iframe src="${proofData.fileDataUrl}" style="width:100%; height:100%; border:none;"></iframe>`;
+                previewBody.innerHTML = `<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; margin-bottom: 15px;"><p style="margin: 0; font-weight: bold; color: #0f172a; font-size: 14px;">📝 ເນື້ອໃນໂດຍຫຍໍ້ທີ່ສຸດ:</p><p style="margin: 5px 0 0 0; color: #334155; font-size: 13px;">${proofData.fileName}</p></div>`;
                 document.getElementById('file-preview-modal').style.display = 'flex';
             }
         }
@@ -1181,62 +1167,29 @@
         }
 
         /* ----------------------------------------------------
-           Modal Preview: ສະແດງ "ໄຟລ໌ສະບັບປັບປຸງ (ຫຍໍ້)" ພ້ອມເນື້ອໃນຫຍໍ້ທີ່ສຸດ
+           Modal Preview: ທຸກປະເພດໄຟລ໌ (PDF, ຮູບ, Word) ຈະສະແດງເປັນ "ເນື້ອໃນໂດຍຫຍໍ້ທີ່ສຸດ" ພ້ອມຫົວຂໍ້ "ໄຟລ໌ສະບັບປັບປຸງ (ຫຍໍ້)" 
         ---------------------------------------------------- */
         function openFilePreviewModal(id, type) {
             getAllDocsFromIDB(type, function(docsList) {
                 const doc = docsList.find(d => d.id == id);
                 if (doc && doc.fileDataUrl) {
-                    if (doc.isPDF) {
-                        const arr = doc.fileDataUrl.split(',');
-                        const mime = arr[0].match(/:(.*?);/)[1];
-                        const bstr = atob(arr[1]);
-                        let n = bstr.length;
-                        const u8arr = new Uint8Array(n);
-                        while (n--) {
-                            u8arr[n] = bstr.charCodeAt(n);
-                        }
-                        const blob = new Blob([u8arr], { type: mime });
-                        const blobUrl = URL.createObjectURL(blob);
-                        window.open(blobUrl, '_blank');
-                        return;
-                    }
-
                     const previewBody = document.getElementById('preview-body');
                     const downloadBtn = document.getElementById('download-btn-modal');
                     
-                    // 🌟 ປ່ຽນຫົວຂໍ້ຕາມທີ່ຕ້ອງການ
+                    // 🌟 ຫົວຂໍ້ຕາມທີ່ຕ້ອງການ
                     document.getElementById('preview-file-title').innerText = "🔍 ໄຟລ໌ສະບັບປັບປຸງ (ຫຍໍ້): " + doc.fileName;
 
-                    // 🌟 ສະແດງເນື້ອໃນໂດຍຫຍໍ້ທີ່ສຸດ (ດຶງຈາກ doc.content)
+                    // 🌟 ໃຫ້ສະແດງເນື້ອໃນໂດຍຫຍໍ້ທີ່ສຸດ (ບໍ່ສະແດງໄຟລ໌ຕົ້ນສະບັບແບບເຕັມຈໍ)
                     previewBody.innerHTML = `
-                        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
-                            <p style="margin: 0; font-weight: bold; color: #0f172a; font-size: 14px;">📝 ເນື້ອໃນໂດຍຫຍໍ້ທີ່ສຸດ:</p>
-                            <p style="margin: 5px 0 0 0; color: #334155; font-size: 13px;">${doc.content}</p>
+                        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px;">
+                            <p style="margin: 0 0 10px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📝 ເນື້ອໃນໂດຍຫຍໍ້ທີ່ສຸດ:</p>
+                            <p style="margin: 0; color: #334155; font-size: 14px; line-height: 1.6;">${doc.content}</p>
+                            <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 15px 0;">
+                            <p style="margin: 0; font-size: 12px; color: #64748b;"><strong>ເລກທີເອກະສານ:</strong> ${doc.docNo} | <strong>ວັນທີ:</strong> ${formatDateDDMMYYYY(doc.docDate)}</p>
                         </div>
                     `;
 
-                    if (doc.isImage) {
-                        previewBody.innerHTML += `<img src="${doc.fileDataUrl}" alt="Preview" style="margin-top:10px;">`;
-                    } 
-                    else if (doc.isDocx) {
-                        try {
-                            const base64Data = doc.fileDataUrl.split(',')[1];
-                            const binaryString = window.atob(base64Data);
-                            const len = binaryString.length;
-                            const bytes = new Uint8Array(len);
-                            for (let i = 0; i < len; i++) {
-                                bytes[i] = binaryString.charCodeAt(i);
-                            }
-                            mammoth.convertToHtml({ arrayBuffer: bytes.buffer })
-                                .then(function(result) {
-                                    // ຫຍໍ້ເນື້ອໃນ Word ໃຫ້ເຫຼືອສະເພາະບຼ໋ອກເນື້ອໃນສຳຄັນ ຫຼື ສະແດງຜົນຫຍໍ້
-                                    previewBody.innerHTML += `<div style="line-height:1.6; color:#0f172a; font-size:13px; margin-top:10px; border-top:1px dashed #cbd5e1; padding-top:10px;">${result.value}</div>`;
-                                })
-                                .catch(function() {});
-                        } catch(e) {}
-                    }
-
+                    // ປຸ່ມດາວໂຫຼດໄຟລ໌ຕົ້ນສະບັບ (ຖ້າຕ້ອງການດາວໂຫຼດ)
                     downloadBtn.onclick = function() {
                         const a = document.createElement('a');
                         a.href = doc.fileDataUrl;
