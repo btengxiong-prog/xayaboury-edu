@@ -1167,7 +1167,7 @@
         }
 
         /* ----------------------------------------------------
-           Modal Preview: ดึงข้อความเนื้อหาในไฟล์ (รวมถึง Word (.docx) ใช้ mammoth) มาแสดงให้ผู้อ่านตรวจสอบได้ทันที
+           Modal Preview: ໃຫ້ທຸກປະເພດໄຟລ໌ (ລວມທັງ PDF ແລະ ຮູບພາບ) ສະແດງເນື້ອໃນຫຍໍ້ທີ່ລະບົບຫຍໍ້ມາ ມາສະແດງໃນສ່ວນ "ລາຍລະອຽດເນື້ອໃນບົດຄວາມທັງໝົດ" ຢ່າງສົມບູນ
         ---------------------------------------------------- */
         function openFilePreviewModal(id, type) {
             getAllDocsFromIDB(type, function(docsList) {
@@ -1185,19 +1185,26 @@
                             <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 12px 0;">
                             <p style="margin: 0; font-size: 12px; color: #64748b;"><strong>ເລກທີເອກະສານ:</strong> ${doc.docNo} | <strong>ວັນທີ:</strong> ${formatDateDDMMYYYY(doc.docDate)} | <strong>ຊື່ໄຟລ໌ຕົ້ນສະບັບ:</strong> ${doc.fileName}</p>
                         </div>
-                        <div id="full-parsed-content" style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px;">
+                        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px;">
                             <p style="margin: 0 0 10px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📄 ລາຍລະອຽດເນື້ອໃນບົດຄວາມທັງໝົດ:</p>
-                            <div id="parsed-text-output" style="color: #1e293b; font-size: 13px; line-height: 1.8;">⏳ ກຳລັງອ່ານ ແລະ ຫຍໍ້ເນື້ອໃນຈາກໄຟລ໌...</div>
+                            <div id="parsed-text-output" style="color: #1e293b; font-size: 13px; line-height: 1.8;">⏳ ກຳລັງໂຫຼດເນື້ອໃນ...</div>
                         </div>
                     `;
 
                     const outputDiv = document.getElementById('parsed-text-output');
 
                     if (doc.isImage) {
-                        outputDiv.innerHTML = `<p style="color: #64748b; font-style: italic;">(ໄຟລ໌ຮູບພາບ: ໃຊ້ການສະແດງຜົນເນື້ອໃນຫຍໍ້ດ້ານເທິງ)</p><img src="${doc.fileDataUrl}" style="max-width:100%; max-height:40vh; margin-top:10px; border-radius:4px;">`;
+                        outputDiv.innerHTML = `
+                            <p style="color: #047857; font-weight: bold; margin-bottom: 10px;">✅ ໄຟລ໌ຮູບພາບໄດ້ຖືກສັງລວມເນື້ອໃນຫຍໍ້ຮຽບຮ້ອຍແລ້ວ (${doc.fileName})</p>
+                            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;"><strong>ເນື້ອໃນສະຫຼຸບ:</strong> ${doc.content}</p>
+                            <img src="${doc.fileDataUrl}" style="max-width:100%; max-height:40vh; margin-top:10px; border-radius:4px; display:block;">
+                        `;
                     } 
                     else if (doc.isPDF) {
-                        outputDiv.innerHTML = `<p style="color: #047857; font-weight: bold;">✅ ໄຟລ໌ PDF ໄດ້ຖືກສັງລວມເນື້ອໃນຫຍໍ້ຮຽບຮ້ອຍແລ້ວ (${doc.fileName})</p><p style="color: #475569; font-size: 13px; margin-top:5px;">ເນື້ອໃນສະຫຼຸບ: ${doc.content}</p>`;
+                        outputDiv.innerHTML = `
+                            <p style="color: #047857; font-weight: bold; margin-bottom: 5px;">✅ ໄຟລ໌ PDF ໄດ້ຖືກສັງລວມເນື້ອໃນຫຍໍ້ຮຽບຮ້ອຍແລ້ວ (${doc.fileName})</p>
+                            <p style="margin: 0; color: #334155; font-size: 13px;"><strong>ເນື້ອໃນສະຫຼຸບ:</strong> ${doc.content}</p>
+                        `;
                     } 
                     else if (doc.isDocx) {
                         try {
@@ -1213,13 +1220,13 @@
                                     outputDiv.innerHTML = result.value;
                                 })
                                 .catch(function() {
-                                    outputDiv.innerHTML = `<p style="color: #64748b;">${doc.content}</p>`;
+                                    outputDiv.innerHTML = `<p style="color: #334155; font-size: 13px;">${doc.content}</p>`;
                                 });
                         } catch(e) {
-                            outputDiv.innerHTML = `<p style="color: #64748b;">${doc.content}</p>`;
+                            outputDiv.innerHTML = `<p style="color: #334155; font-size: 13px;">${doc.content}</p>`;
                         }
                     } else {
-                        outputDiv.innerHTML = `<p style="color: #64748b;">${doc.content}</p>`;
+                        outputDiv.innerHTML = `<p style="color: #334155; font-size: 13px;">${doc.content}</p>`;
                     }
 
                     downloadBtn.onclick = function() {
