@@ -165,7 +165,7 @@
             display: block;
             margin: 0 auto;
         }
-        .preview-container iframe {
+        .preview-container embed, .preview-container iframe {
             width: 100%;
             height: 100%;
             border: none;
@@ -853,7 +853,7 @@
             if (proofData && proofData.fileDataUrl) {
                 const previewBody = document.getElementById('preview-body');
                 document.getElementById('preview-file-title').innerText = "🔍 ເບິ່ງໄຟລ໌: " + proofData.fileName;
-                previewBody.innerHTML = proofData.isImage ? `<img src="${proofData.fileDataUrl}">` : `<iframe src="${proofData.fileDataUrl}"></iframe>`;
+                previewBody.innerHTML = proofData.isImage ? `<img src="${proofData.fileDataUrl}">` : `<iframe src="${proofData.fileDataUrl}" style="width:100%; height:100%; border:none;"></iframe>`;
                 document.getElementById('file-preview-modal').style.display = 'flex';
             }
         }
@@ -1037,7 +1037,7 @@
         }
 
         /* ----------------------------------------------------
-           4. ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ສະບັບເຕັມ/ຕົ້ນສະບັບ) - ໃຫ້ກົດເບິ່ງໄຟລ໌ສະບັບຕົ້ນໄດ້
+           4. ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ສະບັບເຕັມ/ຕົ້ນສະບັບ)
         ---------------------------------------------------- */
         function showDocListTable(type) {
             closeAllDropdowns();
@@ -1054,7 +1054,6 @@
                 if (docsList && docsList.length > 0) {
                     docsList.forEach((doc, idx) => {
                         let fileIcon = doc.isImage ? '🖼️' : (doc.isPDF ? '📕' : '📄');
-                        /* 🌟 ຮັບປະກັນວ່າເມື່ອກົດຊື່ໄຟລ໌ໃນ "ຂໍ້ມູນວຽກທົ່ວໄປ" ແລະ "ຂໍ້ມູນແຜນຍຸດທະສາດ" ຈະເປີດ Modal Preview ສະບັບຕົ້ນຂຶ້ນມາ */
                         let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງໄຟລ໌ຕົ້ນສະບັບ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
 
                         rowsHTML += `
@@ -1182,7 +1181,7 @@
         }
 
         /* ----------------------------------------------------
-           Modal Preview ເປີດເຫັນໄຟລ໌ຂໍ້ມູນສະບັບຕົ້ນ (ທີ່ອັບເຂົ້າໄປ)
+           Modal Preview ປ່ຽນມາໃຊ້ Blob URL ສຳລັບ PDF ຮັບປະກັນເປີດຂຶ້ນ 100%
         ---------------------------------------------------- */
         function openFilePreviewModal(id, type) {
             getAllDocsFromIDB(type, function(docsList) {
@@ -1198,7 +1197,22 @@
                         previewBody.innerHTML = `<img src="${doc.fileDataUrl}" alt="Preview">`;
                     } 
                     else if (doc.isPDF) {
-                        previewBody.innerHTML = `<embed src="${doc.fileDataUrl}" type="application/pdf" width="100%" height="100%">`;
+                        // 🌟 แปลง Base64 เป็น Blob URL เพื่อให้ Browser ทุกตัวแสดงผล PDF ได้อย่างສົມບູນ 100%
+                        try {
+                            const arr = doc.fileDataUrl.split(',');
+                            const mime = arr[0].match(/:(.*?);/)[1];
+                            const bstr = atob(arr[1]);
+                            let n = bstr.length;
+                            const u8arr = new Uint8Array(n);
+                            while (n--) {
+                                u8arr[n] = bstr.charCodeAt(n);
+                            }
+                            const blob = new Blob([u8arr], { type: mime });
+                            const blobUrl = URL.createObjectURL(blob);
+                            previewBody.innerHTML = `<iframe src="${blobUrl}" style="width:100%; height:100%; border:none;"></iframe>`;
+                        } catch (err) {
+                            previewBody.innerHTML = `<embed src="${doc.fileDataUrl}" type="application/pdf" width="100%" height="100%">`;
+                        }
                     } 
                     else if (doc.isDocx) {
                         try {
