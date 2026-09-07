@@ -297,21 +297,60 @@
         }
 
         /* =========================================
-           ແກ້ໄຂ: 1. ເມນູຕິດເທິງສະເໝີ | 2. ກ່ອງລັອກອິນໃຫຍ່ຂຶ້ນ
-           ========================================= */
+        ບັງຄັບ Desktop View & ລັອກເມນູດ້ານເທິງໃຫ້ຕິດແໜ້ນ
+        ========================================= */
+        html, body {
+            min-width: 1200px !important;
+            height: 100vh !important; /* ລັອກຄວາມສູງໜ້າຈໍບໍ່ໃຫ້ເລື່ອນທັງເວັບ */
+            overflow-x: auto !important; /* ອະນຸຍາດໃຫ້ປັດຊ້າຍ-ຂວາໄດ້ທັງໜ້າຈໍ */
+            overflow-y: hidden !important; /* ປິດການເລື່ອນຂຶ້ນ-ລົງຂອງທັງໜ້າເວັບ (ແກ້ເມນູເຄື່ອນ) */
+            margin: 0 !important; 
+            padding: 0 !important;
+        }
         
-        /* 1. ລັອກແຖບເມນູໃຫ້ຕິດເທິງສະເໝີເວລາເລື່ອນໜ້າຈໍລົງ */
-        .top-toolbar {
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 9999 !important; /* ບັງຄັບໃຫ້ຢູ່ໜ້າສຸດສະເໝີ */
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15) !important; /* ເພີ່ມເງົາໃຫ້ດູມີມິຕິແຍກອອກຈາກຂໍ້ມູນ */
+        .main-wrapper {
+            min-width: 1200px !important;
+            height: 100vh !important;
+            display: flex;
+            flex-direction: column; /* ຈັດລຽງແຖບເມນູໄວ້ເທິງ ແລະ ຂໍ້ມູນໄວ້ລຸ່ມ */
         }
 
-        /* 2. ຂະຫຍາຍກ່ອງລັອກອິນໃຫຍ່ຂຶ້ນ 2 ເທົ່າ (ສະເພາະຈໍໂທລະສັບ/ແທັບເລັດ) */
+        .top-toolbar {
+            min-width: 1200px !important;
+            flex-shrink: 0 !important; /* ບັງຄັບບໍ່ໃຫ້ເມນູຫົດຕົວ ຫຼື ເຄື່ອນທີ່ */
+            position: relative !important;
+            z-index: 9999 !important;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .main-container {
+            display: flex !important;
+            flex-direction: row !important; 
+            flex-grow: 1 !important; /* ໃຫ້ກິນພື້ນທີ່ໜ້າຈໍທີ່ເຫຼືອທັງໝົດ */
+            height: calc(100vh - 60px) !important; 
+            overflow: hidden !important;
+        }
+
+        .sidebar-tree {
+            width: 320px !important;
+            min-width: 320px !important;
+            height: 100% !important;
+            overflow-y: auto !important; /* ໃຫ້ເມນູຊ້າຍເລື່ອນຂຶ້ນ-ລົງໄດ້ແຍກຕ່າງຫາກ */
+            border-right: 2px solid #cbd5e1 !important;
+            padding-bottom: 20px !important;
+        }
+
+        .content-area {
+            flex: 1 !important;
+            height: 100% !important;
+            overflow-y: auto !important; /* ໃຫ້ຂໍ້ມູນຂວາເລື່ອນຂຶ້ນ-ລົງໄດ້ແຍກຕ່າງຫາກ */
+            padding-bottom: 50px !important; 
+        }
+
+        /* ຂະຫຍາຍກ່ອງລັອກອິນໃນມືຖືໃຫ້ເບິ່ງງ່າຍຂຶ້ນ */
         @media screen and (max-device-width: 1024px) {
             .login-box {
-                transform: scale(2) !important; /* ຂະຫຍາຍ 2 ເທົ່າ */
+                transform: scale(1.8) !important;
                 transform-origin: center center !important;
             }
         }
