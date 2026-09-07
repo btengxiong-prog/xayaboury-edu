@@ -295,6 +295,27 @@
             margin-left: auto;
             color: #dc2626;
         }
+
+        /* =========================================
+           ແກ້ໄຂ: 1. ເມນູຕິດເທິງສະເໝີ | 2. ກ່ອງລັອກອິນໃຫຍ່ຂຶ້ນ
+           ========================================= */
+        
+        /* 1. ລັອກແຖບເມນູໃຫ້ຕິດເທິງສະເໝີເວລາເລື່ອນໜ້າຈໍລົງ */
+        .top-toolbar {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 9999 !important; /* ບັງຄັບໃຫ້ຢູ່ໜ້າສຸດສະເໝີ */
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15) !important; /* ເພີ່ມເງົາໃຫ້ດູມີມິຕິແຍກອອກຈາກຂໍ້ມູນ */
+        }
+
+        /* 2. ຂະຫຍາຍກ່ອງລັອກອິນໃຫຍ່ຂຶ້ນ 2 ເທົ່າ (ສະເພາະຈໍໂທລະສັບ/ແທັບເລັດ) */
+        @media screen and (max-device-width: 1024px) {
+            .login-box {
+                transform: scale(2) !important; /* ຂະຫຍາຍ 2 ເທົ່າ */
+                transform-origin: center center !important;
+            }
+        }
+        /* ========================================= */
     </style>
 </head>
 <body onclick="closeAllDropdowns(event)">
