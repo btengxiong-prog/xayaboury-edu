@@ -297,28 +297,31 @@
         }
 
         /* =========================================
-        ບັງຄັບ Desktop View & ລັອກເມນູດ້ານເທິງໃຫ້ຕິດແໜ້ນ
-        ========================================= */
+           ບັງຄັບ Desktop View & ລັອກເມນູດ້ານເທິງໃຫ້ຕິດແໜ້ນ 100%
+           ========================================= */
         html, body {
-            min-width: 1200px !important;
-            height: 100vh !important; /* ລັອກຄວາມສູງໜ້າຈໍບໍ່ໃຫ້ເລື່ອນທັງເວັບ */
-            overflow-x: auto !important; /* ອະນຸຍາດໃຫ້ປັດຊ້າຍ-ຂວາໄດ້ທັງໜ້າຈໍ */
-            overflow-y: hidden !important; /* ປິດການເລື່ອນຂຶ້ນ-ລົງຂອງທັງໜ້າເວັບ (ແກ້ເມນູເຄື່ອນ) */
             margin: 0 !important; 
             padding: 0 !important;
+            height: 100vh !important; /* ບັງຄັບຄວາມສູງເທົ່າຈໍພໍດີ */
+            width: 100vw !important;
+            overflow: hidden !important; /* ປິດການເລື່ອນຂອງໜ້າເວັບຫຼັກຢ່າງເດັດຂາດ! (ແກ້ເມນູຫາຍ) */
         }
         
         .main-wrapper {
-            min-width: 1200px !important;
+            display: flex !important;
+            flex-direction: column !important;
             height: 100vh !important;
-            display: flex;
-            flex-direction: column; /* ຈັດລຽງແຖບເມນູໄວ້ເທິງ ແລະ ຂໍ້ມູນໄວ້ລຸ່ມ */
+            min-width: 1200px !important;
+            overflow-x: auto !important; /* ໃຫ້ປັດຊ້າຍ-ຂວາໄດ້ຢູ່ບ່ອນນີ້ */
+            overflow-y: hidden !important;
         }
 
         .top-toolbar {
+            flex: 0 0 auto !important; /* ບັງຄັບບໍ່ໃຫ້ເມນູຫົດຕົວ ຫຼື ເຄື່ອນທີ່ */
             min-width: 1200px !important;
-            flex-shrink: 0 !important; /* ບັງຄັບບໍ່ໃຫ້ເມນູຫົດຕົວ ຫຼື ເຄື່ອນທີ່ */
-            position: relative !important;
+            position: sticky !important;
+            top: 0 !important;
+            left: 0 !important;
             z-index: 9999 !important;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15) !important;
         }
@@ -326,8 +329,8 @@
         .main-container {
             display: flex !important;
             flex-direction: row !important; 
-            flex-grow: 1 !important; /* ໃຫ້ກິນພື້ນທີ່ໜ້າຈໍທີ່ເຫຼືອທັງໝົດ */
-            height: calc(100vh - 60px) !important; 
+            flex: 1 1 auto !important; /* ໃຫ້ກິນພື້ນທີ່ໜ້າຈໍທີ່ເຫຼືອທັງໝົດລຸ່ມເມນູ */
+            height: 0 !important; /* ເຕັກນິກບັງຄັບໃຫ້ສະເພາະສ່ວນລຸ່ມເລື່ອນໄດ້ */
             overflow: hidden !important;
         }
 
@@ -335,16 +338,14 @@
             width: 320px !important;
             min-width: 320px !important;
             height: 100% !important;
-            overflow-y: auto !important; /* ໃຫ້ເມນູຊ້າຍເລື່ອນຂຶ້ນ-ລົງໄດ້ແຍກຕ່າງຫາກ */
+            overflow-y: auto !important; /* ເລື່ອນຂຶ້ນລົງສະເພາະເມນູຊ້າຍ */
             border-right: 2px solid #cbd5e1 !important;
-            padding-bottom: 20px !important;
         }
 
         .content-area {
             flex: 1 !important;
             height: 100% !important;
-            overflow-y: auto !important; /* ໃຫ້ຂໍ້ມູນຂວາເລື່ອນຂຶ້ນ-ລົງໄດ້ແຍກຕ່າງຫາກ */
-            padding-bottom: 50px !important; 
+            overflow-y: auto !important; /* ເລື່ອນຂຶ້ນລົງສະເພາະຂໍ້ມູນຂວາ */
         }
 
         /* ຂະຫຍາຍກ່ອງລັອກອິນໃນມືຖືໃຫ້ເບິ່ງງ່າຍຂຶ້ນ */
