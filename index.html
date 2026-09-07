@@ -293,6 +293,29 @@
             margin-left: auto;
             color: #dc2626;
         }
+
+        /* =========================================
+        Responsive ຈັດໜ້າຈໍສຳລັບໂທລະສັບມືຖື
+        ========================================= */
+        @media screen and (max-width: 768px) {
+            .main-container {
+                flex-direction: column !important; /* ປ່ຽນຈາກຊ້າຍ-ຂວາ ເປັນ ເທິງ-ລຸ່ມ */
+            }
+            .sidebar-tree {
+                width: 100% !important;
+                max-height: 250px !important; /* ໃຫ້ເມນູຊ້າຍມືສູງພຽງ 250px ແລ້ວສາມາດເລື່ອນຂຶ້ນລົງໄດ້ */
+                border-right: none !important;
+                border-bottom: 4px solid #b5651d !important;
+            }
+            .resizer {
+                display: none !important; /* ເຊື່ອງເສັ້ນລາກໃນມືຖື */
+            }
+            .content-area {
+                width: 100% !important;
+                padding: 10px !important;
+                overflow-y: visible !important;
+            }
+        }
     </style>
 </head>
 <body onclick="closeAllDropdowns(event)">
@@ -777,6 +800,12 @@
                     </table>
                 </div>
             `;
+        // ຖ້າເປັນໜ້າຈໍມືຖື ໃຫ້ເລື່ອນລົງໄປຫາຂໍ້ມູນອັດຕະໂນມັດ
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    document.getElementById('content-display').scrollIntoView({ behavior: 'smooth' });
+                }, 150);
+            }
         }
 
         function showAllStrategies() { showStrategy("ALL"); }
@@ -1335,6 +1364,7 @@
 
         function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
         function handleLogout() { currentUser = null; document.getElementById('login-screen').style.display = 'flex'; document.getElementById('main-screen').style.display = 'none'; }
+    
     </script>
 </body>
 </html>
