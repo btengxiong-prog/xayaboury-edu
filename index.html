@@ -295,44 +295,30 @@
         }
 
             /* =========================================
-            Responsive ຈັດໜ້າຈໍສຳລັບໂທລະສັບມືຖື (ແກ້ໄຂອາການຄ້າງ)
+            ບັງຄັບໃຫ້ສະແດງຜົນເປັນໜ້າຈໍຄອມພິວເຕີສະເໝີ (Desktop View)
             ========================================= */
-            @media screen and (max-width: 768px) {
-                /* 1. ປົດລັອກໃຫ້ທັງໜ້າເວັບສາມາດເລື່ອນຂຶ້ນ-ລົງໄດ້ */
-                body, html, .main-wrapper, .main-container {
-                    height: auto !important;
-                    overflow: auto !important; 
-                    display: block !important;
-                }
-                
-                /* 2. ໃຫ້ເມນູດ້ານຊ້າຍ ມາຢູ່ດ້ານເທິງ ແລະ ເລື່ອນໄດ້ຖ້າຍາວເກີນ */
-                .sidebar-tree {
-                    width: 100% !important;
-                    max-height: 220px !important; 
-                    overflow-y: auto !important; 
-                    border-right: none !important;
-                    border-bottom: 4px solid #b5651d !important;
-                }
-                .resizer {
-                    display: none !important; 
-                }
-                
-                /* 3. ຈັດການພື້ນທີ່ສະແດງຂໍ້ມູນ */
-                .content-area {
-                    width: 100% !important;
-                    height: auto !important;
-                    padding: 10px !important;
-                    overflow: visible !important;
-                }
-                
-                /* 4. ບັງຄັບໃຫ້ຕາຕະລາງສາມາດປັດຊ້າຍ-ຂວາໄດ້ແຍກຕ່າງຫາກ (ປ້ອງກັນຂໍ້ມູນບີບເຂົ້າກັນ) */
-                .report-container, #content-display {
-                    overflow-x: auto !important;
-                    -webkit-overflow-scrolling: touch;
-                }
-                .strategy-table {
-                    min-width: 650px; /* ບັງຄັບຂະໜາດຕາຕະລາງບໍ່ໃຫ້ຫົດນ້ອຍເກີນໄປ */
-                }
+            body, html {
+                min-width: 1200px !important; /* ບັງຄັບຄວາມກວ້າງໃຫ້ເທົ່າຈໍຄອມ */
+                overflow: auto !important; /* ໃຫ້ສາມາດປັດຊ້າຍ-ຂວາ, ເທິງ-ລຸ່ມ ໄດ້ອິດສະຫຼະ */
+            }
+
+            .main-container {
+                display: flex !important;
+                flex-direction: row !important; /* ບັງຄັບໃຫ້ເມນູຢູ່ຊ້າຍ ແລະ ຂໍ້ມູນຢູ່ຂວາສະເໝີ */
+            }
+
+            .sidebar-tree {
+                width: 300px !important; /* ລັອກຂະໜາດເມນູດ້ານຊ້າຍໄວ້ */
+                min-width: 300px !important;
+                height: 100vh !important;
+                overflow-y: auto !important;
+                border-right: 2px solid #cbd5e1 !important;
+            }
+
+            .content-area {
+                flex-grow: 1 !important;
+                height: 100vh !important;
+                overflow-y: auto !important;
             }
     </style>
 </head>
