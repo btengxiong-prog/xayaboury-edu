@@ -474,7 +474,7 @@
     </div>
 
     <script>
-        // 🌟 ຕື່ມ Firebase Config ຂອງທ່ານ ບ່ອນນີ້ (ຈາກ Firebase Console)
+        // 🌟 Firebase Config ທີ່ເຊື່ອມຕໍ່ກັບ Firebase Project ຂອງທ່ານ
         const firebaseConfig = {
             apiKey: "AIzaSyCfriMz4ShxvhSu6xbG5OdfAQUP9ikeEbA",
             authDomain: "xayaboury-edu.firebaseapp.com",
@@ -511,61 +511,85 @@
             return dateString;
         }
 
-        /* 🌟 Firestore Realtime Database Functions (ທົດແທນ IndexedDB ເພື່ອໃຫ້ Realtime 100%) */
-        function getCollectionName(type) {
-            if (type === 'general') return 'docs_general';
-            if (type === 'strategy') return 'docs_strategy';
-            if (type === 'execution') return 'docs_execution';
-            return 'docs_general';
-        }
+        /* 🌟 Firestore Realtime Sync State & Functions */
+        let globalStrategiesData = {};
+        let globalStatusesData = {};
+        let globalProofsData = {};
+        let globalDocsGeneral = [];
+        let globalDocsStrategy = [];
+        let globalDocsExecution = [];
 
-        function addDocToIDB(type, docData, callback) {
-            db.collection(getCollectionName(type)).doc(String(docData.id)).set(docData)
-                .then(() => callback(true))
-                .catch(() => callback(false));
-        }
+        let currentActiveViewType = '';
+        let currentActiveUnit = 'ALL';
 
-        function updateDocInIDB(type, docData, callback) {
-            db.collection(getCollectionName(type)).doc(String(docData.id)).set(docData, { merge: true })
-                .then(() => callback && callback(true))
-                .catch(() => callback && callback(false));
-        }
+        // 🌟 Realtime Listeners (ຟັງການປ່ຽນແປງຈາກ Firebase ຕະຫຼອດເວລາ)
+        function initRealtimeFirestoreSync() {
+            // 1. ຟັງຂໍ້ມູນແຜນຍຸດທະສາດ (Strategies)
+            db.collection("app_config").doc("strategies_store").onSnapshot((doc) => {
+                if (doc.exists) {
+                    globalStrategiesData = doc.data().content || {};
+                } else {
+                    globalStrategiesData = {
+                        "ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ": [
+                            { strat: "ຍຸດທະສາດ 01: ເພີ່ມການຈັດສັນງົບປະມານຂອງລັດ...", focus: "1. ຊຸກຍູ້ການເພີ່ມງົບປະມານ..." }
+                        ]
+                    };
+                    db.collection("app_config").doc("strategies_store").set({ content: globalStrategiesData });
+                }
+                refreshCurrentView();
+            });
 
-        function deleteDocFromIDB(type, id, callback) {
-            db.collection(getCollectionName(type)).doc(String(id)).delete()
-                .then(() => callback && callback(true))
-                .catch(() => callback && callback(false));
-        }
+            // 2. ຟັງຂໍ້ມູນສະຖານະ ແລະ ໄຟລ໌ອັບໂຫຼດ (Statuses & Proofs)
+            db.collection("app_config").doc("status_proof_store").onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    globalStatusesData = data.statuses || {};
+                    globalProofsData = data.proofs || {};
+                }
+                refreshCurrentView();
+            });
 
-        function getAllDocsFromIDB(type, callback) {
-            db.collection(getCollectionName(type)).get()
-                .then((querySnapshot) => {
-                    let docs = [];
-                    querySnapshot.forEach((doc) => {
-                        docs.push(doc.data());
-                    });
-                    callback(docs);
-                })
-                .catch(() => callback([]));
-        }
+            // 3. ຟັງຂໍ້ມູນເອກະສານວຽກທົ່ວໄປ (General Docs)
+            db.collection("docs_general").onSnapshot((snapshot) => {
+                globalDocsGeneral = [];
+                snapshot.forEach((doc) => { globalDocsGeneral.push(doc.data()); });
+                refreshCurrentView();
+            });
 
-        // 🌟 Realtime Listener: ໃຫ້ໜ້າຈໍອັບເດດອັດຕະໂນມັດທັນທີເມື່ອມີການປ່ຽນແປງຂໍ້ມູນໃນ Firebase
-        function initRealtimeListeners() {
-            ['general', 'strategy', 'execution'].forEach(type => {
-                db.collection(getCollectionName(type)).onSnapshot((snapshot) => {
-                    // ກວດສອບວ່າປັດຈຸບັນກำລັງສະແດງໜ້າໃດຢູ່ ເພື່ອ Refresh ໃຫ້ທັນທີ
-                    if (document.getElementById('main-screen').style.display !== 'none') {
-                        // ຖ້າຢູ່ໜ້າ Strategy ໃຫ້ໂຫຼດໃໝ່
-                        if (typeof currentActiveViewType !== 'undefined' && currentActiveViewType === type) {
-                            showDocListTable(type);
-                        }
-                    }
-                });
+            // 4. ຟັງຂໍ້ມູນເອກະສານຍຸດທະສາດ (Strategy Docs)
+            db.collection("docs_strategy").onSnapshot((snapshot) => {
+                globalDocsStrategy = [];
+                snapshot.forEach((doc) => { globalDocsStrategy.push(doc.data()); });
+                refreshCurrentView();
+            });
+
+            // 5. ຟັງຂໍ້ມູນການປະຕິບັດ (Execution Docs)
+            db.collection("docs_execution").onSnapshot((snapshot) => {
+                globalDocsExecution = [];
+                snapshot.forEach((doc) => { globalDocsExecution.push(doc.data()); });
+                refreshCurrentView();
             });
         }
-        
+
+        function refreshCurrentView() {
+            if (document.getElementById('main-screen').style.display === 'none') return;
+            if (currentActiveViewType === 'strategy_view') {
+                showStrategy(currentActiveUnit, false);
+            } else if (currentActiveViewType === 'general') {
+                showDocListTable('general', false);
+            } else if (currentActiveViewType === 'strategy_doc') {
+                showDocListTable('strategy', false);
+            } else if (currentActiveViewType === 'general_short') {
+                showGeneralShortSummary(false);
+            } else if (currentActiveViewType === 'strategy_short') {
+                showStrategyShortSummary(false);
+            } else if (currentActiveViewType === 'execution') {
+                showExecutionTable(false);
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
-            initRealtimeListeners();
+            initRealtimeFirestoreSync();
         });
 
         const users = {
@@ -607,29 +631,8 @@
             "ຫ້ອງການກຳມະທິການສຶກສາສິງແຂວງ"
         ];
 
-        const defaultStrategiesData = {
-            "ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ": [
-                { strat: "ຍຸດທະສາດ 01: ເພີ່ມການຈັດສັນງົບປະມານຂອງລັດ...", focus: "1. ຊຸກຍູ້ການເພີ່ມງົບປະມານ..." }
-            ]
-        };
-
-        function getMergedStrategiesData() {
-            let saved = localStorage.getItem("all_strategies_data_store");
-            if (saved) {
-                return JSON.parse(saved);
-            } else {
-                localStorage.setItem("all_strategies_data_store", JSON.stringify(defaultStrategiesData));
-                return JSON.parse(JSON.stringify(defaultStrategiesData));
-            }
-        }
-
-        function saveAllStrategiesDataStore(data) {
-            localStorage.setItem("all_strategies_data_store", JSON.stringify(data));
-        }
-
         let currentImportType = '';
         let tempFileData = null;
-        let currentActiveViewType = '';
 
         function handleLogin(event) {
             event.preventDefault();
@@ -668,15 +671,20 @@
                     menuList.innerHTML += `<li onclick="event.stopPropagation(); showStrategy('${currentUser.name}')">🏫 ${currentUser.name}</li>`;
                 }
 
+                showAllStrategies();
+
             } else {
-                errDiv.innerText = "Username ຫຼື Password ບໍ່ຖືກຕ້ອງ ກະລຸນາລອງໃຫມ່ອີກຄັ້ງ!";
+                errDiv.innerText = "Username ຫຼື Password ບໍ່ຖືກຕ້ອງ ກະລຸນາລອງໃໝ່ອີກຄັ້ງ!";
             }
         }
 
-        function showStrategy(unitName) {
-            currentActiveViewType = 'strategy_view';
+        function showStrategy(unitName, updateViewType = true) {
+            if (updateViewType) {
+                currentActiveViewType = 'strategy_view';
+                currentActiveUnit = unitName;
+            }
             const contentDisplay = document.getElementById('content-display');
-            let stratsData = getMergedStrategiesData();
+            let stratsData = globalStrategiesData;
             let isAdmin = (currentUser && currentUser.type === 'admin');
             let targetUnits = (unitName === 'ALL') ? allUnits : [unitName];
 
@@ -704,8 +712,8 @@
                                 totalFocusCount++;
                             }
                             let uniqueKey = `${unit}_${index}_${fIndex}`;
-                            let savedStatus = localStorage.getItem(`status_${uniqueKey}`) || '';
-                            let savedProof = JSON.parse(localStorage.getItem(`proof_${uniqueKey}`)) || null;
+                            let savedStatus = globalStatusesData[uniqueKey] || '';
+                            let savedProof = globalProofsData[uniqueKey] || null;
 
                             if (savedStatus === 'none') { unitNotDoneCount++; totalNotDoneCount++; }
                             if (savedStatus === 'done') { unitDoneCount++; totalDoneCount++; }
@@ -781,7 +789,7 @@
 
             let stratVal = '', focusVal = '';
             if (isEdit) {
-                let stratsData = getMergedStrategiesData();
+                let stratsData = globalStrategiesData;
                 if (stratsData[defaultUnit] && stratsData[defaultUnit][editIndex]) {
                     stratVal = stratsData[defaultUnit][editIndex].strat || '';
                     focusVal = (stratsData[defaultUnit][editIndex].focus || '').replace(/<br>/g, '\n');
@@ -809,7 +817,7 @@
             const editIndex = document.getElementById('edit-strat-index').value;
 
             if (!stratTitle) { alert('ກະລຸນາປ້ອນເນື້ອໃນແຜນຍຸດທະສາດ!'); return; }
-            let stratsData = getMergedStrategiesData();
+            let stratsData = JSON.parse(JSON.stringify(globalStrategiesData));
             if (!stratsData[selectedUnit]) stratsData[selectedUnit] = [];
             let formattedFocus = stratFocus.replace(/\n/g, '<br>');
 
@@ -820,27 +828,38 @@
                 stratsData[selectedUnit].push({ strat: stratTitle, focus: formattedFocus || '-' });
             }
 
-            saveAllStrategiesDataStore(stratsData);
-            showCustomAlert('✅ ບັນທຶກແຜນຍຸດທະສາດສຳເລັດແລ້ວ!');
-            showStrategy('ALL');
+            db.collection("app_config").doc("strategies_store").set({ content: stratsData })
+                .then(() => {
+                    showCustomAlert('✅ ບັນທຶກແຜນຍຸດທະສາດສຳເລັດແລ້ວ!');
+                    showStrategy('ALL');
+                });
         }
 
         function deleteStrategyEntry(unitName, index) {
             showCustomConfirm('🗑️ ທ່ານຕ້ອງການລົບແຜນຍຸດທະສາດຂໍ້ນີ້ແທ້ ຫຼື ບໍ່?', function() {
-                let stratsData = getMergedStrategiesData();
+                let stratsData = JSON.parse(JSON.stringify(globalStrategiesData));
                 stratsData[unitName].splice(index, 1);
-                saveAllStrategiesDataStore(stratsData);
-                showCustomAlert('🗑️ ລົບສຳເລັດ!');
-                showStrategy('ALL');
+                db.collection("app_config").doc("strategies_store").set({ content: stratsData })
+                    .then(() => {
+                        showCustomAlert('🗑️ ລົບສຳເລັດ!');
+                        showStrategy('ALL');
+                    });
             });
         }
 
         function toggleStatusCheck(event, key, targetStatus, unitName) {
             event.preventDefault();
-            let currentStatus = localStorage.getItem(`status_${key}`) || '';
-            if (currentStatus === targetStatus) localStorage.removeItem(`status_${key}`);
-            else localStorage.setItem(`status_${key}`, targetStatus);
-            showStrategy(unitName);
+            let currentStatus = globalStatusesData[key] || '';
+            let newStatuses = JSON.parse(JSON.stringify(globalStatusesData));
+            if (currentStatus === targetStatus) {
+                delete newStatuses[key];
+            } else {
+                newStatuses[key] = targetStatus;
+            }
+            db.collection("app_config").doc("status_proof_store").set({
+                statuses: newStatuses,
+                proofs: globalProofsData
+            }, { merge: true });
         }
 
         function triggerProofUpload(key) { currentUploadProofTargetKey = key; document.getElementById('proof-file-input').click(); }
@@ -858,18 +877,30 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const proofData = { fileName: file.name, fileDataUrl: e.target.result, fileType: file.type, isImage: false, isPDF: false, isDocx: file.name.toLowerCase().endsWith('.docx') };
-                    localStorage.setItem(`proof_${currentUploadProofTargetKey}`, JSON.stringify(proofData));
-                    showCustomAlert('✅ ອັບໂຫຼດໄຟລ໌ສຳເລັດ!');
-                    showStrategy(currentUploadProofTargetKey.split('_')[0]);
+                    let newProofs = JSON.parse(JSON.stringify(globalProofsData));
+                    newProofs[currentUploadProofTargetKey] = proofData;
+                    db.collection("app_config").doc("status_proof_store").set({
+                        statuses: globalStatusesData,
+                        proofs: newProofs
+                    }, { merge: true }).then(() => {
+                        showCustomAlert('✅ ອັບໂຫຼດໄຟລ໌ສຳເລັດ!');
+                    });
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function removeProofFile(key) { localStorage.removeItem(`proof_${key}`); showStrategy(key.split('_')[0]); }
+        function removeProofFile(key) {
+            let newProofs = JSON.parse(JSON.stringify(globalProofsData));
+            delete newProofs[key];
+            db.collection("app_config").doc("status_proof_store").set({
+                statuses: globalStatusesData,
+                proofs: newProofs
+            }, { merge: true });
+        }
 
         function previewProofFile(key) {
-            const proofData = JSON.parse(localStorage.getItem(`proof_${key}`));
+            const proofData = globalProofsData[key];
             if (proofData && proofData.fileDataUrl) {
                 const previewBody = document.getElementById('preview-body');
                 document.getElementById('preview-file-title').innerText = "🔍 ໄຟລ໌ສະບັບປັບປຸງ (ຫຍໍ້): " + proofData.fileName;
@@ -938,188 +969,179 @@
             if (!content) { alert('ກະລຸນາປ້ອນເນື້ອໃນ!'); return; }
             if (!tempFileData) { showCustomAlert('⚠️ ກະລຸນາເລືອກໄຟລ໌ເອກະສານ (Word ຫຼື Excel) ກ່ອນ!', false); return; }
 
-            getAllDocsFromIDB(currentImportType, function(existingDocs) {
-                let isDuplicate = existingDocs.some(d => d.fileName === tempFileData.fileName);
-                if (isDuplicate) {
-                    showCustomAlert(`⚠️ ໄຟລ໌ "${tempFileData.fileName}" ມີຢູ່ໃນລະບົບແລ້ວ! ບໍ່ສາມາດອັບໂຫຼດໄຟລ໌ຊ້ຳກັນໄດ້.`, false);
-                    return;
-                }
+            let existingDocs = (currentImportType === 'general') ? globalDocsGeneral : (currentImportType === 'strategy' ? globalDocsStrategy : globalDocsExecution);
+            let isDuplicate = existingDocs.some(d => d.fileName === tempFileData.fileName);
+            if (isDuplicate) {
+                showCustomAlert(`⚠️ ໄຟລ໌ "${tempFileData.fileName}" ມີຢູ່ໃນລະບົບແລ້ວ! ບໍ່ສາມາດອັບໂຫຼດໄຟລ໌ຊ້ຳກັນໄດ້.`, false);
+                return;
+            }
 
-                const now = new Date();
-                const recordDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${now.toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit' })}`;
+            const now = new Date();
+            const recordDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${now.toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit' })}`;
+            const docId = Date.now().toString();
 
-                const newDoc = {
-                    id: Date.now(), content, docNo: docNo || '-', docDate: docDate || '-',
-                    fileName: tempFileData.fileName,
-                    fileDataUrl: tempFileData.fileDataUrl,
-                    fileType: tempFileData.fileType,
-                    isImage: false,
-                    isPDF: false,
-                    isDocx: tempFileData.isDocx,
-                    recordDate, owner: currentUser ? currentUser.username : 'EDUXYBL', ownerName: currentUser ? currentUser.name : 'ADMIN'
-                };
+            const newDoc = {
+                id: docId, content, docNo: docNo || '-', docDate: docDate || '-',
+                fileName: tempFileData.fileName,
+                fileDataUrl: tempFileData.fileDataUrl,
+                fileType: tempFileData.fileType,
+                isImage: false,
+                isPDF: false,
+                isDocx: tempFileData.isDocx,
+                recordDate, owner: currentUser ? currentUser.username : 'EDUXYBL', ownerName: currentUser ? currentUser.name : 'ADMIN'
+            };
 
-                addDocToIDB(currentImportType, newDoc, function(success) {
-                    if (success) {
-                        closeDocModal();
-                        showCustomAlert('✅ ບັນທຶກສຳເລັດ!');
-                        if (currentImportType === 'execution') showExecutionTable();
-                        else showDocListTable(currentImportType);
-                    }
+            db.collection(currentImportType === 'general' ? 'docs_general' : (currentImportType === 'strategy' ? 'docs_strategy' : 'docs_execution'))
+                .doc(docId).set(newDoc)
+                .then(() => {
+                    closeDocModal();
+                    showCustomAlert('✅ ບັນທຶກສຳເລັດ!');
+                    if (currentImportType === 'execution') showExecutionTable();
+                    else showDocListTable(currentImportType);
                 });
-            });
         }
 
         function showGeneralSummaryTable() {
             showDocListTable('general');
         }
 
-        function showGeneralShortSummary() {
-            currentActiveViewType = 'general_short';
+        function showGeneralShortSummary(updateViewType = true) {
+            if (updateViewType) currentActiveViewType = 'general_short';
             closeAllDropdowns();
-            getAllDocsFromIDB('general', function(allDocsList) {
-                const contentDisplay = document.getElementById('content-display');
-                let docsList = allDocsList || [];
-                if (currentUser && currentUser.type !== 'admin') {
-                    docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
-                }
+            let docsList = globalDocsGeneral || [];
+            if (currentUser && currentUser.type !== 'admin') {
+                docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
+            }
 
-                let rowsHTML = '';
-                if (docsList.length > 0) {
-                    docsList.forEach((doc, idx) => {
-                        let fileIcon = doc.isDocx ? '📄' : '📊';
-                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, 'general')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນຫຍໍ້">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+            let rowsHTML = '';
+            if (docsList.length > 0) {
+                docsList.forEach((doc, idx) => {
+                    let fileIcon = doc.isDocx ? '📄' : '📊';
+                    let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal('${doc.id}', 'general')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນຫຍໍ້">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
 
-                        rowsHTML += `
+                    rowsHTML += `
+                        <tr>
+                            <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                            <td><strong>${doc.content}</strong><br><span style="font-size: 11px; color: #64748b;">(ເລກທີ: ${doc.docNo !== '-' ? doc.docNo : '-'} | ວັນທີ: ${formatDateDDMMYYYY(doc.docDate)})</span></td>
+                            <td style="text-align: center;">${fileLink}</td>
+                            <td style="text-align: center; color: #047857; font-weight: bold;">✅ ສະຫຼຸບຫຍໍ້ເນື້ອໃນສຳຄັນຄົບຖ້ວນ</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                rowsHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນວຽກທົ່ວໄປທີ່ນຳເຂົ້າ</td></tr>`;
+            }
+
+            document.getElementById('content-display').innerHTML = `
+                <div class="report-container" style="max-width: 100%;">
+                    <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📊 ວຽກທົ່ວໄປ (ສັງລວມເນື້ອໃນຫຼັກໆ ແລະ ຈຸດສຳຄັນ)</h2>
+                    <table class="strategy-table" style="width: 100%;">
+                        <thead>
                             <tr>
-                                <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
-                                <td><strong>${doc.content}</strong><br><span style="font-size: 11px; color: #64748b;">(ເລກທີ: ${doc.docNo !== '-' ? doc.docNo : '-'} | ວັນທີ: ${formatDateDDMMYYYY(doc.docDate)})</span></td>
-                                <td style="text-align: center;">${fileLink}</td>
-                                <td style="text-align: center; color: #047857; font-weight: bold;">✅ ສະຫຼຸບຫຍໍ້ເນື້ອໃນສຳຄັນຄົບຖ້ວນ</td>
+                                <th style="width: 8%; text-align: center;">ລຳດັບ</th>
+                                <th style="width: 42%;">ເນື້ອໃນຫຼັກ ແລະ ຈຸດສຳຄັນ</th>
+                                <th style="width: 25%; text-align: center;">ໄຟລ໌ອ້າງອີງ</th>
+                                <th style="width: 25%; text-align: center;">ສະຖານະ</th>
                             </tr>
-                        `;
-                    });
-                } else {
-                    rowsHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນວຽກທົ່ວໄປທີ່ນຳເຂົ້າ</td></tr>`;
-                }
-
-                contentDisplay.innerHTML = `
-                    <div class="report-container" style="max-width: 100%;">
-                        <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📊 ວຽກທົ່ວໄປ (ສັງລວມເນື້ອໃນຫຼັກໆ ແລະ ຈຸດສຳຄັນ)</h2>
-                        <table class="strategy-table" style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th style="width: 8%; text-align: center;">ລຳດັບ</th>
-                                    <th style="width: 42%;">ເນື້ອໃນຫຼັກ ແລະ ຈຸດສຳຄັນ</th>
-                                    <th style="width: 25%; text-align: center;">ໄຟລ໌ອ້າງອີງ</th>
-                                    <th style="width: 25%; text-align: center;">ສະຖານະ</th>
-                                </tr>
-                            </thead>
-                            <tbody>${rowsHTML}</tbody>
-                        </table>
-                    </div>
-                `;
-            });
+                        </thead>
+                        <tbody>${rowsHTML}</tbody>
+                    </table>
+                </div>
+            `;
         }
 
-        function showStrategyShortSummary() {
-            currentActiveViewType = 'strategy_short';
+        function showStrategyShortSummary(updateViewType = true) {
+            if (updateViewType) currentActiveViewType = 'strategy_short';
             closeAllDropdowns();
-            getAllDocsFromIDB('strategy', function(allDocsList) {
-                const contentDisplay = document.getElementById('content-display');
-                let docsList = allDocsList || [];
-                if (currentUser && currentUser.type !== 'admin') {
-                    docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
-                }
+            let docsList = globalDocsStrategy || [];
+            if (currentUser && currentUser.type !== 'admin') {
+                docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
+            }
 
-                let rowsHTML = '';
-                if (docsList.length > 0) {
-                    docsList.forEach((doc, idx) => {
-                        let fileIcon = doc.isDocx ? '📄' : '📊';
-                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, 'strategy')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນຫຍໍ້">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+            let rowsHTML = '';
+            if (docsList.length > 0) {
+                docsList.forEach((doc, idx) => {
+                    let fileIcon = doc.isDocx ? '📄' : '📊';
+                    let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal('${doc.id}', 'strategy')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງເນື້ອໃນຫຍໍ້">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
 
-                        rowsHTML += `
+                    rowsHTML += `
+                        <tr>
+                            <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                            <td><strong>${doc.content}</strong><br><span style="font-size: 11px; color: #64748b;">(ເລກທີ: ${doc.docNo !== '-' ? doc.docNo : '-'} | ວັນທີ: ${formatDateDDMMYYYY(doc.docDate)})</span></td>
+                            <td style="text-align: center;">${fileLink}</td>
+                            <td style="text-align: center; color: #047857; font-weight: bold;">✅ ສະຫຼຸບຫຍໍ້ເນື້ອໃນສຳຄັນຄົບຖ້ວນ</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                rowsHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມທີ່ນຳເຂົ້າ</td></tr>`;
+            }
+
+            document.getElementById('content-display').innerHTML = `
+                <div class="report-container" style="max-width: 100%;">
+                    <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">🎯 ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສັງລວມເນື້ອໃນຫຼັກໆ ແລະ ຈຸດສຳຄັນ)</h2>
+                    <table class="strategy-table" style="width: 100%;">
+                        <thead>
                             <tr>
-                                <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
-                                <td><strong>${doc.content}</strong><br><span style="font-size: 11px; color: #64748b;">(ເລກທີ: ${doc.docNo !== '-' ? doc.docNo : '-'} | ວັນທີ: ${formatDateDDMMYYYY(doc.docDate)})</span></td>
-                                <td style="text-align: center;">${fileLink}</td>
-                                <td style="text-align: center; color: #047857; font-weight: bold;">✅ ສະຫຼຸບຫຍໍ້ເນື້ອໃນສຳຄັນຄົບຖ້ວນ</td>
+                                <th style="width: 8%; text-align: center;">ລຳດັບ</th>
+                                <th style="width: 42%;">ເນື້ອໃນຫຼັກ ແລະ ຈຸດສຳຄັນຂອງແຜນຍຸດທະສາດ</th>
+                                <th style="width: 25%; text-align: center;">ໄຟລ໌ອ້າງອີງ</th>
+                                <th style="width: 25%; text-align: center;">ສະຖານະ</th>
                             </tr>
-                        `;
-                    });
-                } else {
-                    rowsHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມທີ່ນຳເຂົ້າ</td></tr>`;
-                }
-
-                contentDisplay.innerHTML = `
-                    <div class="report-container" style="max-width: 100%;">
-                        <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">🎯 ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ສັງລວມເນື້ອໃນຫຼັກໆ ແລະ ຈຸດສຳຄັນ)</h2>
-                        <table class="strategy-table" style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th style="width: 8%; text-align: center;">ລຳດັບ</th>
-                                    <th style="width: 42%;">ເນື້ອໃນຫຼັກ ແລະ ຈຸດສຳຄັນຂອງແຜນຍຸດທະສາດ</th>
-                                    <th style="width: 25%; text-align: center;">ໄຟລ໌ອ້າງອີງ</th>
-                                    <th style="width: 25%; text-align: center;">ສະຖານະ</th>
-                                </tr>
-                            </thead>
-                            <tbody>${rowsHTML}</tbody>
-                        </table>
-                    </div>
-                `;
-            });
+                        </thead>
+                        <tbody>${rowsHTML}</tbody>
+                    </table>
+                </div>
+            `;
         }
 
-        function showDocListTable(type) {
-            currentActiveViewType = type;
+        function showDocListTable(type, updateViewType = true) {
+            if (updateViewType) currentActiveViewType = type === 'general' ? 'general' : 'strategy_doc';
             closeAllDropdowns();
             const titleName = (type === 'general') ? '📁 ຂໍ້ມູນວຽກທົ່ວໄປ (ສະບັບເຕັມ/ຕົ້ນສະບັບ)' : '📈 ຂໍ້ມູນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ (ສະບັບເຕັມ/ຕົ້ນສະບັບ)';
             let isAdmin = (currentUser && currentUser.type === 'admin');
 
-            getAllDocsFromIDB(type, function(allDocsList) {
-                const contentDisplay = document.getElementById('content-display');
-                let docsList = allDocsList || [];
-                if (!isAdmin) {
-                    docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
-                }
+            let docsList = (type === 'general') ? globalDocsGeneral : globalDocsStrategy;
+            if (!isAdmin) {
+                docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
+            }
 
-                let rowsHTML = '';
-                if (docsList && docsList.length > 0) {
-                    docsList.forEach((doc, idx) => {
-                        let fileIcon = doc.isDocx ? '📄' : '📊';
-                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງໄຟລ໌ຕົ້ນສະບັບ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
-                        
-                        let deleteBtnHTML = isAdmin ? `<button type="button" class="remove-file-btn" onclick="deleteDocEntry('${type}', ${doc.id})">🗑️ ລົບ</button>` : `<span style="color:#64748b; font-size:11px;">(ສະເພາະ ADMIN)</span>`;
+            let rowsHTML = '';
+            if (docsList && docsList.length > 0) {
+                docsList.forEach((doc, idx) => {
+                    let fileIcon = doc.isDocx ? '📄' : '📊';
+                    let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal('${doc.id}', '${type}')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;" title="ກົດເພື່ອເປີດເບິ່ງໄຟລ໌ຕົ້ນສະບັບ">${fileIcon} ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+                    
+                    let deleteBtnHTML = isAdmin ? `<button type="button" class="remove-file-btn" onclick="deleteDocEntry('${type}', '${doc.id}')">🗑️ ລົບ</button>` : `<span style="color:#64748b; font-size:11px;">(ສະເພາະ ADMIN)</span>`;
 
-                        rowsHTML += `
-                            <tr>
-                                <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
-                                <td><input type="text" class="table-inline-input" value="${doc.content}" onchange="updateDocField(${doc.id}, '${type}', 'content', this.value)"></td>
-                                <td><input type="text" class="table-inline-input" style="text-align: center;" value="${doc.docNo !== '-' ? doc.docNo : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docNo', this.value)"></td>
-                                <td><input type="date" class="table-inline-input" style="text-align: center;" value="${doc.docDate !== '-' ? doc.docDate : ''}" onchange="updateDocField(${doc.id}, '${type}', 'docDate', this.value)"></td>
-                                <td style="text-align: center;">${fileLink}</td>
-                                <td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td>
-                                <td style="text-align: center;">${deleteBtnHTML}</td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    rowsHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານສະບັບເຕັມທີ່ນຳເຂົ້າ</td></tr>`;
-                }
+                    rowsHTML += `
+                        <tr>
+                            <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+                            <td><input type="text" class="table-inline-input" value="${doc.content}" onchange="updateDocField('${doc.id}', '${type}', 'content', this.value)"></td>
+                            <td><input type="text" class="table-inline-input" style="text-align: center;" value="${doc.docNo !== '-' ? doc.docNo : ''}" onchange="updateDocField('${doc.id}', '${type}', 'docNo', this.value)"></td>
+                            <td><input type="date" class="table-inline-input" style="text-align: center;" value="${doc.docDate !== '-' ? doc.docDate : ''}" onchange="updateDocField('${doc.id}', '${type}', 'docDate', this.value)"></td>
+                            <td style="text-align: center;">${fileLink}</td>
+                            <td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td>
+                            <td style="text-align: center;">${deleteBtnHTML}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                rowsHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນເອກະສານສະບັບເຕັມທີ່ນຳເຂົ້າ</td></tr>`;
+            }
 
-                contentDisplay.innerHTML = `
-                    <div class="report-container" style="max-width: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #b5651d; padding-bottom: 10px;">
-                            <h2 style="color: #b5651d; margin: 0;">📋 ${titleName}</h2>
-                            <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າເອກະສານໃໝ່</button>
-                        </div>
-                        <table class="strategy-table" style="width: 100%;">
-                            <thead><tr><th style="width: 5%; text-align: center;">ລຳດັບ</th><th style="width: 30%;">ເນື້ອໃນເອກະສານ (ສະບັບເຕັມ)</th><th style="width: 12%; text-align: center;">ເລກທີ</th><th style="width: 13%; text-align: center;">ວັນທີ</th><th style="width: 15%; text-align: center;">ໄຟລ໌</th><th style="width: 15%; text-align: center;">ບັນທຶກ</th><th style="width: 10%; text-align: center;">ຈັດການ</th></tr></thead>
-                            <tbody>${rowsHTML}</tbody>
-                        </table>
+            document.getElementById('content-display').innerHTML = `
+                <div class="report-container" style="max-width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #b5651d; padding-bottom: 10px;">
+                        <h2 style="color: #b5651d; margin: 0;">📋 ${titleName}</h2>
+                        <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('${type}')">➕ ນຳເຂົ້າເອກະສານໃໝ່</button>
                     </div>
-                `;
-            });
+                    <table class="strategy-table" style="width: 100%;">
+                        <thead><tr><th style="width: 5%; text-align: center;">ລຳດັບ</th><th style="width: 30%;">ເນື້ອໃນເອກະສານ (ສະບັບເຕັມ)</th><th style="width: 12%; text-align: center;">ເລກທີ</th><th style="width: 13%; text-align: center;">ວັນທີ</th><th style="width: 15%; text-align: center;">ໄຟລ໌</th><th style="width: 15%; text-align: center;">ບັນທຶກ</th><th style="width: 10%; text-align: center;">ຈັດການ</th></tr></thead>
+                        <tbody>${rowsHTML}</tbody>
+                    </table>
+                </div>
+            `;
         }
 
         function deleteDocEntry(type, id) {
@@ -1128,165 +1150,150 @@
                 return;
             }
             showCustomConfirm('🗑️ ທ່ານຕ້ອງການລົບເອກະສານນີ້ອອກຈາກລະບົບແທ້ ຫຼື ບໍ່?', function() {
-                deleteDocFromIDB(type, id, function(success) {
-                    if (success) {
+                db.collection(type === 'general' ? 'docs_general' : 'docs_strategy').doc(String(id)).delete()
+                    .then(() => {
                         showCustomAlert('🗑️ ລົບເອກະສານສຳເລັດ!');
-                        showDocListTable(type);
-                    } else {
-                        showCustomAlert('⚠️ ບໍ່ສາມາດລົບເອກະສານໄດ້!', false);
-                    }
-                });
+                    });
             });
         }
 
-        function showExecutionTable() {
-            currentActiveViewType = 'execution';
+        function showExecutionTable(updateViewType = true) {
+            if (updateViewType) currentActiveViewType = 'execution';
             closeAllDropdowns();
-            getAllDocsFromIDB('execution', function(allDocsList) {
-                const contentDisplay = document.getElementById('content-display');
-                let docsList = allDocsList || [];
-                if (currentUser && currentUser.type !== 'admin') docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
+            let docsList = globalDocsExecution || [];
+            if (currentUser && currentUser.type !== 'admin') docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
 
-                let rowsHTML = '';
-                if (docsList.length > 0) {
-                    docsList.forEach((doc, idx) => {
-                        let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal(${doc.id}, 'execution')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;">📄 ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
-                        rowsHTML += `<tr><td style="text-align: center; font-weight: bold;">${idx + 1}</td><td><input type="text" class="table-inline-input" value="${doc.content}" onchange="updateDocField(${doc.id}, 'execution', 'content', this.value)"></td><td style="text-align: center;"><input type="text" class="table-inline-input" style="text-align: center;" value="${doc.docNo}" onchange="updateDocField(${doc.id}, 'execution', 'docNo', this.value)"></td><td style="text-align: center;">${fileLink}</td><td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td></tr>`;
-                    });
-                } else {
-                    rowsHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນການປະຕິບັດ</td></tr>`;
-                }
+            let rowsHTML = '';
+            if (docsList.length > 0) {
+                docsList.forEach((doc, idx) => {
+                    let fileLink = doc.fileDataUrl ? `<span onclick="openFilePreviewModal('${doc.id}', 'execution')" style="cursor: pointer; color: #2563eb; text-decoration: underline; font-size: 12px;">📄 ${doc.fileName}</span>` : `<span style="color:#94a3b8;">(ບໍ່ມີໄຟລ໌)</span>`;
+                    rowsHTML += `<tr><td style="text-align: center; font-weight: bold;">${idx + 1}</td><td><input type="text" class="table-inline-input" value="${doc.content}" onchange="updateDocField('${doc.id}', 'execution', 'content', this.value)"></td><td style="text-align: center;"><input type="text" class="table-inline-input" style="text-align: center;" value="${doc.docNo}" onchange="updateDocField('${doc.id}', 'execution', 'docNo', this.value)"></td><td style="text-align: center;">${fileLink}</td><td style="text-align: center; font-size: 12px; color: #64748b;">${doc.recordDate}</td></tr>`;
+                });
+            } else {
+                rowsHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">ຍັງບໍ່ມີຂໍ້ມູນການປະຕິບັດ</td></tr>`;
+            }
 
-                contentDisplay.innerHTML = `
-                    <div class="report-container" style="max-width: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #b5651d; padding-bottom: 10px;">
-                            <h2 style="color: #b5651d; margin: 0;">⚙️ ບົດສັງລວມຫຍໍ້ການປະຕິບັດ</h2>
-                            <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('execution')">➕ ນຳເຂົ້າປະຕິບັດ</button>
-                        </div>
-                        <table class="strategy-table" style="width: 100%;">
-                            <thead><tr><th style="width: 8%; text-align: center;">ລຳດັບ</th><th style="width: 42%;">ເນື້ອໃນສັງລວມຫຍໍ້ການປະຕິບັດ</th><th style="width: 15%; text-align: center;">ເລກທີ</th><th style="width: 20%; text-align: center;">ໄຟລ໌ອ້າງອີງ</th><th style="width: 15%; text-align: center;">ວັນທີ</th></tr></thead>
-                            <tbody>${rowsHTML}</tbody>
-                        </table>
+            document.getElementById('content-display').innerHTML = `
+                <div class="report-container" style="max-width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #b5651d; padding-bottom: 10px;">
+                        <h2 style="color: #b5651d; margin: 0;">⚙️ ບົດສັງລວມຫຍໍ້ການປະຕິບັດ</h2>
+                        <button type="button" class="save-btn" style="background:#2563eb;" onclick="openImportModal('execution')">➕ ນຳເຂົ້າປະຕິບັດ</button>
                     </div>
-                `;
-            });
+                    <table class="strategy-table" style="width: 100%;">
+                        <thead><tr><th style="width: 8%; text-align: center;">ລຳດັບ</th><th style="width: 42%;">ເນື້ອໃນສັງລວມຫຍໍ້ການປະຕິບັດ</th><th style="width: 15%; text-align: center;">ເລກທີ</th><th style="width: 20%; text-align: center;">ໄຟລ໌ອ້າງອີງ</th><th style="width: 15%; text-align: center;">ວັນທີ</th></tr></thead>
+                        <tbody>${rowsHTML}</tbody>
+                    </table>
+                </div>
+            `;
         }
 
         function showCompareTable() {
             closeAllDropdowns();
-            getAllDocsFromIDB('general', function(generalPlans) {
-                getAllDocsFromIDB('strategy', function(strategyPlans) {
-                    getAllDocsFromIDB('execution', function(executionDocs) {
-                        const contentDisplay = document.getElementById('content-display');
-                        let generalList = generalPlans || [];
-                        let strategyList = strategyPlans || [];
-                        let execList = executionDocs || [];
-                        let compareRows = '';
-                        let maxLen = Math.max(generalList.length, strategyList.length, execList.length);
+            let generalList = globalDocsGeneral || [];
+            let strategyList = globalDocsStrategy || [];
+            let execList = globalDocsExecution || [];
+            let compareRows = '';
+            let maxLen = Math.max(generalList.length, strategyList.length, execList.length);
 
-                        if (maxLen > 0) {
-                            for (let i = 0; i < maxLen; i++) {
-                                compareRows += `<tr><td style="text-align: center; font-weight: bold;">${i + 1}</td><td>${generalList[i] ? generalList[i].content : '-'}</td><td>${strategyList[i] ? strategyList[i].content : '-'}</td><td>${execList[i] ? execList[i].content : '-'}</td></tr>`;
-                            }
-                        } else {
-                            compareRows = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">⚠️ ຍັງບໍ່ມີຂໍ້ມູນໃນລະບົບ</td></tr>`;
-                        }
+            if (maxLen > 0) {
+                for (let i = 0; i < maxLen; i++) {
+                    compareRows += `<tr><td style="text-align: center; font-weight: bold;">${i + 1}</td><td>${generalList[i] ? generalList[i].content : '-'}</td><td>${strategyList[i] ? strategyList[i].content : '-'}</td><td>${execList[i] ? execList[i].content : '-'}</td></tr>`;
+                }
+            } else {
+                compareRows = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">⚠️ ຍັງບໍ່ມີຂໍ້ມູນໃນລະບົບ</td></tr>`;
+            }
 
-                        contentDisplay.innerHTML = `
-                            <div class="report-container" style="max-width: 100%;">
-                                <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">⚖️ ຕາຕະລາງທຽບແຜນ / ປະຕິບັດ</h2>
-                                <table class="strategy-table" style="width: 100%;">
-                                    <thead><tr><th style="width: 8%; text-align: center;">ລຳດັບ</th><th style="width: 31%;">ວຽກທົ່ວໄປ (ແຜນ)</th><th style="width: 31%;">ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ແຜນ)</th><th style="width: 30%;">ຜົນການປະຕິບັດຕົວຈິງ</th></tr></thead>
-                                    <tbody>${compareRows}</tbody>
-                                </table>
-                            </div>
-                        `;
-                    });
-                });
-            });
+            document.getElementById('content-display').innerHTML = `
+                <div class="report-container" style="max-width: 100%;">
+                    <h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">⚖️ ຕາຕະລາງທຽບແຜນ / ປະຕິບັດ</h2>
+                    <table class="strategy-table" style="width: 100%;">
+                        <thead><tr><th style="width: 8%; text-align: center;">ລຳດັບ</th><th style="width: 31%;">ວຽກທົ່ວໄປ (ແຜນ)</th><th style="width: 31%;">ຍຸດທະສາດ/ວຽກຈຸດສຸມ (ແຜນ)</th><th style="width: 30%;">ຜົນການປະຕິບັດຕົວຈິງ</th></tr></thead>
+                        <tbody>${compareRows}</tbody>
+                    </table>
+                </div>
+            `;
         }
 
         function showSummaryReportTable() {
             closeAllDropdowns();
-            getAllDocsFromIDB('general', function(generalPlans) {
-                getAllDocsFromIDB('strategy', function(strategyPlans) {
-                    getAllDocsFromIDB('execution', function(executionDocs) {
-                        const contentDisplay = document.getElementById('content-display');
-                        let summaryText = `
-                            ບົດສະຫຼຸບສັງລວມການຈັດຕັ້ງປະຕິບັດວຽກງານ ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ:
-                            <br><br>
-                            <ul>
-                                <li><strong>1. ດ້ານແຜນການ "ວຽກທົ່ວໄປ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນວຽກທົ່ວໄປເຂົ້າໃນລະບົບທັງໝົດ <strong>${generalPlans ? generalPlans.length : 0}</strong> ຫົວຂໍ້.</li>
-                                <li><strong>2. ດ້ານແຜນການ "ຍຸດທະສາດ/ວຽກຈຸດສຸມ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນຍຸດທະສາດ/ວຽກຈຸດສຸມເຂົ້າໃນລະບົບທັງໝົດ <strong>${strategyPlans ? strategyPlans.length : 0}</strong> ຫົວຂໍ້.</li>
-                                <li><strong>3. ດ້ານການຈັດຕັ້ງປະຕິບັດຕົວຈິງ:</strong> ໄດ້ມີການອັບໂຫຼດບົດລາຍງານ ແລະ ໄຟລ໌ຜົນງານເຂົ້າສູ່ລະບົບແລ້ວທັງໝົດ <strong>${executionDocs ? executionDocs.length : 0}</strong> ສະບັບ.</li>
-                            </ul>
-                        `;
-                        contentDisplay.innerHTML = `<div class="report-container" style="max-width: 100%;"><h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📑 ເນື້ອໃນສະຫຼຸບ</h2><div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 25px; line-height: 1.8; font-size: 14px; color: #0f172a;">${summaryText}</div></div>`;
-                    });
-                });
-            });
+            let generalPlans = globalDocsGeneral || [];
+            let strategyPlans = globalDocsStrategy || [];
+            let executionDocs = globalDocsExecution || [];
+            let summaryText = `
+                ບົດສະຫຼຸບສັງລວມການຈັດຕັ້ງປະຕິບັດວຽກງານ ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ:
+                <br><br>
+                <ul>
+                    <li><strong>1. ດ້ານແຜນການ "ວຽກທົ່ວໄປ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນວຽກທົ່ວໄປເຂົ້າໃນລະບົບທັງໝົດ <strong>${generalPlans.length}</strong> ຫົວຂໍ້.</li>
+                    <li><strong>2. ດ້ານແຜນການ "ຍຸດທະສາດ/ວຽກຈຸດສຸມ":</strong> ມີການກຳນົດ ແລະ ນຳເຂົ້າແຜນຍຸດທະສາດ/ວຽກຈຸດສຸມເຂົ້າໃນລະບົບທັງໝົດ <strong>${strategyPlans.length}</strong> ຫົວຂໍ້.</li>
+                    <li><strong>3. ດ້ານການຈັດຕັ້ງປະຕິບັດຕົວຈິງ:</strong> ໄດ້ມີການອັບໂຫຼດບົດລາຍງານ ແລະ ໄຟລ໌ຜົນງານເຂົ້າສູ່ລະບົບແລ້ວທັງໝົດ <strong>${executionDocs.length}</strong> ສະບັບ.</li>
+                </ul>
+            `;
+            document.getElementById('content-display').innerHTML = `<div class="report-container" style="max-width: 100%;"><h2 style="color: #b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">📑 ເນື້ອໃນສະຫຼຸບ</h2><div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 25px; line-height: 1.8; font-size: 14px; color: #0f172a;">${summaryText}</div></div>`;
         }
 
         function updateDocField(id, type, field, value) {
-            getAllDocsFromIDB(type, function(docsList) {
-                const doc = docsList.find(d => d.id == id);
-                if (doc) { doc[field] = value.trim() || '-'; updateDocInIDB(type, doc, function(success) {}); }
+            let colName = (type === 'general') ? 'docs_general' : (type === 'strategy' ? 'docs_strategy' : 'docs_execution');
+            db.collection(colName).doc(String(id)).get().then((docSnap) => {
+                if (docSnap.exists) {
+                    let docData = docSnap.data();
+                    docData[field] = value.trim() || '-';
+                    db.collection(colName).doc(String(id)).set(docData, { merge: true });
+                }
             });
         }
 
         function openFilePreviewModal(id, type) {
-            getAllDocsFromIDB(type, function(docsList) {
-                const doc = docsList.find(d => d.id == id);
-                if (doc && doc.fileDataUrl) {
-                    const previewBody = document.getElementById('preview-body');
-                    const downloadBtn = document.getElementById('download-btn-modal');
-                    
-                    document.getElementById('preview-file-title').innerText = "🔍 ໄຟລ໌ສະບັບປັບປຸງ (ຫຍໍ້): " + doc.fileName;
+            let docsList = (type === 'general') ? globalDocsGeneral : (type === 'strategy' ? globalDocsStrategy : globalDocsExecution);
+            const doc = docsList.find(d => String(d.id) === String(id));
+            if (doc && doc.fileDataUrl) {
+                const previewBody = document.getElementById('preview-body');
+                const downloadBtn = document.getElementById('download-btn-modal');
+                
+                document.getElementById('preview-file-title').innerText = "🔍 ໄຟລ໌ສະບັບປັບປຸງ (ຫຍໍ້): " + doc.fileName;
 
-                    previewBody.innerHTML = `
-                        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px; margin-bottom: 15px;">
-                            <p style="margin: 0 0 8px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📝 ເນື້ອໃນໂດຍຫຍໍ້ທີ່ສຸດ:</p>
-                            <p style="margin: 0; color: #334155; font-size: 14px; line-height: 1.6;">${doc.content}</p>
-                            <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 12px 0;">
-                            <p style="margin: 0; font-size: 12px; color: #64748b;"><strong>ເລກທີເອກະສານ:</strong> ${doc.docNo} | <strong>ວັນທີ:</strong> ${formatDateDDMMYYYY(doc.docDate)} | <strong>ຊື່ໄຟລ໌ຕົ້ນສະບັບ:</strong> ${doc.fileName}</p>
+                previewBody.innerHTML = `
+                    <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px; margin-bottom: 15px;">
+                        <p style="margin: 0 0 8px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📝 ເນື້ອໃນໂດຍຫຍໍ້ທີ່ສຸດ:</p>
+                        <p style="margin: 0; color: #334155; font-size: 14px; line-height: 1.6;">${doc.content}</p>
+                        <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 12px 0;">
+                        <p style="margin: 0; font-size: 12px; color: #64748b;"><strong>ເລກທີເອກະສານ:</strong> ${doc.docNo} | <strong>ວັນທີ:</strong> ${formatDateDDMMYYYY(doc.docDate)} | <strong>ຊື່ໄຟລ໌ຕົ້ນສະບັບ:</strong> ${doc.fileName}</p>
+                    </div>
+                    <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px;">
+                        <p style="margin: 0 0 10px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📄 ລາຍລະອຽດເນື້ອໃນບົດຄວາມທັງໝົດ:</p>
+                        <div id="word-parsed-content" style="background: #f8fafc; border-left: 4px solid #2563eb; padding: 15px; border-radius: 4px; color: #1e293b; font-size: 14px; line-height: 1.8;">
+                            ${doc.content}
                         </div>
-                        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px;">
-                            <p style="margin: 0 0 10px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📄 ລາຍລະອຽດເນື້ອໃນບົດຄວາມທັງໝົດ:</p>
-                            <div id="word-parsed-content" style="background: #f8fafc; border-left: 4px solid #2563eb; padding: 15px; border-radius: 4px; color: #1e293b; font-size: 14px; line-height: 1.8;">
-                                ${doc.content}
-                            </div>
-                        </div>
-                    `;
+                    </div>
+                `;
 
-                    if (doc.isDocx) {
-                        try {
-                            const base64Data = doc.fileDataUrl.split(',')[1];
-                            const binaryString = window.atob(base64Data);
-                            const len = binaryString.length;
-                            const bytes = new Uint8Array(len);
-                            for (let i = 0; i < len; i++) {
-                                bytes[i] = binaryString.charCodeAt(i);
-                            }
-                            mammoth.convertToHtml({ arrayBuffer: bytes.buffer })
-                                .then(function(result) {
-                                    document.getElementById('word-parsed-content').innerHTML = result.value;
-                                })
-                                .catch(function() {});
-                        } catch(e) {}
-                    }
-
-                    downloadBtn.onclick = function() {
-                        const a = document.createElement('a');
-                        a.href = doc.fileDataUrl;
-                        a.download = doc.fileName;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                    };
-
-                    document.getElementById('file-preview-modal').style.display = 'flex';
+                if (doc.isDocx) {
+                    try {
+                        const base64Data = doc.fileDataUrl.split(',')[1];
+                        const binaryString = window.atob(base64Data);
+                        const len = binaryString.length;
+                        const bytes = new Uint8Array(len);
+                        for (let i = 0; i < len; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);
+                        }
+                        mammoth.convertToHtml({ arrayBuffer: bytes.buffer })
+                            .then(function(result) {
+                                document.getElementById('word-parsed-content').innerHTML = result.value;
+                            })
+                            .catch(function() {});
+                    } catch(e) {}
                 }
-            });
+
+                downloadBtn.onclick = function() {
+                    const a = document.createElement('a');
+                    a.href = doc.fileDataUrl;
+                    a.download = doc.fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                };
+
+                document.getElementById('file-preview-modal').style.display = 'flex';
+            }
         }
 
         function closeFilePreviewModal() { document.getElementById('file-preview-modal').style.display = 'none'; }
