@@ -253,7 +253,12 @@
             padding: 8px 15px;
             border-bottom: 1px solid #cbd5e1;
             gap: 15px;
-            flex-wrap: wrap;
+            
+            /* ໂຕທີ່ເພີ່ມໃໝ່ ເພື່ອໃຫ້ມືຖືເຫັນຄົບ: */
+            flex-wrap: nowrap; /* ບັງຄັບບໍ່ໃຫ້ປຸ່ມຕົກແຖວ */
+            overflow-x: auto; /* ອະນຸຍາດໃຫ້ປັດຊ້າຍ-ຂວາໄດ້ ເວລາຈໍນ້ອຍ */
+            white-space: nowrap; 
+            -webkit-overflow-scrolling: touch; /* ເຮັດໃຫ້ປັດໃນມືຖືໄດ້ລື່ນໄຫຼ */
         }
         .top-toolbar .tool-item {
             display: flex;
