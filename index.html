@@ -2,7 +2,7 @@
 <html lang="lo">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1280">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ລະບົບຕິດຕາມ ແລະ ສະຫຼຸບລາຍງານ - ພສກ ໄຊຍະບູລີ</title>
     <link rel="stylesheet" href="style.css">
     <!-- Mammoth.js ສຳລັບ Parse ໄຟລ໌ Word (.docx) -->
@@ -13,6 +13,47 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
+    /* =========================================
+    ບັງຄັບ Desktop View (ແກ້ບັນຫາຈໍຟ້າ ແລະ ຈໍຄ້າງ)
+    ========================================= */
+        html, body {
+            min-width: 1200px !important; /* ບັງຄັບຄວາມກວ້າງໃຫ້ເປັນຈໍຄອມ */
+            overflow-x: auto !important; /* ເປີດໃຫ້ປັດຊ້າຍ-ຂວາໄດ້ */
+            overflow-y: auto !important; /* ເປີດໃຫ້ປັດຂຶ້ນ-ລົງໄດ້ */
+            margin: 0 !important; 
+            padding: 0 !important;
+            height: auto !important; /* ປົດລັອກຄວາມສູງທີ່ເຮັດໃຫ້ຈໍຟ້າ */
+        }
+        
+        .main-wrapper {
+            min-width: 1200px !important;
+            overflow: visible !important;
+        }
+
+        .main-container {
+            display: flex !important;
+            flex-direction: row !important; /* ບັງຄັບແບ່ງຊ້າຍ-ຂວາ */
+            height: calc(100vh - 60px) !important; 
+        }
+
+        .sidebar-tree {
+            width: 320px !important;
+            min-width: 320px !important;
+            height: 100% !important;
+            overflow-y: auto !important; /* ໃຫ້ເມນູຊ້າຍເລື່ອນໄດ້ອິດສະຫຼະ */
+        }
+
+        .content-area {
+            flex: 1 !important;
+            height: 100% !important;
+            overflow-y: auto !important; /* ໃຫ້ຂໍ້ມູນຂວາເລື່ອນໄດ້ອິດສະຫຼະ */
+        }
+
+        .top-toolbar {
+            min-width: 1200px !important;
+            flex-wrap: nowrap !important;
+        }
+        /* ========================================= */
         .strategy-table {
             width: 100%;
             border-collapse: collapse;
