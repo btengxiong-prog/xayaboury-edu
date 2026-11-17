@@ -550,7 +550,7 @@
                 } else {
                     globalStrategiesData = {
                         "ຂະແໜງ ບໍລິຫານ ແລະ ການເງິນ": [
-                            { strat: "ຍຸດທະສາດ 01: ເພີ່ມການຈັດສັນງົບປະມານຂອງລັດ...", focus: "1. ຊຸກຍູ້ການເພີ່ມງົບປະມານ..." }
+                            { strat: "ຍຸດທະສາດ 01: ເພີ່ມການຈັດສັນງົບປະມານຂອງລັດ...", focus: "1. ຊຸກຍູ້ການເພີ່ມງົບປະມານ...", subUnit: "" }
                         ]
                     };
                     db.collection("app_config").doc("strategies_store").set({ content: globalStrategiesData });
@@ -724,6 +724,9 @@
                         totalStratCount++;
                         let focusItems = item.focus ? item.focus.split(/<br>\s*(?=\d+\.)/) : ['-'];
                         let rowSpan = focusItems.length;
+                        
+                        // ສະແດງຊື່ຂະແໜງການຍ່ອຍ ຖ້າມີ
+                        let subUnitDisplay = item.subUnit ? `<br><span style="color:#059669; font-size:12px;">(ຍ່ອຍ: ${item.subUnit})</span>` : '';
 
                         focusItems.forEach((fItem, fIndex) => {
                             if (fItem.trim() !== '-' && fItem.trim() !== '') {
@@ -739,7 +742,7 @@
 
                             tableRows += `<tr>`;
                             if (fIndex === 0) {
-                                tableRows += `<td rowspan="${rowSpan}" style="width: 30%; vertical-align: top !important;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}</td>`;
+                                tableRows += `<td rowspan="${rowSpan}" style="width: 30%; vertical-align: top !important;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}${subUnitDisplay}</td>`;
                             }
                             let proofHTML = '';
                             if (savedStatus === 'done') {
@@ -784,19 +787,13 @@
 
             contentDisplay.innerHTML = htmlContent + `
                 <div style="margin-top:35px; border-top:3px solid #b5651d; padding-top:10px;">
-                    <h3 style="color:#b5651d; margin-bottom:10px;">📊 ບົດສະຫຼຸບສັງລວມລວມທັງໝົດ (ທຸກຂະແໜງການ):</h3>
+                    <h3 style="color:#b5651d; margin-bottom:10px;">📊 ບົດສະຫຼຸບສັງລວມລວມທັງໝົດ (ທقىຂະແໜງການ):</h3>
                     <table class="strategy-table" style="background:#f8fafc;">
                         <thead><tr class="total-summary-footer"><th style="width: 30%;">ລວມແຜນຍຸດທະສາດທັງໝົດ</th><th style="width: 30%;">ລວມວຽກງານຈຸດສຸມທັງໝົດ</th><th style="width: 40%; text-align: left;" colspan="${isAdmin ? 2 : 1}">ລວມຜົນການຈັດຕັ້ງປະຕິບັດຕົວຈິງ</th></tr></thead>
                         <tbody><tr style="font-weight:bold; font-size:14px; color:#1e293b;"><td>📌 ${totalStratCount} ແຜນຍຸດທະສາດ</td><td>📋 ${totalFocusCount} ວຽກຈຸດສຸມ</td><td colspan="${isAdmin ? 2 : 1}"><span style="color:#ef4444; margin-right:15px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${totalNotDoneCount} ຂໍ້</span><span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${totalDoneCount} ຂໍ້</span></td></tr></tbody>
                     </table>
                 </div>
             `;
-        // ລຶບ 5 ແຖວນີ້ຖິ້ມໄປເລີຍ
-            if (window.innerWidth <= 768) {
-                setTimeout(() => {
-                    document.getElementById('content-display').scrollIntoView({ behavior: 'smooth' });
-                }, 150);
-            }
         }
 
         function showAllStrategies() { showStrategy("ALL"); }
@@ -812,12 +809,13 @@
             let unitOptions = '';
             allUnits.forEach(unit => { unitOptions += `<option value="${unit}" ${unit === defaultUnit ? 'selected' : ''}>${unit}</option>`; });
 
-            let stratVal = '', focusVal = '';
+            let stratVal = '', focusVal = '', subUnitVal = '';
             if (isEdit) {
                 let stratsData = globalStrategiesData;
                 if (stratsData[defaultUnit] && stratsData[defaultUnit][editIndex]) {
                     stratVal = stratsData[defaultUnit][editIndex].strat || '';
                     focusVal = (stratsData[defaultUnit][editIndex].focus || '').replace(/<br>/g, '\n');
+                    subUnitVal = stratsData[defaultUnit][editIndex].subUnit || '';
                 }
             }
 
@@ -825,10 +823,40 @@
                 <div class="report-container" style="max-width:700px; margin:0 auto; text-align:left;">
                     <h2 style="color:#b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">${isEdit ? '✏️ ດັດແກ້ແຜນຍຸດທະສາດ' : '📝 ປ້ອນແຜນຍຸດທະສາດໃໝ່'} (ADMIN)</h2>
                     <input type="hidden" id="edit-strat-index" value="${isEdit ? editIndex : ''}">
-                    <div class="form-field"><label>🏢 ເລືອກຂະແໜງການ:</label><select id="new-strat-unit" ${defaultUnit !== '' ? 'disabled' : ''}>${unitOptions}</select></div>
-                    <div class="form-field"><label>🎯 ເນື້ອໃນແຜນຍຸດທະສາດ:</label><textarea id="new-strat-title" rows="4">${stratVal}</textarea></div>
-                    <div class="form-field"><label>📋 ວຽກງານຈຸດສຸມ:</label><textarea id="new-strat-focus" rows="5">${focusVal}</textarea></div>
-                    <div class="modal-btn-group"><button type="button" class="btn-cancel" onclick="showStrategy('${defaultUnit || 'ALL'}')">ຍົກເລີກ</button><button type="button" class="save-btn" onclick="saveStrategyEntryData('${defaultUnit}')">💾 ບັນທຶກ</button></div>
+                    
+                    <div class="form-field">
+                        <label>🏢 ເລືອກຂະແໜງການ:</label>
+                        <select id="new-strat-unit" ${defaultUnit !== '' ? 'disabled' : ''}>${unitOptions}</select>
+                    </div>
+                    
+                    <!-- ເພີ່ມຊ່ອງເລືອກ ຂະແໜງການຍ່ອຍ ຕາມທີ່ຂໍມາ -->
+                    <div class="form-field">
+                        <label>📑 ເລືອກຂະແໜງການຍ່ອຍ (ຖ້າມີ):</label>
+                        <select id="new-strat-sub-unit">
+                            <option value="" ${subUnitVal === '' ? 'selected' : ''}>-- ບໍ່ລະບຸ (ປ່ອຍຫວ່າງໄດ້) --</option>
+                            <option value="ຂະແໜງການຍ່ອຍການສຶກສາກ່ອນໄວຮຽນ" ${subUnitVal === 'ຂະແໜງການຍ່ອຍການສຶກສາກ່ອນໄວຮຽນ' ? 'selected' : ''}>ຂະແໜງການຍ່ອຍການສຶກສາກ່ອນໄວຮຽນ</option>
+                            <option value="ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນປະຖົມ" ${subUnitVal === 'ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນປະຖົມ' ? 'selected' : ''}>ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນປະຖົມ</option>
+                            <option value="ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນຕົ້ນ" ${subUnitVal === 'ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນຕົ້ນ' ? 'selected' : ''}>ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນຕົ້ນ</option>
+                            <option value="ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນປາຍ" ${subUnitVal === 'ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນປາຍ' ? 'selected' : ''}>ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນປາຍ</option>
+                            <option value="ຂະແໜງການພັດທະນາຄູ ແລະ ບໍລິຫານການສຶກສາ" ${subUnitVal === 'ຂະແໜງການພັດທະນາຄູ ແລະ ບໍລິຫານການສຶກສາ' ? 'selected' : ''}>ຂະແໜງການພັດທະນາຄູ ແລະ ບໍລິຫານການສຶກສາ</option>
+                            <option value="ອື່ນໆ" ${subUnitVal === 'ອື່ນໆ' ? 'selected' : ''}>ອື່ນໆ</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label>🎯 ເນື້ອໃນແຜນຍຸດທະສາດ:</label>
+                        <textarea id="new-strat-title" rows="4">${stratVal}</textarea>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label>📋 ວຽກງານຈຸດສຸມ:</label>
+                        <textarea id="new-strat-focus" rows="5">${focusVal}</textarea>
+                    </div>
+                    
+                    <div class="modal-btn-group">
+                        <button type="button" class="btn-cancel" onclick="showStrategy('${defaultUnit || 'ALL'}')">ຍົກເລີກ</button>
+                        <button type="button" class="save-btn" onclick="saveStrategyEntryData('${defaultUnit}')">💾 ບັນທຶກ</button>
+                    </div>
                 </div>
             `;
         }
@@ -837,6 +865,7 @@
 
         function saveStrategyEntryData(presetUnit = '') {
             const selectedUnit = presetUnit !== '' ? presetUnit : document.getElementById('new-strat-unit').value;
+            const subUnit = document.getElementById('new-strat-sub-unit').value; // ເກັບຄ່າຂະແໜງການຍ່ອຍ
             const stratTitle = document.getElementById('new-strat-title').value.trim();
             const stratFocus = document.getElementById('new-strat-focus').value.trim();
             const editIndex = document.getElementById('edit-strat-index').value;
@@ -848,9 +877,9 @@
 
             if (editIndex !== '' && editIndex !== null && editIndex !== undefined) {
                 let idx = parseInt(editIndex);
-                stratsData[selectedUnit][idx] = { strat: stratTitle, focus: formattedFocus || '-' };
+                stratsData[selectedUnit][idx] = { strat: stratTitle, focus: formattedFocus || '-', subUnit: subUnit };
             } else {
-                stratsData[selectedUnit].push({ strat: stratTitle, focus: formattedFocus || '-' });
+                stratsData[selectedUnit].push({ strat: stratTitle, focus: formattedFocus || '-', subUnit: subUnit });
             }
 
             db.collection("app_config").doc("strategies_store").set({ content: stratsData })
@@ -1024,10 +1053,6 @@
                     if (currentImportType === 'execution') showExecutionTable();
                     else showDocListTable(currentImportType);
                 });
-        }
-
-        function showGeneralSummaryTable() {
-            showDocListTable('general');
         }
 
         function showGeneralShortSummary(updateViewType = true) {
