@@ -714,18 +714,38 @@
                     }
                 });
 
-                const menuList = document.getElementById('menu-list');
-                menuList.innerHTML = '';
-
+                const sidebarTree = document.querySelector('.sidebar-tree');
+                
                 if (currentUser.type === 'admin') {
-                    allUnits.forEach(unit => {
-                        menuList.innerHTML += `<li><div class="tree-item" onclick="event.stopPropagation(); setActiveMenu(this); handleSidebarClick('${unit}')">🏫 ${unit}</div></li>`;
-                    });
+                    // ສຳລັບ Admin: ໃຫ້ເຫັນໂຄງສ້າງເມນູລວມທັງໝົດ
+                    sidebarTree.innerHTML = `
+                        <ul>
+                            <li class="folder">
+                                <div class="tree-item" onclick="setActiveMenu(this); handleSidebarClick('ALL');">📁 ພາກສ່ວນຕ່າງໆ</div>
+                                <ul>
+                                    <li class="folder open">
+                                        <div class="tree-item" onclick="event.stopPropagation(); setActiveMenu(this); handleSidebarClick('ALL');">📂 ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ</div>
+                                        <ul id="menu-list" onclick="event.stopPropagation()">
+                                            ${allUnits.map(unit => `<li><div class="tree-item" onclick="event.stopPropagation(); setActiveMenu(this); handleSidebarClick('${unit}')">🏫 ${unit}</div></li>`).join('')}
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    `;
+                    showAllStrategies(); // Admin ຫຼັອກອິນໃຫ້ສະແດງທຸກຂະແໜງ
                 } else {
-                    menuList.innerHTML += `<li><div class="tree-item" onclick="event.stopPropagation(); setActiveMenu(this); handleSidebarClick('${currentUser.name}')">🏫 ${currentUser.name}</div></li>`;
+                    // ສຳລັບ User ທົ່ວໄປ (ຂະແໜງ): ຕັດເມນູລວມຖິ້ມ ໃຫ້ເຫັນແຕ່ຊື່ຕົນເອງ
+                    sidebarTree.innerHTML = `
+                        <ul>
+                            <li class="folder open">
+                                <div class="tree-item active-menu" onclick="event.stopPropagation(); setActiveMenu(this); handleSidebarClick('${currentUser.name}');">🏫 ${currentUser.name}</div>
+                            </li>
+                        </ul>
+                    `;
+                    // ດຶງຂໍ້ມູນຂອງຂະແໜງນັ້ນໆ ມາສະແດງອັດຕະໂນມັດທັນທີ!
+                    handleSidebarClick(currentUser.name);
                 }
-
-                showAllStrategies();
 
             } else {
                 errDiv.innerText = "Username ຫຼື Password ບໍ່ຖືກຕ້ອງ ກະລຸນາລອງໃໝ່ອີກຄັ້ງ!";
@@ -733,13 +753,19 @@
         }
 
         function showStrategy(unitName, updateViewType = true) {
+            let isAdmin = (currentUser && currentUser.type === 'admin');
+            
+            // 🛡️ ລະບົບປ້ອງກັນ: ຖ້າເປັນ User ທົ່ວໄປ ແຕ່ມີການຮ້ອງຂໍເບິ່ງ 'ALL', ໃຫ້ບັງຄັບສະແດງແຕ່ຂໍ້ມູນຂອງຕົນເອງ
+            if (!isAdmin && unitName === 'ALL') {
+                unitName = currentUser ? currentUser.name : '';
+            }
+
             if (updateViewType) {
                 currentActiveViewType = 'strategy_view';
                 currentActiveUnit = unitName;
             }
             const contentDisplay = document.getElementById('content-display');
             let stratsData = globalStrategiesData;
-            let isAdmin = (currentUser && currentUser.type === 'admin');
             let targetUnits = (unitName === 'ALL') ? allUnits : [unitName];
 
             let totalStratCount = 0;
