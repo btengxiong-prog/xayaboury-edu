@@ -307,6 +307,34 @@
             /* ເພີ່ມແຖວນີ້ເພື່ອປົດລັອກໃຫ້ເມນູ Dropdown ຢ່ອນລົງມາໄດ້ */
             overflow: visible !important; 
         }
+
+        /* 🌟 ເພີ່ມ CSS ສຳລັບ Hover ແລະ Active State ແບບແຍກຊັ້ນກັນຢ່າງຊັດເຈນ */
+        .sidebar-tree ul {
+            list-style: none;
+            padding-left: 20px;
+            margin: 0;
+        }
+        .sidebar-tree > ul {
+            padding-left: 0;
+        }
+        .tree-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+            margin-bottom: 4px;
+            cursor: pointer;
+            display: block;
+        }
+        .tree-item:hover {
+            background-color: rgba(37, 99, 235, 0.1);
+            color: #2563eb;
+        }
+        .tree-item.active-menu {
+            background-color: rgba(37, 99, 235, 0.15);
+            color: #1d4ed8;
+            font-weight: bold;
+            border-left: 4px solid #2563eb;
+        }
     </style>
 </head>
 <body onclick="closeAllDropdowns(event)">
@@ -472,9 +500,11 @@
         <div class="main-container">
             <div class="sidebar-tree">
                 <ul>
-                    <li class="folder" onclick="showAllStrategies()" style="cursor: pointer;">📁 ພາກສ່ວນຕ່າງໆ
+                    <li class="folder">
+                        <div class="tree-item" onclick="setActiveMenu(this); handleSidebarClick('ALL');">📁 ພາກສ່ວນຕ່າງໆ</div>
                         <ul>
-                            <li class="folder open" onclick="event.stopPropagation(); showAllStrategies();" style="cursor: pointer;">📂 ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ
+                            <li class="folder open">
+                                <div class="tree-item" onclick="event.stopPropagation(); setActiveMenu(this); handleSidebarClick('ALL');">📂 ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ</div>
                                 <ul id="menu-list" onclick="event.stopPropagation()"></ul>
                             </li>
                         </ul>
@@ -684,10 +714,10 @@
 
                 if (currentUser.type === 'admin') {
                     allUnits.forEach(unit => {
-                        menuList.innerHTML += `<li onclick="event.stopPropagation(); showStrategy('${unit}')">🏫 ${unit}</li>`;
+                        menuList.innerHTML += `<li><div class="tree-item" onclick="event.stopPropagation(); setActiveMenu(this); handleSidebarClick('${unit}')">🏫 ${unit}</div></li>`;
                     });
                 } else {
-                    menuList.innerHTML += `<li onclick="event.stopPropagation(); showStrategy('${currentUser.name}')">🏫 ${currentUser.name}</li>`;
+                    menuList.innerHTML += `<li><div class="tree-item" onclick="event.stopPropagation(); setActiveMenu(this); handleSidebarClick('${currentUser.name}')">🏫 ${currentUser.name}</div></li>`;
                 }
 
                 showAllStrategies();
@@ -798,6 +828,18 @@
 
         function showAllStrategies() { showStrategy("ALL"); }
 
+        // 🌟 ຟັງຊັນໃໝ່: ຈັດການເມື່ອກົດເມນູດ້ານຊ້າຍ ໃຫ້ມັນຈື່ໜ້າປັດຈຸບັນ
+        function handleSidebarClick(unitName) {
+            currentActiveUnit = unitName;
+            if (!currentActiveViewType) currentActiveViewType = 'strategy_view';
+            const contentDisplay = document.getElementById('content-display');
+            if (contentDisplay.innerHTML.includes('id="new-strat-unit"')) {
+                showStrategy(unitName);
+                return;
+            }
+            refreshCurrentView();
+        }
+
         function showAddStrategyForm(defaultUnit = '', editIndex = null) {
             if (currentUser && currentUser.type !== 'admin') {
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດເພີ່ມ/ດັດແກ້ແຜນຍຸດທະສາດ!', false);
@@ -885,7 +927,7 @@
             db.collection("app_config").doc("strategies_store").set({ content: stratsData })
                 .then(() => {
                     showCustomAlert('✅ ບັນທຶກແຜນຍຸດທະສາດສຳເລັດແລ້ວ!');
-                    showStrategy('ALL');
+                    showStrategy(currentActiveUnit || 'ALL');
                 });
         }
 
@@ -896,7 +938,7 @@
                 db.collection("app_config").doc("strategies_store").set({ content: stratsData })
                     .then(() => {
                         showCustomAlert('🗑️ ລົບສຳເລັດ!');
-                        showStrategy('ALL');
+                        showStrategy(currentActiveUnit || 'ALL');
                     });
             });
         }
@@ -1061,6 +1103,8 @@
             let docsList = globalDocsGeneral || [];
             if (currentUser && currentUser.type !== 'admin') {
                 docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
+            } else if (currentActiveUnit !== 'ALL') {
+                docsList = docsList.filter(d => d.ownerName === currentActiveUnit);
             }
 
             let rowsHTML = '';
@@ -1106,6 +1150,8 @@
             let docsList = globalDocsStrategy || [];
             if (currentUser && currentUser.type !== 'admin') {
                 docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
+            } else if (currentActiveUnit !== 'ALL') {
+                docsList = docsList.filter(d => d.ownerName === currentActiveUnit);
             }
 
             let rowsHTML = '';
@@ -1154,6 +1200,8 @@
             let docsList = (type === 'general') ? globalDocsGeneral : globalDocsStrategy;
             if (!isAdmin) {
                 docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
+            } else if (currentActiveUnit !== 'ALL') {
+                docsList = docsList.filter(d => d.ownerName === currentActiveUnit);
             }
 
             let rowsHTML = '';
@@ -1211,7 +1259,11 @@
             if (updateViewType) currentActiveViewType = 'execution';
             closeAllDropdowns();
             let docsList = globalDocsExecution || [];
-            if (currentUser && currentUser.type !== 'admin') docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
+            if (currentUser && currentUser.type !== 'admin') {
+                docsList = docsList.filter(d => d.owner === currentUser.username || d.ownerName === currentUser.name);
+            } else if (currentActiveUnit !== 'ALL') {
+                docsList = docsList.filter(d => d.ownerName === currentActiveUnit);
+            }
 
             let rowsHTML = '';
             if (docsList.length > 0) {
@@ -1242,6 +1294,17 @@
             let generalList = globalDocsGeneral || [];
             let strategyList = globalDocsStrategy || [];
             let execList = globalDocsExecution || [];
+            
+            if (currentUser && currentUser.type !== 'admin') {
+                generalList = generalList.filter(d => d.ownerName === currentUser.name);
+                strategyList = strategyList.filter(d => d.ownerName === currentUser.name);
+                execList = execList.filter(d => d.ownerName === currentUser.name);
+            } else if (currentActiveUnit !== 'ALL') {
+                generalList = generalList.filter(d => d.ownerName === currentActiveUnit);
+                strategyList = strategyList.filter(d => d.ownerName === currentActiveUnit);
+                execList = execList.filter(d => d.ownerName === currentActiveUnit);
+            }
+            
             let compareRows = '';
             let maxLen = Math.max(generalList.length, strategyList.length, execList.length);
 
@@ -1269,6 +1332,17 @@
             let generalPlans = globalDocsGeneral || [];
             let strategyPlans = globalDocsStrategy || [];
             let executionDocs = globalDocsExecution || [];
+            
+            if (currentUser && currentUser.type !== 'admin') {
+                generalPlans = generalPlans.filter(d => d.ownerName === currentUser.name);
+                strategyPlans = strategyPlans.filter(d => d.ownerName === currentUser.name);
+                executionDocs = executionDocs.filter(d => d.ownerName === currentUser.name);
+            } else if (currentActiveUnit !== 'ALL') {
+                generalPlans = generalPlans.filter(d => d.ownerName === currentActiveUnit);
+                strategyPlans = strategyPlans.filter(d => d.ownerName === currentActiveUnit);
+                executionDocs = executionDocs.filter(d => d.ownerName === currentActiveUnit);
+            }
+            
             let summaryText = `
                 ບົດສະຫຼຸບສັງລວມການຈັດຕັ້ງປະຕິບັດວຽກງານ ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ:
                 <br><br>
@@ -1381,6 +1455,17 @@
         function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
         function handleLogout() { currentUser = null; document.getElementById('login-screen').style.display = 'flex'; document.getElementById('main-screen').style.display = 'none'; }
     
+        // 🌟 ຟັງຊັນສຳລັບຈັດການສະຖານະເມນູທີ່ຖືກກົດ (Active Menu)
+        function setActiveMenu(clickedElement) {
+            // 1. ລຶບ class 'active-menu' ອອກຈາກທຸກໆ tree-item ກ່ອນ
+            const allTreeItems = document.querySelectorAll('.sidebar-tree .tree-item');
+            allTreeItems.forEach(item => item.classList.remove('active-menu'));
+            
+            // 2. ເພີ່ມ class 'active-menu' ໃຫ້ສະເພາະຕົວທີ່ຖືກກົດ
+            if (clickedElement) {
+                clickedElement.classList.add('active-menu');
+            }
+        }
     </script>
 </body>
 </html>
