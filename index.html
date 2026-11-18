@@ -705,37 +705,39 @@
                 document.getElementById('main-screen').style.display = 'flex';
                 document.getElementById('welcome-user').innerText = "ຍິນດີຕ້ອນຮັບ: " + currentUser.name;
 
+                // ຈັດການສະແດງ/ເຊື່ອງ ປຸ່ມຂອງ Admin
                 const adminBtns = document.querySelectorAll('.admin-only-btn');
                 adminBtns.forEach(btn => {
-                    if (currentUser.type === 'admin') {
-                        btn.style.display = 'inline-block';
-                    } else {
-                        btn.style.display = 'none';
-                    }
+                    btn.style.display = (currentUser.type === 'admin') ? 'inline-block' : 'none';
                 });
 
+                // ລ້າງ ແລະ ສ້າງໂຄງສ້າງ Sidebar ໃໝ່ທັງໝົດ ໂດຍທັບ HTML ເກົ່າຖິ້ມ
                 const sidebarTree = document.querySelector('.sidebar-tree');
                 
                 if (currentUser.type === 'admin') {
-                    // ສຳລັບ Admin: ໃຫ້ເຫັນໂຄງສ້າງເມນູລວມທັງໝົດ
+                    let unitsHTML = '';
+                    allUnits.forEach(unit => {
+                        unitsHTML += `<li><div class="tree-item" onclick="event.stopPropagation(); setActiveMenu(this); handleSidebarClick('${unit}')">🏫 ${unit}</div></li>`;
+                    });
+                    
                     sidebarTree.innerHTML = `
                         <ul>
                             <li class="folder">
-                                <div class="tree-item" onclick="setActiveMenu(this); handleSidebarClick('ALL');">📁 ພາກສ່ວນຕ່າງໆ</div>
+                                <div class="tree-item active-menu" onclick="setActiveMenu(this); handleSidebarClick('ALL');">📁 ພາກສ່ວນຕ່າງໆ</div>
                                 <ul>
                                     <li class="folder open">
                                         <div class="tree-item" onclick="event.stopPropagation(); setActiveMenu(this); handleSidebarClick('ALL');">📂 ພະແນກສຶກສາທິການ ແລະ ກິລາ ແຂວງໄຊຍະບູລີ</div>
                                         <ul id="menu-list" onclick="event.stopPropagation()">
-                                            ${allUnits.map(unit => `<li><div class="tree-item" onclick="event.stopPropagation(); setActiveMenu(this); handleSidebarClick('${unit}')">🏫 ${unit}</div></li>`).join('')}
+                                            ${unitsHTML}
                                         </ul>
                                     </li>
                                 </ul>
                             </li>
                         </ul>
                     `;
-                    showAllStrategies(); // Admin ຫຼັອກອິນໃຫ້ສະແດງທຸກຂະແໜງ
+                    currentActiveUnit = 'ALL';
+                    showAllStrategies();
                 } else {
-                    // ສຳລັບ User ທົ່ວໄປ (ຂະແໜງ): ຕັດເມນູລວມຖິ້ມ ໃຫ້ເຫັນແຕ່ຊື່ຕົນເອງ
                     sidebarTree.innerHTML = `
                         <ul>
                             <li class="folder open">
@@ -743,10 +745,9 @@
                             </li>
                         </ul>
                     `;
-                    // ດຶງຂໍ້ມູນຂອງຂະແໜງນັ້ນໆ ມາສະແດງອັດຕະໂນມັດທັນທີ!
+                    currentActiveUnit = currentUser.name;
                     handleSidebarClick(currentUser.name);
                 }
-
             } else {
                 errDiv.innerText = "Username ຫຼື Password ບໍ່ຖືກຕ້ອງ ກະລຸນາລອງໃໝ່ອີກຄັ້ງ!";
             }
@@ -1484,7 +1485,10 @@
         }
 
         function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
-        function handleLogout() { currentUser = null; document.getElementById('login-screen').style.display = 'flex'; document.getElementById('main-screen').style.display = 'none'; }
+        function handleLogout() { 
+            // ວິທີທີ່ດີທີ່ສຸດໃນການລ້າງຄ່າ DOM ແລະ ຕົວແປທັງໝົດບໍ່ໃຫ້ຄ້າງ ຄືການ Refresh ໜ້າເວັບ
+            window.location.reload(); 
+        }
     
         // 🌟 ຟັງຊັນສຳລັບຈັດການສະຖານະເມນູທີ່ຖືກກົດ (Active Menu)
         function setActiveMenu(clickedElement) {
