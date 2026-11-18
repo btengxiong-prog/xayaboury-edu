@@ -814,16 +814,31 @@
                                     proofHTML = `<div class="upload-proof-box"><button type="button" class="save-btn" style="background:#2563eb; padding:4px 8px; font-size:11px;" onclick="triggerProofUpload('${uniqueKey}')">📎 ອັບໂຫຼດໄຟລ໌ສະຫຼຸບ</button></div>`;
                                 }
                             }
-                            tableRows += `
-                                <td style="width: 30%; vertical-align: top !important;">${fItem.trim()}</td>
-                                <td style="width: 25%; vertical-align: top !important;">
+                            if (fIndex === 0) {
+                                let actText = item.activity ? item.activity : '-';
+                                tableRows += `
+                                <td style="width: 25%; vertical-align: top !important;">${fItem.trim()}</td>
+                                <td rowspan="${rowSpan}" style="width: 20%; vertical-align: top !important; background-color:#f8fafc; color:#1e293b;">${actText}</td>
+                                <td style="width: 20%; vertical-align: top !important;">
                                     <div class="status-container">
                                         <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'none', '${unitName}')"><input type="checkbox" ${savedStatus === 'none' ? 'checked' : ''} style="pointer-events:none;"> ❌ ບໍ່ໄດ້ຈັດຕັ້ງ</label>
                                         <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'done', '${unitName}')"><input type="checkbox" ${savedStatus === 'done' ? 'checked' : ''} style="pointer-events:none;"> ✅ ຈັດຕັ້ງ</label>
                                         ${proofHTML}
                                     </div>
                                 </td>
-                            `;
+                                `;
+                            } else {
+                                tableRows += `
+                                <td style="width: 25%; vertical-align: top !important;">${fItem.trim()}</td>
+                                <td style="width: 20%; vertical-align: top !important;">
+                                    <div class="status-container">
+                                        <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'none', '${unitName}')"><input type="checkbox" ${savedStatus === 'none' ? 'checked' : ''} style="pointer-events:none;"> ❌ ບໍ່ໄດ້ຈັດຕັ້ງ</label>
+                                        <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'done', '${unitName}')"><input type="checkbox" ${savedStatus === 'done' ? 'checked' : ''} style="pointer-events:none;"> ✅ ຈັດຕັ້ງ</label>
+                                        ${proofHTML}
+                                    </div>
+                                </td>
+                                `;
+                            }
                             if (fIndex === 0 && isAdmin) {
                                 tableRows += `<td rowspan="${rowSpan}" style="width: 15%; text-align: center; vertical-align: top !important;"><button type="button" class="edit-btn-sm" onclick="editStrategyEntry('${unit}', ${index})">✏️ ດັດແກ້</button><button type="button" class="remove-file-btn" onclick="deleteStrategyEntry('${unit}', ${index})">🗑️ ລົບ</button></td>`;
                             }
@@ -841,8 +856,8 @@
                 htmlContent += `
                     <div class="unit-section-title"><span>🏫 ${unit}</span> ${addBtnUnitHeader}</div>
                     <table class="strategy-table">
-                        <thead><tr><th style="width: 30%;">ແຜນຍຸດທະສາດ</th><th style="width: 30%;">ວຽກງານຈຸດສຸມ</th><th style="width: 25%;">ປະຕິບັດຕົວຈິງ</th>${actionHeader}</tr></thead>
-                        <tbody>${tableRows}<tr class="unit-summary-row"><td style="color:#b5651d;">📊 ສະຫຼຸບລວມປະຈຳຂະແໜງ: ${unitStratCount} ແຜນຍຸດທະສາດ</td><td style="color:#1e293b;">📋 ${unitFocusCount} ວຽກຈຸດສຸມ</td><td colspan="${isAdmin ? 2 : 1}"><span style="color:#ef4444; margin-right:12px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${unitNotDoneCount} ຂໍ້</span><span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${unitDoneCount} ຂໍ້</span></td></tr></tbody>
+                        <thead><tr><th style="width: 25%;">ແຜນຍຸດທະສາດ</th><th style="width: 25%;">ວຽກງານຈຸດສຸມ</th><th style="width: 20%;">ກິດຈະກຳປະຕິບັດ</th><th style="width: 20%;">ປະຕິບັດຕົວຈິງ</th>${actionHeader}</tr></thead>
+                        <tbody>${tableRows}<tr class="unit-summary-row"><td style="color:#b5651d;">📊 ສະຫຼຸບລວມປະຈຳຂະແໜງ: ${unitStratCount} ແຜນຍຸດທະສາດ</td><td style="color:#1e293b;">📋 ${unitFocusCount} ວຽກຈຸດສຸມ</td><td style="color:#2563eb;">🏃‍♂️ ກິດຈະກຳ</td><td colspan="${isAdmin ? 2 : 1}"><span style="color:#ef4444; margin-right:12px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${unitNotDoneCount} ຂໍ້</span><span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${unitDoneCount} ຂໍ້</span></td></tr></tbody>
                     </table>
                 `;
             });
@@ -883,13 +898,14 @@
             let unitOptions = '';
             allUnits.forEach(unit => { unitOptions += `<option value="${unit}" ${unit === defaultUnit ? 'selected' : ''}>${unit}</option>`; });
 
-            let stratVal = '', focusVal = '', subUnitVal = '';
+            let stratVal = '', focusVal = '', subUnitVal = '', activityVal = '';
             if (isEdit) {
                 let stratsData = globalStrategiesData;
                 if (stratsData[defaultUnit] && stratsData[defaultUnit][editIndex]) {
                     stratVal = stratsData[defaultUnit][editIndex].strat || '';
                     focusVal = (stratsData[defaultUnit][editIndex].focus || '').replace(/<br>/g, '\n');
                     subUnitVal = stratsData[defaultUnit][editIndex].subUnit || '';
+                    activityVal = (stratsData[defaultUnit][editIndex].activity || '').replace(/<br>/g, '\n');
                 }
             }
 
@@ -927,6 +943,11 @@
                         <textarea id="new-strat-focus" rows="5">${focusVal}</textarea>
                     </div>
                     
+                    <div class="form-field">
+                        <label>🏃‍♂️ ກິດຈະກຳປະຕິບັດ:</label>
+                        <textarea id="new-strat-activity" rows="4" placeholder="ປ້ອນລາຍລະອຽດກິດຈະກຳທີ່ຈະປະຕິບັດ...">${activityVal}</textarea>
+                    </div>
+                    
                     <div class="modal-btn-group">
                         <button type="button" class="btn-cancel" onclick="showStrategy('${defaultUnit || 'ALL'}')">ຍົກເລີກ</button>
                         <button type="button" class="save-btn" onclick="saveStrategyEntryData('${defaultUnit}')">💾 ບັນທຶກ</button>
@@ -939,21 +960,23 @@
 
         function saveStrategyEntryData(presetUnit = '') {
             const selectedUnit = presetUnit !== '' ? presetUnit : document.getElementById('new-strat-unit').value;
-            const subUnit = document.getElementById('new-strat-sub-unit').value; // ເກັບຄ່າຂະແໜງການຍ່ອຍ
+            const subUnit = document.getElementById('new-strat-sub-unit').value; 
             const stratTitle = document.getElementById('new-strat-title').value.trim();
             const stratFocus = document.getElementById('new-strat-focus').value.trim();
+            const stratActivity = document.getElementById('new-strat-activity').value.trim();
             const editIndex = document.getElementById('edit-strat-index').value;
 
             if (!stratTitle) { alert('ກະລຸນາປ້ອນເນື້ອໃນແຜນຍຸດທະສາດ!'); return; }
             let stratsData = JSON.parse(JSON.stringify(globalStrategiesData));
             if (!stratsData[selectedUnit]) stratsData[selectedUnit] = [];
             let formattedFocus = stratFocus.replace(/\n/g, '<br>');
+            let formattedActivity = stratActivity.replace(/\n/g, '<br>');
 
             if (editIndex !== '' && editIndex !== null && editIndex !== undefined) {
                 let idx = parseInt(editIndex);
-                stratsData[selectedUnit][idx] = { strat: stratTitle, focus: formattedFocus || '-', subUnit: subUnit };
+                stratsData[selectedUnit][idx] = { strat: stratTitle, focus: formattedFocus || '-', subUnit: subUnit, activity: formattedActivity || '-' };
             } else {
-                stratsData[selectedUnit].push({ strat: stratTitle, focus: formattedFocus || '-', subUnit: subUnit });
+                stratsData[selectedUnit].push({ strat: stratTitle, focus: formattedFocus || '-', subUnit: subUnit, activity: formattedActivity || '-' });
             }
 
             db.collection("app_config").doc("strategies_store").set({ content: stratsData })
