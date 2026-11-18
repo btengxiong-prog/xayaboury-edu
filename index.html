@@ -789,6 +789,7 @@
                         
                         // ສະແດງຊື່ຂະແໜງການຍ່ອຍ ຖ້າມີ
                         let subUnitDisplay = item.subUnit ? `<br><span style="color:#059669; font-size:12px;">(ຍ່ອຍ: ${item.subUnit})</span>` : '';
+                        let indText = item.indicator ? item.indicator : '-'; // ດຶງຄ່າຕົວຊີ້ບອກມາໄວ້ແຍກຄໍລຳ
 
                         focusItems.forEach((fItem, fIndex) => {
                             if (fItem.trim() !== '-' && fItem.trim() !== '') {
@@ -802,10 +803,6 @@
                             if (savedStatus === 'none') { unitNotDoneCount++; totalNotDoneCount++; }
                             if (savedStatus === 'done') { unitDoneCount++; totalDoneCount++; }
 
-                            tableRows += `<tr>`;
-                            if (fIndex === 0) {
-                                tableRows += `<td rowspan="${rowSpan}" style="width: 30%; vertical-align: top !important;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}${subUnitDisplay}</td>`;
-                            }
                             let proofHTML = '';
                             if (savedStatus === 'done') {
                                 if (savedProof) {
@@ -814,12 +811,16 @@
                                     proofHTML = `<div class="upload-proof-box"><button type="button" class="save-btn" style="background:#2563eb; padding:4px 8px; font-size:11px;" onclick="triggerProofUpload('${uniqueKey}')">📎 ອັບໂຫຼດໄຟລ໌ສະຫຼຸບ</button></div>`;
                                 }
                             }
+
+                            tableRows += `<tr>`;
                             if (fIndex === 0) {
                                 let actText = item.activity ? item.activity : '-';
                                 tableRows += `
-                                <td style="width: 25%; vertical-align: top !important;">${fItem.trim()}</td>
-                                <td rowspan="${rowSpan}" style="width: 20%; vertical-align: top !important; background-color:#f8fafc; color:#1e293b;">${actText}</td>
-                                <td style="width: 20%; vertical-align: top !important;">
+                                <td rowspan="${rowSpan}" style="width: 15%; vertical-align: top !important; background-color:#fffbeb; color:#92400e; font-size:13px;">🏷️ ${indText}</td>
+                                <td rowspan="${rowSpan}" style="width: 25%; vertical-align: top !important;"><strong>ຂໍ້ ${index + 1}:</strong> ${item.strat}${subUnitDisplay}</td>
+                                <td style="width: 20%; vertical-align: top !important;">${fItem.trim()}</td>
+                                <td rowspan="${rowSpan}" style="width: 15%; vertical-align: top !important; background-color:#f8fafc; color:#1e293b;">${actText}</td>
+                                <td style="width: 15%; vertical-align: top !important;">
                                     <div class="status-container">
                                         <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'none', '${unitName}')"><input type="checkbox" ${savedStatus === 'none' ? 'checked' : ''} style="pointer-events:none;"> ❌ ບໍ່ໄດ້ຈັດຕັ້ງ</label>
                                         <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'done', '${unitName}')"><input type="checkbox" ${savedStatus === 'done' ? 'checked' : ''} style="pointer-events:none;"> ✅ ຈັດຕັ້ງ</label>
@@ -829,8 +830,8 @@
                                 `;
                             } else {
                                 tableRows += `
-                                <td style="width: 25%; vertical-align: top !important;">${fItem.trim()}</td>
-                                <td style="width: 20%; vertical-align: top !important;">
+                                <td style="width: 20%; vertical-align: top !important;">${fItem.trim()}</td>
+                                <td style="width: 15%; vertical-align: top !important;">
                                     <div class="status-container">
                                         <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'none', '${unitName}')"><input type="checkbox" ${savedStatus === 'none' ? 'checked' : ''} style="pointer-events:none;"> ❌ ບໍ່ໄດ້ຈັດຕັ້ງ</label>
                                         <label class="status-option" onclick="toggleStatusCheck(event, '${uniqueKey}', 'done', '${unitName}')"><input type="checkbox" ${savedStatus === 'done' ? 'checked' : ''} style="pointer-events:none;"> ✅ ຈັດຕັ້ງ</label>
@@ -840,34 +841,34 @@
                                 `;
                             }
                             if (fIndex === 0 && isAdmin) {
-                                tableRows += `<td rowspan="${rowSpan}" style="width: 15%; text-align: center; vertical-align: top !important;"><button type="button" class="edit-btn-sm" onclick="editStrategyEntry('${unit}', ${index})">✏️ ດັດແກ້</button><button type="button" class="remove-file-btn" onclick="deleteStrategyEntry('${unit}', ${index})">🗑️ ລົບ</button></td>`;
+                                tableRows += `<td rowspan="${rowSpan}" style="width: 10%; text-align: center; vertical-align: top !important;"><button type="button" class="edit-btn-sm" onclick="editStrategyEntry('${unit}', ${index})">✏️ ດັດແກ້</button><button type="button" class="remove-file-btn" style="margin-top:4px;" onclick="deleteStrategyEntry('${unit}', ${index})">🗑️ ລົບ</button></td>`;
                             }
                             tableRows += `</tr>`;
                         });
                     });
                 } else {
-                    let colSpan = isAdmin ? 4 : 3;
+                    let colSpan = isAdmin ? 6 : 5; // ປັບໃຫ້ກວມເອົາ 6 ຄໍລຳສຳລັບ Admin ແລະ 5 ສຳລັບ User (ເນື່ອງຈາກເຮົາເພີ່ມຖັນໃໝ່ເຂົ້າມາ)
                     tableRows = `<tr><td colspan="${colSpan}" style="text-align: center; color: #666; padding:15px;">ຍັງບໍ່ມີຂໍ້ມູນແຜນຍຸດທະສາດສຳລັບໜ່ວຍງານນີ້</td></tr>`;
                 }
 
-                let actionHeader = isAdmin ? `<th style="width: 15%; text-align: center;">ຈັດການ</th>` : '';
+                let actionHeader = isAdmin ? `<th style="width: 10%; text-align: center;">ຈັດການ</th>` : '';
                 let addBtnUnitHeader = isAdmin ? `<button type="button" class="save-btn" style="background:#2563eb; font-size:12px; padding:5px 12px;" onclick="showAddStrategyForm('${unit}')">📝 ປ້ອນແຜນຍຸດທະສາດ ແລະ ວຽກຈຸດສຸມ</button>` : '';
 
                 htmlContent += `
                     <div class="unit-section-title"><span>🏫 ${unit}</span> ${addBtnUnitHeader}</div>
                     <table class="strategy-table">
-                        <thead><tr><th style="width: 25%;">ແຜນຍຸດທະສາດ</th><th style="width: 25%;">ວຽກງານຈຸດສຸມ</th><th style="width: 20%;">ກິດຈະກຳປະຕິບັດ</th><th style="width: 20%;">ປະຕິບັດຕົວຈິງ</th>${actionHeader}</tr></thead>
-                        <tbody>${tableRows}<tr class="unit-summary-row"><td style="color:#b5651d;">📊 ສະຫຼຸບລວມປະຈຳຂະແໜງ: ${unitStratCount} ແຜນຍຸດທະສາດ</td><td style="color:#1e293b;">📋 ${unitFocusCount} ວຽກຈຸດສຸມ</td><td style="color:#2563eb;">🏃‍♂️ ກິດຈະກຳ</td><td colspan="${isAdmin ? 2 : 1}"><span style="color:#ef4444; margin-right:12px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${unitNotDoneCount} ຂໍ້</span><span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${unitDoneCount} ຂໍ້</span></td></tr></tbody>
+                        <thead><tr><th style="width: 15%;">ຊື່ຕົວຊີ້ບອກ</th><th style="width: 25%;">ແຜນຍຸດທະສາດ</th><th style="width: 20%;">ວຽກງານຈຸດສຸມ</th><th style="width: 15%;">ກິດຈະກຳປະຕິບັດ</th><th style="width: 15%;">ປະຕິບັດຕົວຈິງ</th>${actionHeader}</tr></thead>
+                        <tbody>${tableRows}<tr class="unit-summary-row"><td colspan="2" style="color:#b5651d;">📊 ສະຫຼຸບລວມປະຈຳຂະແໜງ: ${unitStratCount} ແຜນຍຸດທະສາດ</td><td style="color:#1e293b;">📋 ${unitFocusCount} ວຽກຈຸດສຸມ</td><td style="color:#2563eb;">🏃‍♂️ ກິດຈະກຳ</td><td colspan="${isAdmin ? 2 : 1}"><span style="color:#ef4444; margin-right:12px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${unitNotDoneCount} ຂໍ້</span><span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${unitDoneCount} ຂໍ້</span></td></tr></tbody>
                     </table>
                 `;
             });
 
             contentDisplay.innerHTML = htmlContent + `
                 <div style="margin-top:35px; border-top:3px solid #b5651d; padding-top:10px;">
-                    <h3 style="color:#b5651d; margin-bottom:10px;">📊 ບົດສະຫຼຸບສັງລວມລວມທັງໝົດ (ທقىຂະແໜງການ):</h3>
+                    <h3 style="color:#b5651d; margin-bottom:10px;">📊 ບົດສະຫຼຸບສັງລວມລວມທັງໝົດ (ທຸກຂະແໜງການ):</h3>
                     <table class="strategy-table" style="background:#f8fafc;">
-                        <thead><tr class="total-summary-footer"><th style="width: 30%;">ລວມແຜນຍຸດທະສາດທັງໝົດ</th><th style="width: 30%;">ລວມວຽກງານຈຸດສຸມທັງໝົດ</th><th style="width: 40%; text-align: left;" colspan="${isAdmin ? 2 : 1}">ລວມຜົນການຈັດຕັ້ງປະຕິບັດຕົວຈິງ</th></tr></thead>
-                        <tbody><tr style="font-weight:bold; font-size:14px; color:#1e293b;"><td>📌 ${totalStratCount} ແຜນຍຸດທະສາດ</td><td>📋 ${totalFocusCount} ວຽກຈຸດສຸມ</td><td colspan="${isAdmin ? 2 : 1}"><span style="color:#ef4444; margin-right:15px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${totalNotDoneCount} ຂໍ້</span><span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${totalDoneCount} ຂໍ້</span></td></tr></tbody>
+                        <thead><tr class="total-summary-footer"><th style="width: 40%;" colspan="2">ລວມແຜນຍຸດທະສາດທັງໝົດ</th><th style="width: 20%;">ລວມວຽກງານຈຸດສຸມທັງໝົດ</th><th style="width: 40%; text-align: left;" colspan="${isAdmin ? 3 : 2}">ລວມຜົນການຈັດຕັ້ງປະຕິບັດຕົວຈິງ</th></tr></thead>
+                        <tbody><tr style="font-weight:bold; font-size:14px; color:#1e293b;"><td colspan="2">📌 ${totalStratCount} ແຜນຍຸດທະສາດ</td><td>📋 ${totalFocusCount} ວຽກຈຸດສຸມ</td><td colspan="${isAdmin ? 3 : 2}"><span style="color:#ef4444; margin-right:15px;">❌ ບໍ່ໄດ້ຈັດຕັ້ງ: ${totalNotDoneCount} ຂໍ້</span><span style="color:#10b981;">✅ ຈັດຕັ້ງ: ${totalDoneCount} ຂໍ້</span></td></tr></tbody>
                     </table>
                 </div>
             `;
@@ -879,12 +880,29 @@
         function handleSidebarClick(unitName) {
             currentActiveUnit = unitName;
             if (!currentActiveViewType) currentActiveViewType = 'strategy_view';
+            
             const contentDisplay = document.getElementById('content-display');
             if (contentDisplay.innerHTML.includes('id="new-strat-unit"')) {
-                showStrategy(unitName);
+                showStrategy(unitName, true);
                 return;
             }
-            refreshCurrentView();
+            
+            // ບັງຄັບການສະແດງຜົນໃໝ່ທັນທີ ໂດຍສົ່ງຄ່າ true ເພື່ອລີເຊັດ state ປ້ອງກັນໜ້າຈໍຄ້າງ
+            if (currentActiveViewType === 'strategy_view') {
+                showStrategy(unitName, true);
+            } else if (currentActiveViewType === 'general') {
+                showDocListTable('general', true);
+            } else if (currentActiveViewType === 'strategy_doc') {
+                showDocListTable('strategy', true);
+            } else if (currentActiveViewType === 'general_short') {
+                showGeneralShortSummary(true);
+            } else if (currentActiveViewType === 'strategy_short') {
+                showStrategyShortSummary(true);
+            } else if (currentActiveViewType === 'execution') {
+                showExecutionTable(true);
+            } else {
+                showStrategy(unitName, true);
+            }
         }
 
         function showAddStrategyForm(defaultUnit = '', editIndex = null) {
@@ -898,7 +916,7 @@
             let unitOptions = '';
             allUnits.forEach(unit => { unitOptions += `<option value="${unit}" ${unit === defaultUnit ? 'selected' : ''}>${unit}</option>`; });
 
-            let stratVal = '', focusVal = '', subUnitVal = '', activityVal = '';
+            let stratVal = '', focusVal = '', subUnitVal = '', activityVal = '', indicatorVal = '';
             if (isEdit) {
                 let stratsData = globalStrategiesData;
                 if (stratsData[defaultUnit] && stratsData[defaultUnit][editIndex]) {
@@ -906,49 +924,59 @@
                     focusVal = (stratsData[defaultUnit][editIndex].focus || '').replace(/<br>/g, '\n');
                     subUnitVal = stratsData[defaultUnit][editIndex].subUnit || '';
                     activityVal = (stratsData[defaultUnit][editIndex].activity || '').replace(/<br>/g, '\n');
+                    indicatorVal = (stratsData[defaultUnit][editIndex].indicator || '').replace(/<br>/g, '\n');
                 }
             }
 
             contentDisplay.innerHTML = `
-                <div class="report-container" style="max-width:700px; margin:0 auto; text-align:left;">
+                <div class="report-container" style="max-width:900px; margin:0 auto; text-align:left;">
                     <h2 style="color:#b5651d; margin-top:0; border-bottom:2px solid #b5651d; padding-bottom:10px;">${isEdit ? '✏️ ດັດແກ້ແຜນຍຸດທະສາດ' : '📝 ປ້ອນແຜນຍຸດທະສາດໃໝ່'} (ADMIN)</h2>
                     <input type="hidden" id="edit-strat-index" value="${isEdit ? editIndex : ''}">
                     
-                    <div class="form-field">
-                        <label>🏢 ເລືອກຂະແໜງການ:</label>
-                        <select id="new-strat-unit" ${defaultUnit !== '' ? 'disabled' : ''}>${unitOptions}</select>
-                    </div>
-                    
-                    <!-- ເພີ່ມຊ່ອງເລືອກ ຂະແໜງການຍ່ອຍ ຕາມທີ່ຂໍມາ -->
-                    <div class="form-field">
-                        <label>📑 ເລືອກຂະແໜງການຍ່ອຍ (ຖ້າມີ):</label>
-                        <select id="new-strat-sub-unit">
-                            <option value="" ${subUnitVal === '' ? 'selected' : ''}>-- ບໍ່ລະບຸ (ປ່ອຍຫວ່າງໄດ້) --</option>
-                            <option value="ຂະແໜງການຍ່ອຍການສຶກສາກ່ອນໄວຮຽນ" ${subUnitVal === 'ຂະແໜງການຍ່ອຍການສຶກສາກ່ອນໄວຮຽນ' ? 'selected' : ''}>ຂະແໜງການຍ່ອຍການສຶກສາກ່ອນໄວຮຽນ</option>
-                            <option value="ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນປະຖົມ" ${subUnitVal === 'ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນປະຖົມ' ? 'selected' : ''}>ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນປະຖົມ</option>
-                            <option value="ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນຕົ້ນ" ${subUnitVal === 'ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນຕົ້ນ' ? 'selected' : ''}>ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນຕົ້ນ</option>
-                            <option value="ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນປາຍ" ${subUnitVal === 'ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນປາຍ' ? 'selected' : ''}>ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນປາຍ</option>
-                            <option value="ຂະແໜງການພັດທະນາຄູ ແລະ ບໍລິຫານການສຶກສາ" ${subUnitVal === 'ຂະແໜງການພັດທະນາຄູ ແລະ ບໍລິຫານການສຶກສາ' ? 'selected' : ''}>ຂະແໜງການພັດທະນາຄູ ແລະ ບໍລິຫານການສຶກສາ</option>
-                            <option value="ອື່ນໆ" ${subUnitVal === 'ອື່ນໆ' ? 'selected' : ''}>ອື່ນໆ</option>
-                        </select>
-                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                        <!-- ແຖວທີ 1 -->
+                        <div class="form-field" style="margin-bottom: 0;">
+                            <label>🏢 ເລືອກຂະແໜງການ:</label>
+                            <select id="new-strat-unit" ${defaultUnit !== '' ? 'disabled' : ''}>${unitOptions}</select>
+                        </div>
+                        
+                        <div class="form-field" style="margin-bottom: 0;">
+                            <label>📑 ເລືອກຂະແໜງການຍ່ອຍ (ຖ້າມີ):</label>
+                            <select id="new-strat-sub-unit">
+                                <option value="" ${subUnitVal === '' ? 'selected' : ''}>-- ບໍ່ລະບຸ (ປ່ອຍຫວ່າງໄດ້) --</option>
+                                <option value="ຂະແໜງການຍ່ອຍການສຶກສາກ່ອນໄວຮຽນ" ${subUnitVal === 'ຂະແໜງການຍ່ອຍການສຶກສາກ່ອນໄວຮຽນ' ? 'selected' : ''}>ຂະແໜງການຍ່ອຍການສຶກສາກ່ອນໄວຮຽນ</option>
+                                <option value="ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນປະຖົມ" ${subUnitVal === 'ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນປະຖົມ' ? 'selected' : ''}>ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນປະຖົມ</option>
+                                <option value="ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນຕົ້ນ" ${subUnitVal === 'ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນຕົ້ນ' ? 'selected' : ''}>ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນຕົ້ນ</option>
+                                <option value="ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນປາຍ" ${subUnitVal === 'ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນປາຍ' ? 'selected' : ''}>ຂະແໜງການຍ່ອຍການສຶກສາຊັ້ນມັດທະຍົມຕອນປາຍ</option>
+                                <option value="ຂະແໜງການພັດທະນາຄູ ແລະ ບໍລິຫານການສຶກສາ" ${subUnitVal === 'ຂະແໜງການພັດທະນາຄູ ແລະ ບໍລິຫານການສຶກສາ' ? 'selected' : ''}>ຂະແໜງການພັດທະນາຄູ ແລະ ບໍລິຫານການສຶກສາ</option>
+                                <option value="ອື່ນໆ" ${subUnitVal === 'ອື່ນໆ' ? 'selected' : ''}>ອື່ນໆ</option>
+                            </select>
+                        </div>
 
-                    <div class="form-field">
-                        <label>🎯 ເນື້ອໃນແຜນຍຸດທະສາດ:</label>
-                        <textarea id="new-strat-title" rows="4">${stratVal}</textarea>
+                        <!-- ແຖວທີ 2 -->
+                        <div class="form-field" style="margin-bottom: 0;">
+                            <label>🏷️ ຊື່ຕົວຊີ້ບອກຂະແໜງການ:</label>
+                            <textarea id="new-strat-indicator" rows="4" placeholder="ປ້ອນ ຫຼື ວາງ (Paste) ຊື່ຕົວຊີ້ບອກຂະແໜງການ...">${indicatorVal}</textarea>
+                        </div>
+
+                        <div class="form-field" style="margin-bottom: 0;">
+                            <label>🎯 ເນື້ອໃນແຜນຍຸດທະສາດ:</label>
+                            <textarea id="new-strat-title" rows="4" placeholder="ປ້ອນເນື້ອໃນແຜນຍຸດທະສາດ...">${stratVal}</textarea>
+                        </div>
+                        
+                        <!-- ແຖວທີ 3 -->
+                        <div class="form-field" style="margin-bottom: 0;">
+                            <label>📋 ວຽກງານຈຸດສຸມ:</label>
+                            <textarea id="new-strat-focus" rows="5" placeholder="ປ້ອນວຽກງານຈຸດສຸມ...">${focusVal}</textarea>
+                        </div>
+                        
+                        <div class="form-field" style="margin-bottom: 0;">
+                            <label>🏃‍♂️ ກິດຈະກຳປະຕິບັດ:</label>
+                            <textarea id="new-strat-activity" rows="5" placeholder="ປ້ອນລາຍລະອຽດກິດຈະກຳທີ່ຈະປະຕິບັດ...">${activityVal}</textarea>
+                        </div>
                     </div>
                     
-                    <div class="form-field">
-                        <label>📋 ວຽກງານຈຸດສຸມ:</label>
-                        <textarea id="new-strat-focus" rows="5">${focusVal}</textarea>
-                    </div>
-                    
-                    <div class="form-field">
-                        <label>🏃‍♂️ ກິດຈະກຳປະຕິບັດ:</label>
-                        <textarea id="new-strat-activity" rows="4" placeholder="ປ້ອນລາຍລະອຽດກິດຈະກຳທີ່ຈະປະຕິບັດ...">${activityVal}</textarea>
-                    </div>
-                    
-                    <div class="modal-btn-group">
+                    <div class="modal-btn-group" style="margin-top: 25px;">
                         <button type="button" class="btn-cancel" onclick="showStrategy('${defaultUnit || 'ALL'}')">ຍົກເລີກ</button>
                         <button type="button" class="save-btn" onclick="saveStrategyEntryData('${defaultUnit}')">💾 ບັນທຶກ</button>
                     </div>
@@ -961,6 +989,7 @@
         function saveStrategyEntryData(presetUnit = '') {
             const selectedUnit = presetUnit !== '' ? presetUnit : document.getElementById('new-strat-unit').value;
             const subUnit = document.getElementById('new-strat-sub-unit').value; 
+            const stratIndicator = document.getElementById('new-strat-indicator').value.trim();
             const stratTitle = document.getElementById('new-strat-title').value.trim();
             const stratFocus = document.getElementById('new-strat-focus').value.trim();
             const stratActivity = document.getElementById('new-strat-activity').value.trim();
@@ -971,12 +1000,13 @@
             if (!stratsData[selectedUnit]) stratsData[selectedUnit] = [];
             let formattedFocus = stratFocus.replace(/\n/g, '<br>');
             let formattedActivity = stratActivity.replace(/\n/g, '<br>');
+            let formattedIndicator = stratIndicator.replace(/\n/g, '<br>');
 
             if (editIndex !== '' && editIndex !== null && editIndex !== undefined) {
                 let idx = parseInt(editIndex);
-                stratsData[selectedUnit][idx] = { strat: stratTitle, focus: formattedFocus || '-', subUnit: subUnit, activity: formattedActivity || '-' };
+                stratsData[selectedUnit][idx] = { strat: stratTitle, focus: formattedFocus || '-', subUnit: subUnit, indicator: formattedIndicator, activity: formattedActivity || '-' };
             } else {
-                stratsData[selectedUnit].push({ strat: stratTitle, focus: formattedFocus || '-', subUnit: subUnit, activity: formattedActivity || '-' });
+                stratsData[selectedUnit].push({ strat: stratTitle, focus: formattedFocus || '-', subUnit: subUnit, indicator: formattedIndicator, activity: formattedActivity || '-' });
             }
 
             db.collection("app_config").doc("strategies_store").set({ content: stratsData })
