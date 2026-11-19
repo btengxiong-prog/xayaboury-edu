@@ -345,8 +345,8 @@
 <body onclick="closeAllDropdowns(event)">
 
     <!-- Hidden File Inputs -->
-    <input type="file" id="hidden-file-input" style="display:none;" accept=".doc,.docx,.xls,.xlsx" onchange="handleFileSelected(event)">
-    <input type="file" id="proof-file-input" style="display:none;" accept=".doc,.docx,.xls,.xlsx" onchange="handleProofFileSelected(event)">
+    <input type="file" id="hidden-file-input" style="display:none;" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileSelected(event)">
+    <input type="file" id="proof-file-input" style="display:none;" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="handleProofFileSelected(event)">
 
     <!-- Modal Preview ເບິ່ງເນື້ອໃນຫຍໍ້ -->
     <div id="file-preview-modal" class="image-modal-overlay" onclick="closeFilePreviewModal()">
@@ -365,14 +365,14 @@
         <div class="input-modal-box">
             <h3 id="doc-modal-title">📝 ປ້ອນຂໍ້ມູນເອກະສານ</h3>
             <div class="form-field">
-                <label>ເລືອກໄຟລ໌ເອກະສານ (ສະເພາະ Word, Excel):</label>
+                <label>ເລືອກໄຟລ໌ເອກະສານ (PDF, Word, Excel - ບໍ່ຈຳກັດຂະໜາດ):</label>
                 <div style="display:flex; gap:8px;">
                     <button type="button" onclick="document.getElementById('hidden-file-input').click()" style="padding:6px 12px; background:#e2e8f0; border:1px solid #cbd5e1; border-radius:4px; cursor:pointer; font-size:12px;">📎 ເລືອກໄຟລ໌</button>
                     <span id="selected-filename-display" style="font-size:12px; color:#2563eb; align-self:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px;">ຍັງບໍ່ໄດ້ເລືອກໄຟລ໌</span>
                 </div>
             </div>
             <div class="form-field">
-                <label>ເນື້ອໃນເອກະສານ (ສຳລັບ Word / Excel):</label>
+                <label>ເນື້ອໃນເອກະສານ (PDF / Word / Excel):</label>
                 <textarea id="modal-doc-content" rows="4" placeholder="ປ້ອນ ຫຼື ວາງ (Paste) ເນື້ອໃນ..."></textarea>
             </div>
             <div class="form-field">
@@ -400,6 +400,19 @@
                 <button type="button" id="custom-alert-btn-cancel" class="btn-cancel" style="display:none; padding:8px 20px; font-size:13px;" onclick="closeCustomAlert()">ຍົກເລີກ</button>
                 <button type="button" id="custom-alert-btn-ok" class="custom-alert-btn" onclick="closeCustomAlert()">ຕົກລົງ</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal ສະແດງຄວາມຄືບໜ້າຕອນກຳລັງອັບໂຫຼດໄຟລ໌ຂຶ້ນ Google Drive -->
+    <div id="upload-progress-modal" class="custom-alert-overlay" style="z-index: 999999;">
+        <div class="custom-alert-box" style="width: 380px;">
+            <div class="custom-alert-icon">☁️</div>
+            <div class="custom-alert-title">ກຳລັງອັບໂຫຼດໄຟລ໌ຂຶ້ນ Google Drive</div>
+            <div id="upload-progress-text" class="custom-alert-msg" style="margin-bottom: 12px;">ກຳລັງກຽມການອັບໂຫຼດ...</div>
+            <div style="width: 100%; background: #e2e8f0; border-radius: 8px; height: 14px; overflow: hidden; margin-bottom: 8px;">
+                <div id="upload-progress-bar" style="width: 0%; height: 100%; background: #2563eb; transition: width 0.2s;"></div>
+            </div>
+            <div id="upload-progress-percent" style="font-size: 13px; font-weight: bold; color: #2563eb;">0%</div>
         </div>
     </div>
 
@@ -543,8 +556,129 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // 🌟 ວາງລິ້ງ Web App URL (ລົງທ້າຍດ້ວຍ /exec) ຈາກ Google Apps Script ຢູ່ບ່ອນນີ້
+        const GAS_UPLOAD_URL = "https://script.google.com/macros/s/AKfycbwGdDGSMMuEIrOpkFknkfwoYBKnxfkbaSfLrNyfvBNW9ldwJn_3ScDVYQuAHLi81sVC/exec";
+
         let currentUser = null;
         let currentUploadProofTargetKey = null;
+        let legacyProofsData = {};
+        let driveProofsData = {};
+
+        function safeProofDocId(key) {
+            return String(key).replace(/[\/\.\#\$\[\]]/g, '_');
+        }
+
+        function syncMergedProofs() {
+            globalProofsData = Object.assign({}, legacyProofsData, driveProofsData);
+            refreshCurrentView();
+        }
+
+        function getMimeTypeFromFile(file) {
+            if (file.type) return file.type;
+            const n = file.name.toLowerCase();
+            if (n.endsWith('.pdf')) return 'application/pdf';
+            if (n.endsWith('.docx')) return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+            if (n.endsWith('.doc')) return 'application/msword';
+            if (n.endsWith('.xlsx')) return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            if (n.endsWith('.xls')) return 'application/vnd.ms-excel';
+            return 'application/octet-stream';
+        }
+
+        function showUploadProgress(msg, percent) {
+            document.getElementById('upload-progress-modal').style.display = 'flex';
+            document.getElementById('upload-progress-text').innerText = msg;
+            document.getElementById('upload-progress-bar').style.width = percent + '%';
+            document.getElementById('upload-progress-percent').innerText = percent + '%';
+        }
+
+        function hideUploadProgress() {
+            document.getElementById('upload-progress-modal').style.display = 'none';
+        }
+
+        // ຟັງຊັນກາງສຳລັບອັບໂຫຼດໄຟລ໌ຂະໜາດໃຫຍ່ເຂົ້າ Google Drive ໂດຍກົງ (Resumable Upload)
+        async function uploadFileToGoogleDrive(file, subFolder = 'ທົ່ວໄປ') {
+            if (!GAS_UPLOAD_URL || !GAS_UPLOAD_URL.startsWith("https://script.google.com/macros/s/")) {
+                throw new Error('ກະລຸນາໃສ່ລິ້ງ Google Apps Script URL (ລົງທ້າຍດ້ວຍ /exec) ໃນໂຄດກ່ອນໃຊ້ງານ!');
+            }
+
+            const mimeType = getMimeTypeFromFile(file);
+            const totalMB = (file.size / (1024 * 1024)).toFixed(2);
+            showUploadProgress(`ກຳລັງເຊື່ອມຕໍ່ Google Drive (${file.name} - ${totalMB} MB)...`, 5);
+
+            // 1. ຂໍລິ້ງຊ່ອງທາງອັບໂຫຼດຈາກ Google Apps Script
+            const initRes = await fetch(GAS_UPLOAD_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'initUpload',
+                    fileName: file.name,
+                    mimeType: mimeType,
+                    fileSize: file.size,
+                    subFolder: subFolder,
+                    origin: window.location.origin
+                })
+            });
+
+            const initJson = await initRes.json();
+            if (initJson.status !== 'ok' || !initJson.uploadUrl) {
+                throw new Error(initJson.message || 'ບໍ່ສາມາດສ້າງຊ່ອງທາງອັບໂຫຼດໄດ້');
+            }
+
+            // 2. ຍິງໄຟລ໌ຕົວຈິງເຂົ້າ Google Drive ໂດຍກົງ (ບໍ່ຈຳກັດຂະໜາດ)
+            const driveFile = await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('PUT', initJson.uploadUrl, true);
+                xhr.setRequestHeader('Content-Type', mimeType);
+
+                xhr.upload.onprogress = function(e) {
+                    if (e.lengthComputable) {
+                        const pct = Math.min(95, Math.round((e.loaded / e.total) * 90) + 5);
+                        const loadedMB = (e.loaded / (1024 * 1024)).toFixed(2);
+                        showUploadProgress(`ກຳລັງອັບໂຫຼດ: ${file.name} (${loadedMB} / ${totalMB} MB)`, pct);
+                    }
+                };
+
+                xhr.onload = function() {
+                    if (xhr.status === 200 || xhr.status === 201) {
+                        resolve(JSON.parse(xhr.responseText));
+                    } else {
+                        reject(new Error(`ອັບໂຫຼດບໍ່ສຳເລັດ (HTTP ${xhr.status})`));
+                    }
+                };
+
+                xhr.onerror = function() {
+                    reject(new Error('ເກີດຂໍ້ຜິດພາດເຄືອຂ່າຍ ຫຼື CORS ລະຫວ່າງອັບໂຫຼດ (ກະລຸນາເປີດຜ່ານລິ້ງ GitHub Pages)'));
+                };
+
+                xhr.send(file);
+            });
+
+            showUploadProgress('ກຳລັງຕັ້ງສິດເປີດອ່ານ ແລະ ບັນທຶກລິ້ງລົງຖານຂໍ້ມູນ...', 98);
+
+            // 3. ຕັ້ງສິດໃຫ້ເປີດອ່ານໄດ້ຜ່ານລິ້ງ
+            await fetch(GAS_UPLOAD_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'setPublic', fileId: driveFile.id })
+            }).catch(() => {});
+
+            return {
+                driveFileId: driveFile.id,
+                previewUrl: `https://drive.google.com/file/d/${driveFile.id}/preview`,
+                downloadUrl: `https://drive.google.com/uc?export=download&id=${driveFile.id}`,
+                mimeType: mimeType,
+                fileSize: file.size
+            };
+        }
+
+        function deleteFileFromGoogleDrive(driveFileId) {
+            if (!driveFileId || !GAS_UPLOAD_URL || GAS_UPLOAD_URL.includes("ວາງ_WEB_APP_URL")) return;
+            fetch(GAS_UPLOAD_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'delete', fileId: driveFileId })
+            }).catch(() => {});
+        }
 
         function formatDateDDMMYYYY(dateString) {
             if (!dateString || dateString === '-') return '-';
@@ -593,14 +727,26 @@
                 refreshCurrentView();
             });
 
-            // 2. ຟັງຂໍ້ມູນສະຖານະ ແລະ ໄຟລ໌ອັບໂຫຼດ (Statuses & Proofs)
+            // 2. ຟັງຂໍ້ມູນສະຖານະ ແລະ ໄຟລ໌ເກົ່າ (Statuses & Legacy Proofs)
             db.collection("app_config").doc("status_proof_store").onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
                     globalStatusesData = data.statuses || {};
-                    globalProofsData = data.proofs || {};
+                    legacyProofsData = data.proofs || {};
                 }
-                refreshCurrentView();
+                syncMergedProofs();
+            });
+
+            // 2.1 ຟັງຂໍ້ມູນໄຟລ໌ສະຫຼຸບຈາກ Collection ໃໝ່ (1 ໄຟລ໌ ຕໍ່ 1 Document ຮອງຮັບ 10,000+ ໄຟລ໌)
+            db.collection("proof_files").onSnapshot((snapshot) => {
+                driveProofsData = {};
+                snapshot.forEach((doc) => {
+                    const d = doc.data();
+                    if (d && d.uniqueKey) {
+                        driveProofsData[d.uniqueKey] = d;
+                    }
+                });
+                syncMergedProofs();
             });
 
             // 3. ຟັງຂໍ້ມູນເອກະສານວຽກທົ່ວໄປ (General Docs)
@@ -986,13 +1132,23 @@
 
         function editStrategyEntry(unitName, index) { showAddStrategyForm(unitName, index); }
 
+        // ຟັງຊັນສຳລັບທຳຄວາມສະອາດຂໍ້ມູນທີ່ Copy ມາ (ລຶບ " ອອກທັງໝົດ ແລະ ຕັດ , . ຍະຫວ່າງ ໜ້າ/ຫຼັງ)
+        function cleanInputText(text) {
+            if (!text) return '';
+            let cleaned = text.replace(/"/g, ''); // ລຶບ " ທີ່ມັກຕິດມາຈາກ Excel/Word
+            cleaned = cleaned.replace(/^[.,\s]+|[.,\s]+$/g, ''); // ລຶບ ຍະຫວ່າງ, ຈຸດ, ຈ້ຳ ທີ່ຢູ່ໜ້າສຸດ ແລະ ຫຼັງສຸດ
+            return cleaned;
+        }
+
         function saveStrategyEntryData(presetUnit = '') {
             const selectedUnit = presetUnit !== '' ? presetUnit : document.getElementById('new-strat-unit').value;
             const subUnit = document.getElementById('new-strat-sub-unit').value; 
-            const stratIndicator = document.getElementById('new-strat-indicator').value.trim();
-            const stratTitle = document.getElementById('new-strat-title').value.trim();
-            const stratFocus = document.getElementById('new-strat-focus').value.trim();
-            const stratActivity = document.getElementById('new-strat-activity').value.trim();
+            
+            // ໃຊ້ cleanInputText() ແທນການໃຊ້ .trim() ທຳມະດາ
+            const stratIndicator = cleanInputText(document.getElementById('new-strat-indicator').value);
+            const stratTitle = cleanInputText(document.getElementById('new-strat-title').value);
+            const stratFocus = cleanInputText(document.getElementById('new-strat-focus').value);
+            const stratActivity = cleanInputText(document.getElementById('new-strat-activity').value);
             const editIndex = document.getElementById('edit-strat-index').value;
 
             if (!stratTitle) { alert('ກະລຸນາປ້ອນເນື້ອໃນແຜນຍຸດທະສາດ!'); return; }
@@ -1037,55 +1193,114 @@
             } else {
                 newStatuses[key] = targetStatus;
             }
+            // ອັບເດດສະເພາະ statuses ເພື່ອບໍ່ໃຫ້ໄຟລ໌ລິ້ງໄຫຼກັບມາລົ້ນ status_proof_store
             db.collection("app_config").doc("status_proof_store").set({
-                statuses: newStatuses,
-                proofs: globalProofsData
+                statuses: newStatuses
             }, { merge: true });
         }
 
-        function triggerProofUpload(key) { currentUploadProofTargetKey = key; document.getElementById('proof-file-input').click(); }
+        function triggerProofUpload(key) {
+            currentUploadProofTargetKey = key;
+            document.getElementById('proof-file-input').click();
+        }
 
-        function handleProofFileSelected(event) {
+        async function handleProofFileSelected(event) {
             const input = event.target;
-            if (input.files && input.files[0] && currentUploadProofTargetKey) {
-                const file = input.files[0];
-                const fileName = file.name.toLowerCase();
-                if (fileName.endsWith('.pdf') || fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || fileName.endsWith('.png')) {
-                    showCustomAlert('⚠️ ລະບົບไม่อະນຸຍາດໃຫ້ນຳໃຊ້ໄຟລ໌ PDF ຫຼື ຮູບພາບ! ກະລຸນາເລືອກສະເພາະໄຟລ໌ Word ຫຼື Excel.', false);
-                    input.value = '';
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const proofData = { fileName: file.name, fileDataUrl: e.target.result, fileType: file.type, isImage: false, isPDF: false, isDocx: file.name.toLowerCase().endsWith('.docx') };
-                    let newProofs = JSON.parse(JSON.stringify(globalProofsData));
-                    newProofs[currentUploadProofTargetKey] = proofData;
-                    db.collection("app_config").doc("status_proof_store").set({
-                        statuses: globalStatusesData,
-                        proofs: newProofs
-                    }, { merge: true }).then(() => {
-                        showCustomAlert('✅ ອັບໂຫຼດໄຟລ໌ສຳເລັດ!');
-                    });
+            if (!input.files || !input.files[0] || !currentUploadProofTargetKey) return;
+
+            const file = input.files[0];
+            const targetKey = currentUploadProofTargetKey;
+            const fileNameLower = file.name.toLowerCase();
+            input.value = '';
+
+            if (!fileNameLower.endsWith('.pdf') && !fileNameLower.endsWith('.doc') && !fileNameLower.endsWith('.docx') && !fileNameLower.endsWith('.xls') && !fileNameLower.endsWith('.xlsx')) {
+                showCustomAlert('⚠️ ກະລຸນາເລືອກສະເພາະໄຟລ໌ PDF, Word ຫຼື Excel ເທົ່ານັ້ນ!', false);
+                return;
+            }
+
+            try {
+                const unitFolder = targetKey.split('_')[0] || 'ໄຟລ໌ສະຫຼຸບຍຸດທະສາດ';
+                const uploaded = await uploadFileToGoogleDrive(file, unitFolder);
+
+                const proofData = {
+                    uniqueKey: targetKey,
+                    storageType: 'gdrive',
+                    fileName: file.name,
+                    fileSize: uploaded.fileSize,
+                    fileType: uploaded.mimeType,
+                    isPDF: fileNameLower.endsWith('.pdf'),
+                    isDocx: fileNameLower.endsWith('.docx'),
+                    driveFileId: uploaded.driveFileId,
+                    previewUrl: uploaded.previewUrl,
+                    downloadUrl: uploaded.downloadUrl,
+                    uploadedBy: currentUser ? currentUser.name : 'ADMIN',
+                    uploadedAt: new Date().toISOString()
                 };
-                reader.readAsDataURL(file);
+
+                await db.collection("proof_files").doc(safeProofDocId(targetKey)).set(proofData);
+
+                hideUploadProgress();
+                const totalMB = (file.size / (1024 * 1024)).toFixed(2);
+                showCustomAlert(`✅ ອັບໂຫຼດໄຟລ໌ "${file.name}" (${totalMB} MB) ສຳເລັດແລ້ວ!`);
+            } catch (err) {
+                hideUploadProgress();
+                console.error(err);
+                showCustomAlert('❌ ອັບໂຫຼດບໍ່ສຳເລັດ: ' + err.message, false);
             }
         }
 
         function removeProofFile(key) {
-            let newProofs = JSON.parse(JSON.stringify(globalProofsData));
-            delete newProofs[key];
-            db.collection("app_config").doc("status_proof_store").set({
-                statuses: globalStatusesData,
-                proofs: newProofs
-            }, { merge: true });
+            const proofData = globalProofsData[key];
+            showCustomConfirm('🗑️ ທ່ານຕ້ອງການລົບໄຟລ໌ສະຫຼຸບນີ້ແທ້ ຫຼື ບໍ່?', async function() {
+                try {
+                    if (proofData && proofData.storageType === 'gdrive') {
+                        await db.collection("proof_files").doc(safeProofDocId(key)).delete();
+                        deleteFileFromGoogleDrive(proofData.driveFileId);
+                    } else {
+                        let newLegacy = JSON.parse(JSON.stringify(legacyProofsData));
+                        delete newLegacy[key];
+                        await db.collection("app_config").doc("status_proof_store").set({
+                            statuses: globalStatusesData,
+                            proofs: newLegacy
+                        }, { merge: true });
+                    }
+                    showCustomAlert('🗑️ ລົບໄຟລ໌ສະຫຼຸບສຳເລັດແລ້ວ!');
+                } catch (err) {
+                    showCustomAlert('❌ ລົບໄຟລ໌ບໍ່ສຳເລັດ: ' + err.message, false);
+                }
+            });
         }
 
         function previewProofFile(key) {
             const proofData = globalProofsData[key];
-            if (proofData && proofData.fileDataUrl) {
-                const previewBody = document.getElementById('preview-body');
-                document.getElementById('preview-file-title').innerText = "🔍 ໄຟລ໌ສະບັບປັບປຸງ (ຫຍໍ້): " + proofData.fileName;
-                previewBody.innerHTML = `<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px;"><p style="margin: 0; font-weight: bold; color: #0f172a;">📝 ເນື້ອໃນໂດຍຫຍໍ້ທີ່ສຸດ:</p><p style="margin: 5px 0 0 0; color: #334155;">${proofData.fileName}</p></div>`;
+            if (!proofData) return;
+
+            const previewBody = document.getElementById('preview-body');
+            const downloadBtn = document.getElementById('download-btn-modal');
+            document.getElementById('preview-file-title').innerText = "🔍 ເບິ່ງໄຟລ໌ສະຫຼຸບ: " + proofData.fileName;
+
+            if (proofData.storageType === 'gdrive' && proofData.previewUrl) {
+                const sizeText = proofData.fileSize ? ` (${(proofData.fileSize / (1024 * 1024)).toFixed(2)} MB)` : '';
+                previewBody.innerHTML = `
+                    <div style="margin-bottom: 10px; font-size: 12px; color: #475569;">
+                        <strong>📎 ຊື່ໄຟລ໌:</strong> ${proofData.fileName}${sizeText}
+                    </div>
+                    <iframe src="${proofData.previewUrl}" style="width: 100%; height: 56vh; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff;" allow="autoplay"></iframe>
+                `;
+                downloadBtn.onclick = function() {
+                    window.open(proofData.downloadUrl, '_blank');
+                };
+                document.getElementById('file-preview-modal').style.display = 'flex';
+            } else if (proofData.fileDataUrl) {
+                previewBody.innerHTML = `<div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px;"><p style="margin: 0; font-weight: bold; color: #0f172a;">📝 ຊື່ໄຟລ໌:</p><p style="margin: 5px 0 0 0; color: #334155;">${proofData.fileName}</p></div>`;
+                downloadBtn.onclick = function() {
+                    const a = document.createElement('a');
+                    a.href = proofData.fileDataUrl;
+                    a.download = proofData.fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                };
                 document.getElementById('file-preview-modal').style.display = 'flex';
             }
         }
@@ -1120,35 +1335,38 @@
             const input = event.target;
             if (input.files && input.files[0]) {
                 const file = input.files[0];
-                const fileName = file.name.toLowerCase();
+                const fileNameLower = file.name.toLowerCase();
 
-                if (fileName.endsWith('.pdf') || fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || fileName.endsWith('.png') || fileName.endsWith('.gif')) {
-                    showCustomAlert('⚠️ ລະບົບไม่อະນຸຍາດໃຫ້ນຳເຂົ້າໄຟລ໌ PDF ຫຼື ຮູບພາບ! ກະລຸນາເລືອກສະເພາະໄຟລ໌ Word (.doc, .docx) ຫຼື Excel (.xls, .xlsx).', false);
+                if (!fileNameLower.endsWith('.pdf') && !fileNameLower.endsWith('.doc') && !fileNameLower.endsWith('.docx') && !fileNameLower.endsWith('.xls') && !fileNameLower.endsWith('.xlsx')) {
+                    showCustomAlert('⚠️ ກະລຸນາເລືອກສະເພາະໄຟລ໌ PDF, Word (.doc, .docx) ຫຼື Excel (.xls, .xlsx) ເທົ່ານັ້ນ!', false);
                     input.value = '';
                     document.getElementById('selected-filename-display').innerText = 'ຍັງບໍ່ໄດ້ເລືອກໄຟລ໌';
                     tempFileData = null;
                     return;
                 }
 
-                const reader = new FileReader();
                 document.getElementById('modal-doc-date').value = new Date(file.lastModified || Date.now()).toISOString().split('T')[0];
                 let cleanName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
                 document.getElementById('modal-doc-content').value = cleanName;
 
-                reader.onload = function(e) {
-                    tempFileData = { fileName: file.name, fileDataUrl: e.target.result, fileType: file.type, isImage: false, isPDF: false, isDocx: file.name.toLowerCase().endsWith('.docx') };
-                    document.getElementById('selected-filename-display').innerText = '📎 ' + file.name;
+                tempFileData = {
+                    rawFile: file,
+                    fileName: file.name,
+                    fileType: getMimeTypeFromFile(file),
+                    isPDF: fileNameLower.endsWith('.pdf'),
+                    isDocx: fileNameLower.endsWith('.docx')
                 };
-                reader.readAsDataURL(file);
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                document.getElementById('selected-filename-display').innerText = `📎 ${file.name} (${sizeMB} MB)`;
             }
         }
 
-        function saveDocEntry() {
-            const content = document.getElementById('modal-doc-content').value.trim();
+        async function saveDocEntry() {
+            const content = cleanInputText(document.getElementById('modal-doc-content').value);
             const docNo = document.getElementById('modal-doc-no').value.trim();
             const docDate = document.getElementById('modal-doc-date').value;
             if (!content) { alert('ກະລຸນາປ້ອນເນື້ອໃນ!'); return; }
-            if (!tempFileData) { showCustomAlert('⚠️ ກະລຸນາເລືອກໄຟລ໌ເອກະສານ (Word ຫຼື Excel) ກ່ອນ!', false); return; }
+            if (!tempFileData || !tempFileData.rawFile) { showCustomAlert('⚠️ ກະລຸນາເລືອກໄຟລ໌ເອກະສານ (PDF, Word ຫຼື Excel) ກ່ອນ!', false); return; }
 
             let existingDocs = (currentImportType === 'general') ? globalDocsGeneral : (currentImportType === 'strategy' ? globalDocsStrategy : globalDocsExecution);
             let isDuplicate = existingDocs.some(d => d.fileName === tempFileData.fileName);
@@ -1157,29 +1375,48 @@
                 return;
             }
 
-            const now = new Date();
-            const recordDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${now.toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit' })}`;
-            const docId = Date.now().toString();
+            try {
+                const subFolderName = (currentImportType === 'general') ? 'ແຜນວຽກທົ່ວໄປ' : (currentImportType === 'strategy' ? 'ແຜນຍຸດທະສາດ_ວຽກຈຸດສຸມ' : 'ຜົນການປະຕິບັດ');
+                const uploaded = await uploadFileToGoogleDrive(tempFileData.rawFile, subFolderName);
 
-            const newDoc = {
-                id: docId, content, docNo: docNo || '-', docDate: docDate || '-',
-                fileName: tempFileData.fileName,
-                fileDataUrl: tempFileData.fileDataUrl,
-                fileType: tempFileData.fileType,
-                isImage: false,
-                isPDF: false,
-                isDocx: tempFileData.isDocx,
-                recordDate, owner: currentUser ? currentUser.username : 'EDUXYBL', ownerName: currentUser ? currentUser.name : 'ADMIN'
-            };
+                const now = new Date();
+                const recordDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${now.toLocaleTimeString('lo-LA', { hour: '2-digit', minute: '2-digit' })}`;
+                const docId = Date.now().toString();
 
-            db.collection(currentImportType === 'general' ? 'docs_general' : (currentImportType === 'strategy' ? 'docs_strategy' : 'docs_execution'))
-                .doc(docId).set(newDoc)
-                .then(() => {
-                    closeDocModal();
-                    showCustomAlert('✅ ບັນທຶກສຳເລັດ!');
-                    if (currentImportType === 'execution') showExecutionTable();
-                    else showDocListTable(currentImportType);
-                });
+                const newDoc = {
+                    id: docId,
+                    content,
+                    docNo: docNo || '-',
+                    docDate: docDate || '-',
+                    storageType: 'gdrive',
+                    driveFileId: uploaded.driveFileId,
+                    previewUrl: uploaded.previewUrl,
+                    downloadUrl: uploaded.downloadUrl,
+                    fileSize: uploaded.fileSize,
+                    fileName: tempFileData.fileName,
+                    fileDataUrl: uploaded.previewUrl,
+                    fileType: uploaded.mimeType,
+                    isImage: false,
+                    isPDF: tempFileData.isPDF,
+                    isDocx: tempFileData.isDocx,
+                    recordDate,
+                    owner: currentUser ? currentUser.username : 'EDUXYBL',
+                    ownerName: currentUser ? currentUser.name : 'ADMIN'
+                };
+
+                const colName = currentImportType === 'general' ? 'docs_general' : (currentImportType === 'strategy' ? 'docs_strategy' : 'docs_execution');
+                await db.collection(colName).doc(docId).set(newDoc);
+
+                hideUploadProgress();
+                closeDocModal();
+                showCustomAlert('✅ ອັບໂຫຼດ ແລະ ບັນທຶກເອກະສານສຳເລັດ!');
+                if (currentImportType === 'execution') showExecutionTable();
+                else showDocListTable(currentImportType);
+            } catch (err) {
+                hideUploadProgress();
+                console.error(err);
+                showCustomAlert('❌ ບັນທຶກບໍ່ສຳເລັດ: ' + err.message, false);
+            }
         }
 
         function showGeneralShortSummary(updateViewType = true) {
@@ -1332,9 +1569,16 @@
                 showCustomAlert('⚠️ ສະເພາະ ADMIN ເທົ່ານັ້ນ ທີ່ມີສິດລົບເອກະສານ!', false);
                 return;
             }
+            const docsList = (type === 'general') ? globalDocsGeneral : (type === 'strategy' ? globalDocsStrategy : globalDocsExecution);
+            const targetDoc = docsList.find(d => String(d.id) === String(id));
+            const colName = (type === 'general') ? 'docs_general' : (type === 'strategy' ? 'docs_strategy' : 'docs_execution');
+
             showCustomConfirm('🗑️ ທ່ານຕ້ອງການລົບເອກະສານນີ້ອອກຈາກລະບົບແທ້ ຫຼື ບໍ່?', function() {
-                db.collection(type === 'general' ? 'docs_general' : 'docs_strategy').doc(String(id)).delete()
+                db.collection(colName).doc(String(id)).delete()
                     .then(() => {
+                        if (targetDoc && targetDoc.driveFileId) {
+                            deleteFileFromGoogleDrive(targetDoc.driveFileId);
+                        }
                         showCustomAlert('🗑️ ລົບເອກະສານສຳເລັດ!');
                     });
             });
@@ -1454,52 +1698,66 @@
         function openFilePreviewModal(id, type) {
             let docsList = (type === 'general') ? globalDocsGeneral : (type === 'strategy' ? globalDocsStrategy : globalDocsExecution);
             const doc = docsList.find(d => String(d.id) === String(id));
-            if (doc && doc.fileDataUrl) {
+            if (doc && (doc.previewUrl || doc.fileDataUrl)) {
                 const previewBody = document.getElementById('preview-body');
                 const downloadBtn = document.getElementById('download-btn-modal');
                 
-                document.getElementById('preview-file-title').innerText = "🔍 ໄຟລ໌ສະບັບປັບປຸງ (ຫຍໍ້): " + doc.fileName;
+                document.getElementById('preview-file-title').innerText = "🔍 ເບິ່ງເອກະສານ: " + doc.fileName;
 
-                previewBody.innerHTML = `
-                    <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px; margin-bottom: 15px;">
-                        <p style="margin: 0 0 8px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📝 ເນື້ອໃນໂດຍຫຍໍ້ທີ່ສຸດ:</p>
-                        <p style="margin: 0; color: #334155; font-size: 14px; line-height: 1.6;">${doc.content}</p>
-                        <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 12px 0;">
-                        <p style="margin: 0; font-size: 12px; color: #64748b;"><strong>ເລກທີເອກະສານ:</strong> ${doc.docNo} | <strong>ວັນທີ:</strong> ${formatDateDDMMYYYY(doc.docDate)} | <strong>ຊື່ໄຟລ໌ຕົ້ນສະບັບ:</strong> ${doc.fileName}</p>
-                    </div>
-                    <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px;">
-                        <p style="margin: 0 0 10px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📄 ລາຍລະອຽດເນື້ອໃນບົດຄວາມທັງໝົດ:</p>
-                        <div id="word-parsed-content" style="background: #f8fafc; border-left: 4px solid #2563eb; padding: 15px; border-radius: 4px; color: #1e293b; font-size: 14px; line-height: 1.8;">
-                            ${doc.content}
+                if (doc.storageType === 'gdrive' && doc.previewUrl) {
+                    const sizeText = doc.fileSize ? ` | <strong>ຂະໜາດ:</strong> ${(doc.fileSize / (1024 * 1024)).toFixed(2)} MB` : '';
+                    previewBody.innerHTML = `
+                        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px 16px; margin-bottom: 12px;">
+                            <p style="margin: 0 0 6px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📝 ${doc.content}</p>
+                            <p style="margin: 0; font-size: 12px; color: #64748b;"><strong>ເລກທີ:</strong> ${doc.docNo} | <strong>ວັນທີ:</strong> ${formatDateDDMMYYYY(doc.docDate)}${sizeText}</p>
                         </div>
-                    </div>
-                `;
+                        <iframe src="${doc.previewUrl}" style="width: 100%; height: 52vh; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff;" allow="autoplay"></iframe>
+                    `;
+                    downloadBtn.onclick = function() {
+                        window.open(doc.downloadUrl, '_blank');
+                    };
+                } else {
+                    previewBody.innerHTML = `
+                        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px; margin-bottom: 15px;">
+                            <p style="margin: 0 0 8px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📝 ເນື້ອໃນໂດຍຫຍໍ້ທີ່ສຸດ:</p>
+                            <p style="margin: 0; color: #334155; font-size: 14px; line-height: 1.6;">${doc.content}</p>
+                            <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 12px 0;">
+                            <p style="margin: 0; font-size: 12px; color: #64748b;"><strong>ເລກທີເອກະສານ:</strong> ${doc.docNo} | <strong>ວັນທີ:</strong> ${formatDateDDMMYYYY(doc.docDate)} | <strong>ຊື່ໄຟລ໌ຕົ້ນສະບັບ:</strong> ${doc.fileName}</p>
+                        </div>
+                        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 20px;">
+                            <p style="margin: 0 0 10px 0; font-weight: bold; color: #0f172a; font-size: 14px;">📄 ລາຍລະອຽດເນື້ອໃນບົດຄວາມທັງໝົດ:</p>
+                            <div id="word-parsed-content" style="background: #f8fafc; border-left: 4px solid #2563eb; padding: 15px; border-radius: 4px; color: #1e293b; font-size: 14px; line-height: 1.8;">
+                                ${doc.content}
+                            </div>
+                        </div>
+                    `;
 
-                if (doc.isDocx) {
-                    try {
-                        const base64Data = doc.fileDataUrl.split(',')[1];
-                        const binaryString = window.atob(base64Data);
-                        const len = binaryString.length;
-                        const bytes = new Uint8Array(len);
-                        for (let i = 0; i < len; i++) {
-                            bytes[i] = binaryString.charCodeAt(i);
-                        }
-                        mammoth.convertToHtml({ arrayBuffer: bytes.buffer })
-                            .then(function(result) {
-                                document.getElementById('word-parsed-content').innerHTML = result.value;
-                            })
-                            .catch(function() {});
-                    } catch(e) {}
+                    if (doc.isDocx) {
+                        try {
+                            const base64Data = doc.fileDataUrl.split(',')[1];
+                            const binaryString = window.atob(base64Data);
+                            const len = binaryString.length;
+                            const bytes = new Uint8Array(len);
+                            for (let i = 0; i < len; i++) {
+                                bytes[i] = binaryString.charCodeAt(i);
+                            }
+                            mammoth.convertToHtml({ arrayBuffer: bytes.buffer })
+                                .then(function(result) {
+                                    document.getElementById('word-parsed-content').innerHTML = result.value;
+                                })
+                                .catch(function() {});
+                        } catch(e) {}
+                    }
+
+                    downloadBtn.onclick = function() {
+                        const a = document.createElement('a');
+                        a.href = doc.fileDataUrl;
+                        a.download = doc.fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    };
                 }
-
-                downloadBtn.onclick = function() {
-                    const a = document.createElement('a');
-                    a.href = doc.fileDataUrl;
-                    a.download = doc.fileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                };
 
                 document.getElementById('file-preview-modal').style.display = 'flex';
             }
