@@ -1186,17 +1186,29 @@
 
         function toggleStatusCheck(event, key, targetStatus, unitName) {
             event.preventDefault();
-            let currentStatus = globalStatusesData[key] || '';
-            let newStatuses = JSON.parse(JSON.stringify(globalStatusesData));
-            if (currentStatus === targetStatus) {
-                delete newStatuses[key];
+            event.stopPropagation();
+
+            const currentStatus = globalStatusesData[key] || '';
+            const isUnchecking = (currentStatus === targetStatus);
+
+            // 1. ອັບເດດສະຖານະໜ້າຈໍທັນທີ (ກົດບາດ 1 = ຕິກ, ກົດບາດ 2 = ຍົກເລີກຕິກ)
+            if (isUnchecking) {
+                delete globalStatusesData[key];
             } else {
-                newStatuses[key] = targetStatus;
+                globalStatusesData[key] = targetStatus;
             }
-            // ອັບເດດສະເພາະ statuses ເພື່ອບໍ່ໃຫ້ໄຟລ໌ລິ້ງໄຫຼກັບມາລົ້ນ status_proof_store
+            refreshCurrentView();
+
+            // 2. ບັນທຶກ ຫຼື ລຶບສະເພາະຂໍ້ນີ້ໃນ Firestore ດ້ວຍ FieldValue.delete()
+            const statusUpdate = {};
+            statusUpdate[key] = isUnchecking ? firebase.firestore.FieldValue.delete() : targetStatus;
+
             db.collection("app_config").doc("status_proof_store").set({
-                statuses: newStatuses
-            }, { merge: true });
+                statuses: statusUpdate
+            }, { merge: true }).catch((err) => {
+                console.error(err);
+                showCustomAlert('❌ ບໍ່ສາມາດບັນທຶກສະຖານະໄດ້: ' + err.message, false);
+            });
         }
 
         function triggerProofUpload(key) {
